@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import re
 import six
+from functools32 import partial
 
 from django.utils import timezone
 from rest_framework import serializers
@@ -15,6 +16,7 @@ from sentry.utils.dates import (
 from sentry.api.serializers.rest_framework import ListField
 from sentry.api.bases.organization import OrganizationPermission
 from sentry.api.bases import OrganizationEndpoint
+from sentry.api.paginator import SnubaOffsetPaginator
 from sentry.models import Project, ProjectStatus, OrganizationMember, OrganizationMemberTeam
 from sentry.utils import snuba
 from sentry import roles
@@ -172,9 +174,10 @@ class DiscoverQuerySerializer(serializers.Serializer):
 class OrganizationDiscoverQueryEndpoint(OrganizationEndpoint):
     permission_classes = (OrganizationDiscoverQueryPermission, )
 
-    def do_query(self, start, end, groupby, **kwargs):
+    def do_query(self, start, end, groupby, request, **kwargs):
 
-        snuba_results = snuba.raw_query(
+        data_fn = partial(
+            snuba.raw_query,
             start=start,
             end=end,
             groupby=groupby,
@@ -182,7 +185,11 @@ class OrganizationDiscoverQueryEndpoint(OrganizationEndpoint):
             **kwargs
         )
 
-        return snuba_results
+        return self.paginate(
+            request=request,
+            on_results=lambda results:results,
+            paginator=SnubaOffsetPaginator(data_fn=data_fn)
+        )
 
     def post(self, request, organization):
 
@@ -211,7 +218,7 @@ class OrganizationDiscoverQueryEndpoint(OrganizationEndpoint):
                 if field not in groupby:
                     groupby.append(field)
 
-        results = self.do_query(
+        return self.do_query(
             serialized.get('start'),
             serialized.get('end'),
             groupby=groupby,
@@ -223,6 +230,5 @@ class OrganizationDiscoverQueryEndpoint(OrganizationEndpoint):
             rollup=serialized.get('rollup'),
             filter_keys={'project_id': serialized.get('projects')},
             arrayjoin=serialized.get('arrayjoin'),
+            request=request,
         )
-
-        return Response(results, status=200)
