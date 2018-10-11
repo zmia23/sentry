@@ -185,8 +185,10 @@ export default function createQueryBuilder(initial = {}, organization) {
       return Promise.reject(new Error('Start date cannot be after end date'));
     }
 
+    const perPage = data.limit || 1000;
+
     return api
-      .requestPromise(endpoint, {
+      .requestPromise(`${endpoint}?per_page=${perPage}&cursor=0:4:0`, {
         method: 'POST',
         data,
       })

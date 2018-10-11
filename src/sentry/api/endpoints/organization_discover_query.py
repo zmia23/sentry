@@ -176,19 +176,21 @@ class OrganizationDiscoverQueryEndpoint(OrganizationEndpoint):
 
     def do_query(self, start, end, groupby, request, **kwargs):
 
-        data_fn = partial(
-            snuba.raw_query,
-            start=start,
-            end=end,
-            groupby=groupby,
-            referrer='discover',
-            **kwargs
-        )
+        def data_fn(limit, offset):
+            kwargs['limit'] = limit
+            kwargs['offset'] = offset
+            return snuba.raw_query(
+                start=start,
+                end=end,
+                groupby=groupby,
+                referrer='discover',
+                **kwargs)
 
         return self.paginate(
             request=request,
-            on_results=lambda results:results,
-            paginator=SnubaOffsetPaginator(data_fn=data_fn)
+            on_results=lambda results: results,
+            paginator=SnubaOffsetPaginator(data_fn=data_fn),
+            default_per_page=kwargs['limit']
         )
 
     def post(self, request, organization):

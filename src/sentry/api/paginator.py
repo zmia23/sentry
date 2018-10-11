@@ -354,9 +354,21 @@ class SnubaOffsetPaginator(object):
         offset = cursor.offset if cursor is not None else 0
         # Request 1 more than limit so we can tell if there is another page
         data = self.data_fn(offset=offset, limit=limit + 1)
-        has_more = (len(data) == limit + 1)
+
+        if isinstance(data, list):
+            has_more = (len(data) == limit + 1)
+        elif data.get('data'):
+            has_more = (len(data['data']) == limit + 1)
+
         if has_more:
-            data.pop()
+            if isinstance(data, list):
+                data.pop()
+            elif data.get('data'):
+                data['data'].pop()
+
+        # has_more = (len(data) == limit + 1)
+        # if has_more:
+        #     data.pop()
 
         # Since we are not issuing ranged queries, our cursors always have
         # `value=0` (ie. all rows have the same value), and so offset naturally
