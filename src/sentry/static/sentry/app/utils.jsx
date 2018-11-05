@@ -236,6 +236,27 @@ export function descopeFeatureName(feature) {
     : feature.match(/(?:^(?:projects|organizations):)?(.*)/).pop();
 }
 
+/**
+ * This parses our period shorthand strings (e.g. <int><unit>)
+ * and converts it into hours
+ */
+export function parsePeriodToHours(str) {
+  const [, periodNumber, periodLength] = str.match(/([0-9]+)([mhdw])/);
+
+  switch (periodLength) {
+    case 'm':
+      return periodNumber / 60;
+    case 'h':
+      return periodNumber;
+    case 'd':
+      return periodNumber * 24;
+    case 'w':
+      return periodLength * 24 * 7;
+    default:
+      return -1;
+  }
+}
+
 // re-export under utils
 export {parseLinkHeader, Collection, PendingChangeQueue, CursorPoller};
 
