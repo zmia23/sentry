@@ -67,6 +67,8 @@ class OrganizationEventsContainer extends React.Component {
 
     this.actions = {
       updateParams: this.updateParams,
+      changePeriod: this.handleChangeTime,
+      updatePeriod: this.handleUpdatePeriod,
     };
 
     this.state = OrganizationEventsContainer.getInitialStateFromRouter(props);

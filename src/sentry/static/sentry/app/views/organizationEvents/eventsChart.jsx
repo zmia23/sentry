@@ -5,10 +5,8 @@ import moment from 'moment';
 import {HealthRequestWithParams} from 'app/views/organizationHealth/util/healthRequest';
 import {t} from 'app/locale';
 import AreaChart from 'app/components/charts/areaChart';
-import DataZoom from 'app/components/charts/components/dataZoom';
 import EventsContext from 'app/views/organizationEvents/eventsContext';
 import SentryTypes from 'app/sentryTypes';
-import ToolBox from 'app/components/charts/components/toolBox';
 import withApi from 'app/utils/withApi';
 
 class EventsChart extends React.Component {
@@ -16,6 +14,14 @@ class EventsChart extends React.Component {
     organization: SentryTypes.Organization,
     actions: PropTypes.object,
     period: PropTypes.string,
+    /**
+     * Absolute start date for query
+     */
+    start: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+    /**
+     * Absolute end date for query
+     */
+    end: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
   };
 
   constructor(props) {
@@ -61,19 +67,27 @@ class EventsChart extends React.Component {
       .subtract(1, 'second')
       .format(moment.HTML5_FMT.DATETIME_LOCAL_MS);
 
-    this.props.actions.updateParams({
-      statsPeriod: null,
+    this.props.actions.changePeriod({
+      relative: null,
       start,
       end,
     });
+    this.props.actions.updatePeriod();
+  };
+
+  useHourlyInterval = () => {
+    const {period, start, end} = this.props;
+    return (
+      (typeof period === 'string' && period.endsWith('h')) ||
+      period === '1d' ||
+      (start && end && moment.duration(moment(end).diff(start)).asHours() <= 48)
+    );
   };
 
   render() {
-    const {period} = this.props;
-
     let interval = '1d';
     let xAxisOptions = {};
-    if ((typeof period === 'string' && period.endsWith('h')) || period === '1d') {
+    if (this.useHourlyInterval()) {
       interval = '1h';
       xAxisOptions.axisLabel = {
         formatter: value =>
@@ -105,14 +119,6 @@ class EventsChart extends React.Component {
                 right: '18px',
               }}
               xAxis={xAxisOptions}
-              dataZoom={DataZoom()}
-              toolBox={ToolBox(
-                {},
-                {
-                  dataZoom: {},
-                  restore: {},
-                }
-              )}
               onEvents={{
                 datazoom: this.handleDataZoom,
                 click: this.handleChartClick,
