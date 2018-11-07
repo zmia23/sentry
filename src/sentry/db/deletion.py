@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 import itertools
-from uuid import uuid4
 
 from datetime import timedelta
 from django.db import connections, router
@@ -121,7 +120,7 @@ class BulkDeleteQuery(object):
         for chunk in g:
             yield chunk
 
-    def iterator_postgres(self, chunk_size, batch_size=1000000):
+    def iterator_postgres(self, chunk_size, batch_size=10000):
         assert self.days is not None
         assert self.dtfield is not None and self.dtfield == self.order_by
 
@@ -138,10 +137,7 @@ class BulkDeleteQuery(object):
 
             completed = False
             while not completed:
-                # We explicitly use a named cursor here so that we can read a
-                # large quantity of rows from postgres incrementally, without
-                # having to pull all rows into memory at once.
-                with conn.cursor(uuid4().hex) as cursor:
+                with conn.cursor() as cursor:
                     where = [(
                         u"{} < %s".format(quote_name(self.dtfield)),
                         [cutoff],
