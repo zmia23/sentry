@@ -19,6 +19,7 @@ class dontexplodedict(object):
 
 
 class EventError(object):
+    GENERAL = 'general'
     INVALID_DATA = 'invalid_data'
     INVALID_ATTRIBUTE = 'invalid_attribute'
     MISSING_ATTRIBUTE = 'missing_attribute'
@@ -59,6 +60,7 @@ class EventError(object):
     PROGUARD_MISSING_LINENO = 'proguard_missing_lineno'
 
     _messages = {
+        GENERAL: u'Discarded \'{name}\': {message}',
         INVALID_DATA: u'Discarded invalid value for parameter \'{name}\'',
         INVALID_ATTRIBUTE: u'Discarded invalid parameter \'{name}\'',
         MISSING_ATTRIBUTE: u'Missing value for required parameter \'{name}\'',
@@ -104,11 +106,27 @@ class EventError(object):
 
     @classmethod
     def get_message(cls, data):
+        return cls(data).message
+
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def type(self):
+        return self.data['type']
+
+    @property
+    def message(self):
         return Formatter().vformat(
-            cls._messages[data['type']],
+            self._messages[self.data['type']],
             [],
-            dontexplodedict(data),
+            dontexplodedict(self.data),
         )
 
     def to_dict(self):
-        return {k: v for k, v in six.iteritems(self) if k != 'type'}
+        if self.data['type'] == EventError.GENERAL:
+            ignored = ('type', 'name' 'message')
+        else:
+            ignored = ('type',)
+
+        return {k: v for k, v in six.iteritems(self.data) if k not in ignored}
