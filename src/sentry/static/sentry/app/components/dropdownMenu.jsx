@@ -213,11 +213,15 @@ class DropdownMenu extends React.Component {
     }
   };
 
-  handleActorMount = ref => {
+  handleActorMount = (onActorMount, ref) => {
     if (ref && !(ref instanceof HTMLElement)) {
       return;
     }
     this.dropdownActor = ref;
+
+    if (onActorMount) {
+      onActorMount(ref);
+    }
   };
 
   handleToggle = e => {
@@ -240,15 +244,18 @@ class DropdownMenu extends React.Component {
   getRootProps = props => props;
 
   // Actor is the component that will open the dropdown menu
-  getActorProps = ({
-    onClick,
-    onMouseEnter,
-    onMouseLeave,
-    onKeyDown,
-    isStyled,
-    style,
-    ...props
-  } = {}) => {
+  getActorProps = (
+    {
+      onActorMount,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+      onKeyDown,
+      isStyled,
+      style,
+      ...props
+    } = {}
+  ) => {
     const {isNestedDropdown, closeOnEscape} = this.props;
 
     // Props that the actor needs to have <DropdownMenu> work
@@ -256,12 +263,12 @@ class DropdownMenu extends React.Component {
     // `isStyled`: with styled-components we need to pass `innerRef` to get DOM el's ref vs `ref` otherwise
     return {
       ...props,
-      ...((isStyled && {innerRef: this.handleActorMount}) || {}),
+      ...((isStyled && {innerRef: this.handleActorMount.bind(this, onActorMount)}) || {}),
       style: {
         ...(style || {}),
         outline: 'none',
       },
-      ref: !isStyled ? this.handleActorMount : undefined,
+      ref: !isStyled ? this.handleActorMount.bind(this, onActorMount) : undefined,
       tabIndex: -1,
       onKeyDown: e => {
         if (typeof onKeyDown === 'function') {
