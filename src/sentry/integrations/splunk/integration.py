@@ -16,6 +16,8 @@ from sentry.pipeline import PipelineView
 from sentry.utils.hashlib import sha1_text
 from sentry.web.helpers import render_to_response
 
+from .processor import SplunkEventProcessor
+
 DESCRIPTION = """
 Connect your Sentry organization to Splunk, enabling the following features:
 """
@@ -186,10 +188,10 @@ class SplunkIntegrationProvider(IntegrationProvider):
 
         return integration
 
-    # def setup(self):
-    #     from sentry.plugins import bindings
-    #     bindings.add(
-    #         'integration-repository.provider',
-    #         GitlabRepositoryProvider,
-    #         id='integrations:gitlab',
-    #     )
+    def setup(self):
+        from sentry.plugins import bindings
+        bindings.add(
+            'event.processor',
+            SplunkEventProcessor,
+            id=self.key,
+        )

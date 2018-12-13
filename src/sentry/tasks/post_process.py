@@ -134,6 +134,28 @@ def post_process_group(event, is_new, is_regression, is_sample, is_new_group_env
                             event=event,
                         )
 
+        from sentry.constants import ObjectStatus
+        from sentry.models import Integration
+        from sentry.plugins import bindings
+        processors = bindings.get('event.processor')
+        for binding_id in processors:
+            # find any active event processors
+            integrations = Integration.objects.filter(
+                organizationintegration__organization=event.project.organization_id,
+                organizationintegration__status=ObjectStatus.ACTIVE,
+                status=ObjectStatus.ACTIVE,
+                provider=binding_id,
+            )
+            for integration in integrations:
+                processor = processors.get(binding_id)(id=binding_id)
+                processor.process_event(
+                    # config=config,
+                    event=event,
+                    is_new=is_new,
+                    is_regression=is_regression,
+                    is_sample=is_sample,
+                )
+
         for plugin in plugins.for_project(event.project):
             plugin_post_process_group(
                 plugin_slug=plugin.slug,

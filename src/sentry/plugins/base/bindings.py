@@ -37,10 +37,15 @@ class IntegrationRepositoryProviderManager(ProviderManager):
     type = providers.IntegrationRepositoryProvider
 
 
+class EventProcessorManager(ProviderManager):
+    type = providers.EventProcessor
+
+
 class BindingManager(object):
     BINDINGS = {
         'repository.provider': RepositoryProviderManager,
-        'integration-repository.provider': IntegrationRepositoryProviderManager
+        'integration-repository.provider': IntegrationRepositoryProviderManager,
+        'event.processor': EventProcessorManager,
     }
 
     def __init__(self):
