@@ -7,7 +7,7 @@ const eventsQuery = {
   aggregations: [['count()', null, 'count']],
   limit: 1000,
 
-  orderby: 'time',
+  orderby: '-time',
   groupby: ['time'],
   rollup: 86400,
 };

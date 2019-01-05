@@ -348,20 +348,14 @@ def transform_aliases_and_query(**kwargs):
                 result['data'],
                 kwargs['start'],
                 kwargs['end'],
-<< << << < HEAD
                 kwargs['rollup'],
                 kwargs['orderby'],
             )
 
-
-== == == =
-                kwargs['rollup'])
->> >>>> > wip dashboard
-
     return result
 
 
-def raw_query(start, end, groupby = None, conditions = None, filter_keys = None,
+def raw_query(start, end, groupby=None, conditions=None, filter_keys=None,
               aggregations=None, rollup=None, arrayjoin=None, limit=None, offset=None,
               orderby=None, having=None, referrer=None, is_grouprelease=False,
               selected_columns=None, totals=None, limitby=None, turbo=False):
