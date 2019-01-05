@@ -231,7 +231,7 @@ class OrganizationDiscoverQueryTest(APITestCase, SnubaTestCase):
             })
         assert response.status_code == 200, response.content
         assert len(response.data['data']) == 7
-        assert(response.data['data'][6]['time']) == 'bar'
+        assert response.data['data'][5]['time'] < response.data['data'][6]['time']
         assert(response.data['data'][6]['project.name']) == 'bar'
         assert(response.data['data'][6]['count']) == 1
 
@@ -250,7 +250,7 @@ class OrganizationDiscoverQueryTest(APITestCase, SnubaTestCase):
             })
         assert response.status_code == 200, response.content
         assert len(response.data['data']) == 7
-        assert(response.data['data'][6]['time']) == 'bar'
+        assert response.data['data'][5]['time'] > response.data['data'][6]['time']
         assert(response.data['data'][6]['project.name']) == 'bar'
         assert(response.data['data'][6]['count']) == 1
 
