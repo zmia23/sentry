@@ -10,8 +10,9 @@
 .tipsy-inner {
   background-color: #000;
   color: #fff;
-  max-width: 200px;
-  padding: 5px 8px 4px 8px;
+  min-width: 200px;
+  max-width: 400px;
+  padding: 10px 10px 10px 20px;
   text-align: center;
 }
 

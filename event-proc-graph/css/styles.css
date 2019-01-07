@@ -30,10 +30,6 @@ svg {
   margin: 0 auto;
 }
 
-pre {
-  border: 1px solid #ccc;
-}
-
 text {
   font-weight: 300;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
@@ -61,11 +57,19 @@ text {
   font-weight: bold;
   color: #60b1fc;
   margin: 0;
+  margin-bottom: 10px;
 }
 
 /* This styles the body of the tooltip */
 .tipsy .description {
   font-size: 1.2em;
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.tipsy .description a {
+  color: cyan;
+  text-decoration: none;
 }
 
 /* Components */
@@ -93,5 +97,6 @@ text {
 /* Edges */
 
 .main-flow path {
-  stroke-width: 3px;
+  stroke: brown;
+  stroke-width: 2px;
 }

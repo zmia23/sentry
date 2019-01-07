@@ -2,12 +2,20 @@
 const states = {
   "outer-space": {
     label: "Internet",
-    description: "Clients",
+    description: "Clients that use Sentry SDKs",
     styles: ["comp-outer"]
   },
   "web-worker": {
     label: "Web worker (uwsgi)",
-    description: "web worker",
+    description: `
+    Processes requests <i>synchronously</i>.
+    Does some basic event checks and discards garbage.
+    Returns the event ID.<br><br>
+      Sources:
+      <ul>
+      <li><a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/web/api.py#L465">StoreView class</a></li>
+      <li><a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/web/api.py#L532">Main processing function</a></li>
+      </ul>`,
     styles: ["comp-uwsgi", "comp-sync"]
   },
   "task-preprocess-event": {
@@ -42,27 +50,61 @@ const edges = [
     to: "web-worker",
     options: {
       label: "Raw event data",
-      description: "test desc"
+      description: `
+        Example: <br>
+        <pre>{bla}</pre>
+      `,
+      styles: ["main-flow"]
     }
   },
   {
     from: "web-worker",
     to: "task-preprocess-event",
     options: {
-      style: "fill: none; stroke-width: 3px"
+      label: "Start task",
+      description: `
+        Source:
+        <a href="https://github.com/getsentry/sentry/blob/824c03089907ad22a9282303a5eaca33989ce481/src/sentry/coreapi.py#L182">Scheduling "preprocess_event"</a>
+      `,
+      styles: ["main-flow"]
     }
   },
   {
     from: "task-preprocess-event",
     to: "task-process-event",
-    options: { styles: ["main-flow"] }
+    options: {
+      label: "    Start task",
+      description: `
+        Source:
+        <a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/tasks/store.py#L78">Scheduling "process_event"</a>
+      `,
+      styles: ["main-flow"]
+    }
   },
-  { from: "task-process-event", to: "task-save-event" },
+  {
+    from: "task-process-event",
+    to: "task-save-event",
+    options: {
+      label: "   Start task",
+      description: `
+        Source:
+        <a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/tasks/store.py#L193">Scheduling "save_event"</a>
+      `,
+      styles: ["main-flow"]
+    }
+  },
   { from: "web-worker", to: "redis-buffers" },
   { from: "redis-buffers", to: "task-preprocess-event" },
   { from: "redis-buffers", to: "task-process-event" },
   { from: "redis-buffers", to: "task-save-event" },
-  { from: "task-save-event", to: "database-postgres" },
+  {
+    from: "task-save-event",
+    to: "database-postgres",
+    options: {
+      label: "    Save to DB",
+      description: `Source: <a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/event_manager.py#L1112">Saving to database</a>`
+    }
+  },
   { from: "task-save-event", to: "kafka-eventstream" }
 ];
 
@@ -74,7 +116,7 @@ function setEdge(g, fromNode, toNode, options) {
 
 function prepareElements(g) {
   // Add states to the graph, set labels, and style
-  Object.keys(states).forEach(function(state) {
+  Object.keys(states).forEach(function (state) {
     const value = states[state];
     // value.label = state;
     value.rx = value.ry = 5;
@@ -84,7 +126,7 @@ function prepareElements(g) {
     g.setNode(state, value);
   });
 
-  edges.forEach(function(edgeParams) {
+  edges.forEach(function (edgeParams) {
     const options = { ...edgeParams.options };
     if (options.styles && options.styles.length > 0) {
       options.class = options.styles.join(" ");
@@ -95,13 +137,13 @@ function prepareElements(g) {
 
 function addTooltips(inner, g) {
   // Simple function to style the tooltip for the given node.
-  const styleTooltip = function(name, description) {
+  const styleTooltip = (name, description) => {
+    console.log(description);
     return (
-      "<p class='name'>" +
-      name +
-      "</p><p class='description'>" +
-      description +
-      "</p>"
+      `
+      <div class="name">${name}</div>
+      <div class="description">${description}</div>
+      `
     );
   };
 
@@ -115,20 +157,22 @@ function addTooltips(inner, g) {
   // Add tooltips for nodes
   inner
     .selectAll("g.node")
-    .attr("title", function(v) {
-      return styleTooltip(v, g.node(v).description);
+    .attr("title", (v) => {
+      const node = g.node(v);
+      return styleTooltip(node.label.trim(), node.description);
     })
-    .each(function(v) {
+    .each(function (v) {
       $(this).tipsy(tooltipOptions);
     });
 
   // Add tooltips for edges
   inner
     .selectAll("g.edgeLabel")
-    .attr("title", function(v) {
-      return styleTooltip("edge-name", g.edge(v).description || "");
+    .attr("title", (v) => {
+      const edge = g.edge(v);
+      return styleTooltip(edge.label.trim(), edge.description || "");
     })
-    .each(function(v) {
+    .each((v) => {
       $(this).tipsy(tooltipOptions);
     });
 }
@@ -147,7 +191,7 @@ function initGraph() {
   const inner = svg.append("g");
 
   // Set up zoom support
-  const zoom = d3.zoom().on("zoom", function() {
+  const zoom = d3.zoom().on("zoom", () => {
     inner.attr("transform", d3.event.transform);
   });
   svg.call(zoom);
