@@ -8,22 +8,38 @@ const states = {
   "web-worker": {
     label: "Web worker (uwsgi)",
     description: `
-    Processes requests <i>synchronously</i>.
-    Does some basic event checks and discards garbage.
+    Processes requests <i>synchronously</i>, i.e. without waiting for background tasks to finish.
+    Does some basic event checks, discards garbage data, and performs event normalization.
     Returns the event ID.<br><br>
       Sources:
       <ul>
       <li><a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/web/api.py#L465">StoreView class</a></li>
       <li><a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/web/api.py#L532">Main processing function</a></li>
+      <li><a href="https://github.com/getsentry/sentry/blob/master/src/sentry/event_manager.py#L443">Normalization in EventManager</a></li>
       </ul>`,
     styles: ["comp-uwsgi", "comp-sync"]
   },
   "task-preprocess-event": {
     label: "Task: preprocess event",
+    description: `
+      ??? TODO <br><br>
+        Source:
+        <a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/tasks/store.py#L97">preprocess_event</a>
+    `,
     styles: ["comp-celery-task"]
   },
   "task-process-event": {
     label: "Task: process event",
+    description: `
+      Here's what happens on this stage:
+      stacktrace processing, plugin preprocessors (e.g. for
+        <a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/lang/javascript/plugin.py#L51">
+          javascript
+        </a> we try to translate the error message)
+      <br><br>
+      Source:
+      <a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/tasks/store.py#L205">process_event</a>
+  `,
     styles: ["comp-celery-task"]
   },
   "task-save-event": {
@@ -32,6 +48,10 @@ const states = {
   },
   "redis-buffers": {
     label: "Redis (buffers)",
+    description: `
+      This cache is used to pass data between event processing stages. <br>
+      It is powered by <a href="https://github.com/getsentry/rb">RB</a> (Redis Blaster), and is not Highly Available.
+    `,
     styles: ["comp-redis"]
   },
   "database-postgres": {
@@ -52,7 +72,10 @@ const edges = [
       label: "Raw event data",
       description: `
         Example: <br>
-        <pre>{bla}</pre>
+        <pre>{"exception":{"values":[{"stacktrace":{"frames":
+[{"colno":"12","filename":"http://test.com/f.js",
+"function":"?","in_app":true,"lineno":13}]},"type":
+"SyntaxError","value":"Use of const in strict mode." ...</pre>
       `,
       styles: ["main-flow"]
     }
@@ -93,10 +116,33 @@ const edges = [
       styles: ["main-flow"]
     }
   },
-  { from: "web-worker", to: "redis-buffers" },
-  { from: "redis-buffers", to: "task-preprocess-event" },
-  { from: "redis-buffers", to: "task-process-event" },
-  { from: "redis-buffers", to: "task-save-event" },
+  {
+    from: "web-worker",
+    to: "redis-buffers",
+    options: {
+      label: "Caching event data",
+      description: `
+        Source:
+        <a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/coreapi.py#L172">Saving event data</a>
+      `,
+      styles: ["redis-buffers-flow"]
+     }
+  },
+  {
+    from: "redis-buffers",
+    to: "task-preprocess-event",
+    options: { styles: ["redis-buffers-flow"] }
+  },
+  {
+    from: "redis-buffers",
+    to: "task-process-event",
+    options: { styles: ["redis-buffers-flow"] }
+  },
+  {
+    from: "redis-buffers",
+    to: "task-save-event",
+    options: { styles: ["redis-buffers-flow"] }
+  },
   {
     from: "task-save-event",
     to: "database-postgres",
@@ -105,7 +151,13 @@ const edges = [
       description: `Source: <a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/event_manager.py#L1112">Saving to database</a>`
     }
   },
-  { from: "task-save-event", to: "kafka-eventstream" }
+  {
+    from: "task-save-event",
+    to: "kafka-eventstream",
+    options: {
+      label: "Publish to topic"
+    }
+  }
 ];
 
 function setEdge(g, fromNode, toNode, options) {
@@ -138,7 +190,6 @@ function prepareElements(g) {
 function addTooltips(inner, g) {
   // Simple function to style the tooltip for the given node.
   const styleTooltip = (name, description) => {
-    console.log(description);
     return (
       `
       <div class="name">${name}</div>
@@ -159,7 +210,7 @@ function addTooltips(inner, g) {
     .selectAll("g.node")
     .attr("title", (v) => {
       const node = g.node(v);
-      return styleTooltip(node.label.trim(), node.description);
+      return styleTooltip(node.label.trim(), node.description || "");
     })
     .each(function (v) {
       $(this).tipsy(tooltipOptions);
@@ -172,9 +223,7 @@ function addTooltips(inner, g) {
       const edge = g.edge(v);
       return styleTooltip(edge.label.trim(), edge.description || "");
     })
-    .each((v) => {
-      $(this).tipsy(tooltipOptions);
-    });
+    .each(function (v) { $(this).tipsy(tooltipOptions) });
 }
 
 function initGraph() {
@@ -202,7 +251,7 @@ function initGraph() {
   addTooltips(inner, g);
 
   // Center the graph
-  const initialScale = 0.75;
+  const initialScale = 0.85;
   svg.call(
     zoom.transform,
     d3.zoomIdentity

@@ -100,3 +100,7 @@ text {
   stroke: brown;
   stroke-width: 2px;
 }
+
+.redis-buffers-flow path {
+  stroke-dasharray: 8, 4;
+}
