@@ -20,7 +20,7 @@ const states = {
     styles: ["comp-uwsgi", "comp-sync"]
   },
   "task-preprocess-event": {
-    label: "Task: preprocess event",
+    label: "Task: preprocess_event",
     description: `
       ??? TODO <br><br>
         Source:
@@ -29,7 +29,7 @@ const states = {
     styles: ["comp-celery-task"]
   },
   "task-process-event": {
-    label: "Task: process event",
+    label: "Task: process_event",
     description: `
       Here's what happens on this stage:
       stacktrace processing, plugin preprocessors (e.g. for
@@ -43,7 +43,7 @@ const states = {
     styles: ["comp-celery-task"]
   },
   "task-save-event": {
-    label: "Task: save event",
+    label: "Task: save_event",
     styles: ["comp-celery-task"]
   },
   "redis-buffers": {
@@ -61,6 +61,16 @@ const states = {
   "kafka-eventstream": {
     label: "Kafka Event Stream",
     styles: ["comp-kafka"]
+  },
+  "snuba-consumer": {},
+  "worker-relay": {},
+  "task-post-process-group": {
+    label: "Task: post_process_group",
+    styles: ["comp-celery-task"]
+  },
+  "database-clickhouse": {
+    label: "Database (ClickHouse)",
+    styles: ["comp-database"]
   }
 };
 
@@ -126,7 +136,7 @@ const edges = [
         <a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/coreapi.py#L172">Saving event data</a>
       `,
       styles: ["redis-buffers-flow"]
-     }
+    }
   },
   {
     from: "redis-buffers",
@@ -155,7 +165,34 @@ const edges = [
     from: "task-save-event",
     to: "kafka-eventstream",
     options: {
-      label: "Publish to topic"
+      label: `Publish to "events" topic`,
+      styles: ["main-flow"]
+    }
+  },
+  {
+    from: "kafka-eventstream",
+    to: "snuba-consumer",
+    options: {
+      label: `Consume from "events" topic`,
+      styles: ["main-flow"]
+    }
+  },
+  {
+    from: "snuba-consumer",
+    to: "worker-relay",
+    options: {
+      styles: ["main-flow"]
+    }
+  },
+  {
+    from: "snuba-consumer",
+    to: "database-clickhouse"
+  },
+  {
+    from: "worker-relay",
+    to: "task-post-process-group",
+    options: {
+      styles: ["main-flow"]
     }
   }
 ];
