@@ -46,6 +46,10 @@ const states = {
     label: "Task: save_event",
     styles: ["comp-celery-task"]
   },
+  "storage-nodestore": {
+    label: "Nodestore (Riak)",
+    styles: ["comp-database"]
+  },
   "redis-buffers": {
     label: "Redis (buffers)",
     description: `
@@ -62,8 +66,18 @@ const states = {
     label: "Kafka Event Stream",
     styles: ["comp-kafka"]
   },
-  "snuba-consumer": {},
-  "worker-relay": {},
+  "snuba-consumer": {
+    description: `
+    <i>snuba-consumer</i> is responsible for consuming from the events topic in Kafka and
+    writing those events in batches to ClickHouse, the database powering Snuba.
+    `
+  },
+  "worker-relay": {
+    description: `
+    <i>worker-relay</i> is responsible for waiting on snuba-consumer to commit writes to ClickHouse,
+    and subsequently fire off the post_process_group job to Celery.
+    `
+  },
   "task-post-process-group": {
     label: "Task: post_process_group",
     styles: ["comp-celery-task"]
@@ -81,7 +95,7 @@ const edges = [
     options: {
       label: "Raw event data",
       description: `
-        Example: <br>
+        The data looks like this: <br>
         <pre>{"exception":{"values":[{"stacktrace":{"frames":
 [{"colno":"12","filename":"http://test.com/f.js",
 "function":"?","in_app":true,"lineno":13}]},"type":
@@ -155,20 +169,28 @@ const edges = [
   },
   {
     from: "task-save-event",
-    to: "database-postgres",
-    options: {
-      label: "    Save to DB",
-      description: `Source: <a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/event_manager.py#L1112">Saving to database</a>`
-    }
-  },
-  {
-    from: "task-save-event",
     to: "kafka-eventstream",
     options: {
       label: `Publish to "events" topic`,
       styles: ["main-flow"]
     }
   },
+  {
+    from: "task-save-event",
+    to: "storage-nodestore",
+    options: {
+      label: "         Save event payload"
+    }
+  },
+  {
+    from: "task-save-event",
+    to: "database-postgres",
+    options: {
+      label: "Save to DB",
+      description: `Source: <a href="https://github.com/getsentry/sentry/blob/37eb11f6b050fd019375002aed4cf1d8dff2b117/src/sentry/event_manager.py#L1112">Saving to database</a>`
+    }
+  },
+
   {
     from: "kafka-eventstream",
     to: "snuba-consumer",
@@ -197,7 +219,7 @@ const edges = [
   }
 ];
 
-function setEdge(g, fromNode, toNode, options) {
+function addEdge(g, fromNode, toNode, options) {
   const defaultOptions = { curve: d3.curveBasis };
   const finalOptions = { ...defaultOptions, ...(options || {}) };
   g.setEdge(fromNode, toNode, finalOptions);
@@ -215,12 +237,13 @@ function prepareElements(g) {
     g.setNode(state, value);
   });
 
+  // Add edges
   edges.forEach(function (edgeParams) {
     const options = { ...edgeParams.options };
     if (options.styles && options.styles.length > 0) {
       options.class = options.styles.join(" ");
     }
-    setEdge(g, edgeParams.from, edgeParams.to, options);
+    addEdge(g, edgeParams.from, edgeParams.to, options);
   });
 }
 
