@@ -19,59 +19,69 @@ export default class Subscriptions extends React.Component {
   static propTypes = {
     permissions: PropTypes.object,
     events: PropTypes.array,
+    onChange: PropTypes.func,
   };
-
-  static getDerivedStateFromProps(props, state) {
-    if (props.events !== state.events) {
-      return {
-        events: props.events,
-      };
-    }
-    return null;
-  }
 
   constructor(...args) {
     super(...args);
-    this.state = {
-      events: this.props.events,
-    };
+    this.state = {events: this.props.events};
+  }
+
+  // Removes events that are not allowed due to missing Permissions.
+  // Happens whenever this component is updated with a new version of
+  // Permissions from the parent (which is in turn trigger by the
+  // User changing Permissions).
+  //
+  componentDidUpdate(prevProps) {
+    const {events} = this.state;
+    const {permissions} = this.props;
+
+    const permittedEvents = events.filter(resource => {
+      return permissions[PERMISSIONS_MAP[resource]] !== 'no-access';
+    });
+
+    // Javascript is cool.
+    if (JSON.stringify(events) !== JSON.stringify(permittedEvents)) {
+      this.save(permittedEvents);
+    }
   }
 
   onChange = (resource, checked) => {
-    const events = new Set(this.state.events);
+    let events = new Set(this.state.events);
     checked ? events.add(resource) : events.delete(resource);
-    const eventsArr = Array.from(events);
-    this.setState({events: eventsArr});
-    this.context.form.setValue('events', eventsArr);
+    this.save(Array.from(events));
   };
 
-  renderBoxes() {
-    const {permissions} = this.props;
-    const {events} = this.state;
-    return EVENT_CHOICES.map(choice => {
-      const disabled = permissions[PERMISSIONS_MAP[choice]] === 'no-access';
-      return (
-        <React.Fragment key={choice}>
-          <SubscriptionBox
-            key={`${choice}${disabled}`}
-            disabled={disabled}
-            checked={events.includes(choice) && !disabled}
-            resource={choice}
-            onChange={this.onChange}
-          />
-        </React.Fragment>
-      );
-    });
+  save = (events) => {
+    this.setState({events});
+    this.props.onChange(events);
+    this.context.form.setValue('events', events);
   }
 
   render() {
+    const {permissions} = this.props;
+    const {events} = this.state;
+
     return (
-      <React.Fragment>
-        <PanelHeader>{t('Resource Subscriptions')}</PanelHeader>
-        <PanelBody>
-          <SubscriptionGrid>{this.renderBoxes()}</SubscriptionGrid>
-        </PanelBody>
-      </React.Fragment>
+      <SubscriptionGrid>
+        {
+          EVENT_CHOICES.map(choice => {
+            const disabled = permissions[PERMISSIONS_MAP[choice]] === 'no-access';
+
+            return (
+              <React.Fragment key={choice}>
+                <SubscriptionBox
+                  key={`${choice}${disabled}`}
+                  disabled={disabled}
+                  checked={events.includes(choice) && !disabled}
+                  resource={choice}
+                  onChange={this.onChange}
+                />
+              </React.Fragment>
+            );
+          })
+        }
+      </SubscriptionGrid>
     );
   }
 }

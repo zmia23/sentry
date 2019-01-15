@@ -15,6 +15,7 @@ import PermissionSelection from 'app/views/settings/organizationDeveloperSetting
 import TextCopyInput from 'app/views/settings/components/forms/textCopyInput';
 import sentryApplicationForm from 'app/data/forms/sentryApplication';
 import getDynamicText from 'app/utils/getDynamicText';
+import Subscriptions from 'app/views/settings/organizationDeveloperSettings/resourceSubscriptions';
 
 class SentryAppFormModel extends FormModel {
   /**
@@ -54,6 +55,8 @@ export default class SentryApplicationDetails extends AsyncView {
     return {
       ...super.getDefaultState(),
       app: null,
+      permissions: {},
+      events: [],
     };
   }
 
@@ -71,8 +74,7 @@ export default class SentryApplicationDetails extends AsyncView {
     return t('Sentry Application Details');
   }
 
-  // Events may come from the API as "issue.created" when we just want "issue" here.
-  normalize(events) {
+  getResourceName(events) {
     if (events.length == 0) {
       return events;
     }
@@ -86,11 +88,21 @@ export default class SentryApplicationDetails extends AsyncView {
     browserHistory.push(`/settings/${orgId}/developer-settings/`);
   };
 
+  onPermissionsChange = permissions => {
+    this.setState({permissions});
+  }
+
+  onSubscriptionsChange = events => {
+    this.setState({events});
+  }
+
   renderBody() {
     const {orgId} = this.props.params;
     const {app} = this.state;
+    const {permissions} = this.state;
+
     const scopes = (app && [...app.scopes]) || [];
-    const events = (app && this.normalize(app.events)) || [];
+    const events = (app && this.getResourceName(app.events)) || [];
 
     let method = app ? 'PUT' : 'POST';
     let endpoint = app ? `/sentry-apps/${app.slug}/` : '/sentry-apps/';
@@ -112,7 +124,21 @@ export default class SentryApplicationDetails extends AsyncView {
           <Panel>
             <PanelHeader>{t('Permissions')}</PanelHeader>
             <PanelBody>
-              <PermissionSelection scopes={scopes} events={events} />
+              <PermissionSelection
+                scopes={scopes}
+                onChange={this.onPermissionsChange}
+              />
+            </PanelBody>
+          </Panel>
+
+          <Panel>
+            <PanelHeader>{t('Webhook Subscriptions')}</PanelHeader>
+            <PanelBody>
+              <Subscriptions
+                permissions={permissions}
+                events={events}
+                onChange={this.onSubscriptionsChange}
+              />
             </PanelBody>
           </Panel>
 

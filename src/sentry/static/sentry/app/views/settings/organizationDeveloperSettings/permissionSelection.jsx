@@ -86,15 +86,12 @@ export default class PermissionSelection extends React.Component {
 
   static propTypes = {
     scopes: PropTypes.arrayOf(PropTypes.string).isRequired,
-    events: PropTypes.arrayOf(PropTypes.string).isRequired,
+    onChange: PropTypes.func,
   };
 
   constructor(...args) {
     super(...args);
-    this.state = {
-      permissions: this.scopeListToPermissionState(),
-      events: this.props.events,
-    };
+    this.state = {permissions: this.scopeListToPermissionState()};
   }
 
   /**
@@ -129,28 +126,21 @@ export default class PermissionSelection extends React.Component {
     );
   }
 
-  validEvents(permissions) {
-    const {events} = this.state;
-    return events.filter(choice => {
-      return permissions[PERMISSIONS_MAP[choice]] !== 'no-access';
-    });
-  }
-
   onChange = (resource, choice) => {
     const {permissions} = this.state;
 
     permissions[resource] = choice;
-    // events depend on permissions and if someone updates a resource
-    // to have 'no-access' we must also update the corresponding
-    // resource subscription to be unselected.
-    const events = this.validEvents(permissions);
-    this.setState({permissions, events});
-    this.context.form.setValue('scopes', this.permissionStateToList());
-    this.context.form.setValue('events', events);
+    this.save(permissions);
   };
 
+  save = (permissions) => {
+    this.setState({permissions});
+    this.props.onChange(permissions);
+    this.context.form.setValue('scopes', this.permissionStateToList());
+  }
+
   render() {
-    const {permissions, events} = this.state;
+    const {permissions} = this.state;
 
     return (
       <React.Fragment>
@@ -176,7 +166,6 @@ export default class PermissionSelection extends React.Component {
             />
           );
         })}
-        <Subscriptions permissions={permissions} events={events} />
       </React.Fragment>
     );
   }
