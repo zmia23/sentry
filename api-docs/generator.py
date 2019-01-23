@@ -251,6 +251,7 @@ def output_markdown(sections, scenarios, section_mapping):
                 query_parameters=endpoint['params'].get('query'),
                 path_parameters=endpoint['params'].get('path'),
                 parameters=endpoint['params'].get('param'),
+                scope=endpoint['params'].get('scope'),
                 authentication=auth,
                 example_request=format_request(endpoint, scenarios),
                 example_response=format_response(endpoint, scenarios)
