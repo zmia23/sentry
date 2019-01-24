@@ -34,7 +34,7 @@ class ProjectIndexEndpoint(Endpoint):
         session.
 
         :auth: required
-        :param string scope: ``"project:read"``
+        :scope: "project:read"
         """
         queryset = Project.objects.select_related('organization').distinct()
 
