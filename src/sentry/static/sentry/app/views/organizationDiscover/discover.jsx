@@ -5,11 +5,12 @@ import moment from 'moment';
 
 import {addErrorMessage, addSuccessMessage} from 'app/actionCreators/indicator';
 import {getUtcDateString} from 'app/utils/dates';
+import {getUtcToLocalDateObject} from 'app/components/organizations/timeRangeSelector/utils';
 import {t, tct} from 'app/locale';
 import {updateProjects, updateDateTime} from 'app/actionCreators/globalSelection';
 import BetaTag from 'app/components/betaTag';
-import SentryTypes from 'app/sentryTypes';
 import PageHeading from 'app/components/pageHeading';
+import SentryTypes from 'app/sentryTypes';
 
 import {
   DiscoverContainer,
@@ -132,8 +133,8 @@ export default class OrganizationDiscover extends React.Component {
 
         // These props come from URL string, so will always be in UTC
         updateDateTime({
-          start: start && new Date(moment.utc(start).local()),
-          end: end && new Date(moment.utc(end).local()),
+          start: start && getUtcToLocalDateObject(start),
+          end: end && getUtcToLocalDateObject(end),
           period: range,
           utc,
         });

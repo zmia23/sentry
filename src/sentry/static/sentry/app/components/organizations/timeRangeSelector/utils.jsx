@@ -44,17 +44,13 @@ function getParser(local = false) {
 }
 
 /**
- * Return a date object in local time, when given a UTC timestamp
+ * Given a UTC timestamp, return a local date object
  */
-export function getLocalDateObject(date) {
+export function getUtcToLocalDateObject(date) {
   return moment
     .utc(date)
     .local()
     .toDate();
-}
-
-export function getFormattedDate(dateObj, format, {local} = {}) {
-  return getParser(local)(dateObj).format(format);
 }
 
 /**
@@ -77,34 +73,25 @@ export function setDateToTime(dateObj, timeStr, {local} = {}) {
 }
 
 /**
- * Given a UTC timestamp, return a local date object with the same date
- * e.g. given: 1/1/2001 @ 22:00 UTC, return:  1/1/2001 @ 22:00 GMT-7
+ * Given a UTC timestamp, return a local/system date object with the same date
+ * e.g. given: 1/1/2001 @ 22:00 UTC, return: 1/1/2001 @ 22:00 -0700 (PST)
  */
-export function getUtcInLocal(dateObj) {
-  const utc = moment.utc(dateObj);
-  const format = 'YYYY-MM-DD HH:mm:ss';
-
+export function getUtcToSystem(dateObj) {
   // This is required because if your system timezone !== user configured timezone
   // then there will be a mismatch of dates with `react-date-picker`
   //
   // We purposely strip the timezone when formatting from the utc timezone
-  return new Date(utc.format(format));
+  return new Date(moment.utc(dateObj).format(DATE_TIME_FORMAT));
 }
 
-export function getLocalWithoutTimezone(dateObj) {
-  const format = 'YYYY-MM-DD HH:mm:ss';
-  return moment(dateObj)
-    .local()
-    .format(format);
-}
 /**
- * Given a local date, return a UTC date object with the same date
- * e.g. given: 1/1/2001 @ 22:00 GMT-7, return:  1/1/2001 @ 22:00 UTC
+ * Given a timestamp, return a local/system date object with the same date
+ * e.g. system: -0700 PST, preference: -0400 EST
+ * given: 1/1/2001 @ 22:00 UTC --> 1/1/2001 @ 18:00 -0400 (EST) -->
+ * return:  1/1/2001 @ 18:00 -0700 (PST)
  */
-export function getLocalToUtc(dateObj) {
-  const localDate = getLocalWithoutTimezone(dateObj);
-
-  return moment.utc(localDate).toDate();
+export function getLocalToSystem(dateObj) {
+  return new Date(moment(dateObj).format(DATE_TIME_FORMAT));
 }
 
 // Get the beginning of day (e.g. midnight)

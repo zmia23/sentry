@@ -1,7 +1,7 @@
 import {pick, pickBy, identity} from 'lodash';
 
 import {defined} from 'app/utils';
-import {getLocalDateObject} from 'app/components/organizations/timeRangeSelector/utils';
+import {getUtcToLocalDateObject} from 'app/components/organizations/timeRangeSelector/utils';
 
 import {URL_PARAM} from './constants';
 
@@ -28,8 +28,8 @@ export function getStateFromQuery(query) {
   }
 
   if (hasAbsolute) {
-    start = getLocalDateObject(start);
-    end = getLocalDateObject(end);
+    start = getUtcToLocalDateObject(start);
+    end = getUtcToLocalDateObject(end);
   }
 
   return {

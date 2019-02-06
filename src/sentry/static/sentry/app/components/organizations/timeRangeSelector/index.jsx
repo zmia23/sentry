@@ -7,8 +7,9 @@ import styled from 'react-emotion';
 import {DEFAULT_RELATIVE_PERIODS, DEFAULT_STATS_PERIOD} from 'app/constants';
 import {analytics} from 'app/utils/analytics';
 import {
+  getLocalToSystem,
   getPeriodAgo,
-  getUtcInLocal,
+  getUtcToSystem,
 } from 'app/components/organizations/timeRangeSelector/utils';
 import {getUserTimezone} from 'app/utils/dates';
 import {parsePeriodToHours} from 'app/utils';
@@ -22,7 +23,7 @@ import RelativeSelector from 'app/components/organizations/timeRangeSelector/dat
 import SelectorItem from 'app/components/organizations/timeRangeSelector/dateRange/selectorItem';
 import getDynamicText from 'app/utils/getDynamicText';
 
-// Strips timezone from local date, creates a new moment date object with timezone
+// Strips timezone from local/system date, creates a new moment date object with timezone
 // Then returns as a Date object
 const getDateWithTimezoneInUtc = (date, utc) =>
   moment
@@ -37,10 +38,13 @@ const getDateWithTimezoneInUtc = (date, utc) =>
 
 const getInternalDate = (date, utc) => {
   if (utc) {
-    return getUtcInLocal(date);
+    return getUtcToSystem(date);
   } else {
     return new Date(
-      moment.tz(moment.utc(date), getUserTimezone()).format('YYYY-MM-DD HH:mm:ss')
+      moment
+        .utc(date)
+        .tz(getUserTimezone())
+        .format('YYYY-MM-DD HH:mm:ss')
     );
   }
 };
@@ -177,7 +181,6 @@ class TimeRangeSelector extends React.PureComponent {
       end: new Date(),
       utc: this.state.utc,
     };
-    console.log(new Date(), this.state.utc);
     this.setState({
       hasChanges: true,
       ...newDateTime,
@@ -213,7 +216,7 @@ class TimeRangeSelector extends React.PureComponent {
       end: null,
       utc: this.state.utc,
     };
-    callIfFunction(onChange, newDateTime);
+    this.callCallback(onChange, newDateTime);
     this.handleUpdate(newDateTime);
   };
 
@@ -244,25 +247,10 @@ class TimeRangeSelector extends React.PureComponent {
       });
       const newDateTime = {
         relative: null,
-        start:
-          this.props.utc === utc
-            ? utc
-              ? new Date(moment.utc(start).format('YYYY-MM-DD HH:mm:ss'))
-              : new Date(moment(start).format('YYYY-MM-DD HH:mm:ss'))
-            : utc
-              ? new Date(moment(start).format('YYYY-MM-DD HH:mm:ss'))
-              : new Date(moment.utc(start).format('YYYY-MM-DD HH:mm:ss')),
-        end:
-          this.props.utc === utc
-            ? utc
-              ? new Date(moment.utc(end).format('YYYY-MM-DD HH:mm:ss'))
-              : new Date(moment(end).format('YYYY-MM-DD HH:mm:ss'))
-            : utc
-              ? new Date(moment(end).format('YYYY-MM-DD HH:mm:ss'))
-              : new Date(moment.utc(end).format('YYYY-MM-DD HH:mm:ss')),
+        start: this.props.utc ? getUtcToSystem(start) : getLocalToSystem(start),
+        end: this.props.utc ? getUtcToSystem(end) : getLocalToSystem(end),
         utc,
       };
-      console.log('utc changed from ', !utc, 'to', utc, start, newDateTime.start);
       this.callCallback(onChange, newDateTime);
 
       return {

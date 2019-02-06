@@ -15,24 +15,4 @@ describe('utils.dates', function() {
       expect(newDate).toEqual(new Date(1508238671000));
     });
   });
-
-  describe('getUtcInLocal', function() {
-    it('works', function() {
-      const date = new Date();
-      console.log(date.getTimezoneOffset());
-      console.log(
-        moment()
-          .toDate()
-          .getTimezoneOffset(),
-        moment.utc()
-      );
-      moment.tz.setDefault('UTC');
-      console.log(
-        moment()
-          .toDate()
-          .getTimezoneOffset(),
-        moment.utc()
-      );
-    });
-  });
 });
