@@ -3,15 +3,26 @@ import React from 'react';
 import moment from 'moment';
 
 import {callIfFunction} from 'app/utils/callIfFunction';
-import {getFormattedDate} from 'app/utils/dates';
-import {useShortInterval} from 'app/components/charts/utils';
+import {getFormattedDate, getUserTimezone} from 'app/utils/dates';
 import {updateParams} from 'app/actionCreators/globalSelection';
+import {useShortInterval} from 'app/components/charts/utils';
 import DataZoom from 'app/components/charts/components/dataZoom';
 import SentryTypes from 'app/sentryTypes';
 import ToolBox from 'app/components/charts/components/toolBox';
 
-const getDate = date =>
-  date ? moment.utc(date).format(moment.HTML5_FMT.DATETIME_LOCAL_SECONDS) : null;
+const getDate = (date, utc) => {
+  if (!date) {
+    return null;
+  }
+
+  if (utc) {
+    return moment.utc(date).format(moment.HTML5_FMT.DATETIME_LOCAL_SECONDS);
+  } else {
+    return moment
+      .tz(date, getUserTimezone())
+      .format(moment.HTML5_FMT.DATETIME_LOCAL_SECONDS);
+  }
+};
 
 /**
  * This is a very opinionated component that takes a render prop through `children`. It
@@ -71,8 +82,8 @@ class ChartZoom extends React.Component {
   saveCurrentPeriod = props => {
     this.currentPeriod = {
       period: props.period,
-      start: getDate(props.start),
-      end: getDate(props.end),
+      start: getDate(props.start, props.utc),
+      end: getDate(props.end, props.utc),
     };
   };
 
@@ -85,9 +96,9 @@ class ChartZoom extends React.Component {
    *
    * Saves a callback function to be called after chart animation is completed
    */
-  setPeriod = ({period, start, end}, saveHistory) => {
-    const startFormatted = getDate(start);
-    const endFormatted = getDate(end);
+  setPeriod = ({period, start, end, utc}, saveHistory) => {
+    const startFormatted = getDate(start, utc);
+    const endFormatted = getDate(end, utc);
 
     // Save period so that we can revert back to it when using echarts "back" navigation
     if (saveHistory) {

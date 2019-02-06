@@ -2,7 +2,7 @@ import React from 'react';
 
 import {EventsChart} from 'app/views/organizationEvents/eventsChart';
 import {chart, doZoom, mockZoomRange} from 'app-test/helpers/charts';
-import {getLocalDateObject} from 'app/utils/dates';
+import {getLocalDateObject} from 'app/components/organizations/timeRangeSelector/utils';
 import {initializeOrg} from 'app-test/helpers/initializeOrg';
 import {mount} from 'enzyme';
 import {updateParams} from 'app/actionCreators/globalSelection';
