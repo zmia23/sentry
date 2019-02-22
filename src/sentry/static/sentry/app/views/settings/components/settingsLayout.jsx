@@ -4,9 +4,8 @@ import React from 'react';
 import styled from 'react-emotion';
 
 import AccountSettingsNavigation from 'app/views/settings/account/accountSettingsNavigation';
-import Footer from 'app/components/footer';
 import OrganizationSettingsNavigation from 'app/views/settings/organization/organizationSettingsNavigation';
-import Sidebar from 'app/components/sidebar';
+import ProjectSettingsNavigation from 'app/views/settings/project/projectSettingsNavigation';
 import space from 'app/styles/space';
 
 import SettingsBackButton from './settingsBackButton';
@@ -30,7 +29,6 @@ class SettingsLayout extends React.Component {
     const childRoute = childProps.route || route || {};
     return (
       <React.Fragment>
-        <Sidebar />
         <SettingsColumn>
           <SettingsHeader>
             <Flex align="center" width={1}>
@@ -57,7 +55,6 @@ class SettingsLayout extends React.Component {
             )}
             <Content>{children}</Content>
           </MaxWidthContainer>
-          <Footer />
         </SettingsColumn>
       </React.Fragment>
     );
