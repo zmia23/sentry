@@ -8,7 +8,6 @@ import OrganizationSettingsNavigation from 'app/views/settings/organization/orga
 import ProjectSettingsNavigation from 'app/views/settings/project/projectSettingsNavigation';
 import space from 'app/styles/space';
 
-import SettingsBackButton from './settingsBackButton';
 import SettingsBreadcrumb from './settingsBreadcrumb';
 import SettingsHeader from './settingsHeader';
 import SettingsSearch from './settingsSearch';
@@ -46,7 +45,6 @@ class SettingsLayout extends React.Component {
           <MaxWidthContainer>
             {typeof renderNavigation === 'function' && (
               <SidebarWrapper>
-                <SettingsBackButton params={params} />
                 <SidebarWrapperContent>
                   <OrganizationSettingsNavigation {...this.props} />
                   <AccountSettingsNavigation {...this.props} />
