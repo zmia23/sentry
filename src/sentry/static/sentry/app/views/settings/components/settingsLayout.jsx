@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'react-emotion';
 
-import Sidebar from 'app/components/sidebar';
+import AccountSettingsNavigation from 'app/views/settings/account/accountSettingsNavigation';
 import Footer from 'app/components/footer';
+import OrganizationSettingsNavigation from 'app/views/settings/organization/organizationSettingsNavigation';
+import Sidebar from 'app/components/sidebar';
 import space from 'app/styles/space';
 
 import SettingsBackButton from './settingsBackButton';
@@ -47,7 +49,10 @@ class SettingsLayout extends React.Component {
             {typeof renderNavigation === 'function' && (
               <SidebarWrapper>
                 <SettingsBackButton params={params} />
-                <SidebarWrapperContent>{renderNavigation()}</SidebarWrapperContent>
+                <SidebarWrapperContent>
+                  <OrganizationSettingsNavigation {...this.props} />
+                  <AccountSettingsNavigation {...this.props} />
+                </SidebarWrapperContent>
               </SidebarWrapper>
             )}
             <Content>{children}</Content>
