@@ -47,6 +47,7 @@ class SettingsLayout extends React.Component {
               <SidebarWrapper>
                 <SidebarWrapperContent>
                   <OrganizationSettingsNavigation {...this.props} />
+                  <ProjectSettingsNavigation {...this.props} />
                   <AccountSettingsNavigation {...this.props} />
                 </SidebarWrapperContent>
               </SidebarWrapper>

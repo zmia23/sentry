@@ -28,7 +28,7 @@ export default function getConfiguration({project}) {
         {
           path: `${pathPrefix}/tags/`,
           title: t('Tags'),
-          description: t("View and manage a  project's tags"),
+          description: t("View and manage a project's tags"),
         },
         {
           path: `${pathPrefix}/environments/`,
@@ -58,7 +58,7 @@ export default function getConfiguration({project}) {
           title: t('Processing Issues'),
           // eslint-disable-next-line no-shadow
           badge: ({project}) => {
-            if (project.processingIssues <= 0) return null;
+            if (!project || project.processingIssues <= 0) return null;
             return project.processingIssues > 99 ? '99+' : project.processingIssues;
           },
         },
