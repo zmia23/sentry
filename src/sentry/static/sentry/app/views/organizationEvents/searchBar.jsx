@@ -137,6 +137,7 @@ class FieldKeyInput extends React.Component {
           {this.props.value || 'Placeholder text'}
         </div>
         <DropdownAutoCompleteMenu
+          shouldSelectWithTab={true}
           defaultHighlightedIndex={-1}
           busy={this.state.busy}
           items={this.state.searchItems}
@@ -266,6 +267,7 @@ class FieldValueInput extends React.Component {
 
   handleInputFocus = open => {
     this.updateAutoCompleteMenu();
+    this.props.onFocus();
     // open();
   };
 
@@ -303,6 +305,7 @@ class FieldValueInput extends React.Component {
   render() {
     return (
       <DropdownAutoCompleteMenu
+        shouldSelectWithTab={true}
         busy={this.state.busy}
         items={this.state.searchItems}
         alignMenu="left"
@@ -364,6 +367,7 @@ const NewTermInput = styled(
     };
 
     componentDidUpdate(prevProps, prevState) {
+      console.log('cdu', prevState.isEditingKey, this.state.isEditingKey);
       if (
         this.props.term.key &&
         ((!prevProps.isEditingValue && this.props.isEditingValue) ||
@@ -377,6 +381,7 @@ const NewTermInput = styled(
             prevProps.term.value !== this.props.term.value)) ||
         (!prevState.isEditingKey && this.state.isEditingKey)
       ) {
+        console.log('keyRef focus');
         this.keyRef.focus();
       }
     }
@@ -392,7 +397,17 @@ const NewTermInput = styled(
       this.setState({isEditingKey: true});
     };
 
-    handleValueFocus = () => {};
+    handleKeyBackspace = e => {
+      console.log('handle key backspace');
+      this.setState({isEditingKey: false});
+      this.props.onEditPreviousTerm(e);
+    };
+
+    handleValueFocus = () => {
+      console.log('handle value focus');
+      this.setState({isEditingKey: false});
+    };
+
     handleValueBlur = () => {
       console.log('value blur');
       this.handleSelectValue(this.props.term.value);
@@ -441,7 +456,7 @@ const NewTermInput = styled(
             onSelect={this.handleSelectKey}
             onGetRef={ref => (this.keyRef = ref)}
             onQueryChange={this.handleKeyQueryChange}
-            onBackspace={this.props.onEditPreviousTerm}
+            onBackspace={this.handleKeyBackspace}
             onFocus={this.handleKeyFocus}
           />
           <FieldValueInput
@@ -501,9 +516,9 @@ class SmartSearchBar extends React.Component {
     };
   }
 
-  parseTerms: (query) => {
-    return query.split(' ')
-  }
+  parseTerms = query => {
+    return query.split(' ');
+  };
 
   handleClearSearch = () => {
     this.setState(state => ({
