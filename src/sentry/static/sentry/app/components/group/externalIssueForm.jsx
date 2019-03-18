@@ -201,6 +201,25 @@ export class SentryAppExternalIssueForm extends React.Component {
     this.props.onSubmitSuccess(issue);
   };
 
+  loadOptions = (field, input) => {
+    const url = field.url;
+    const method = 'GET';
+    return $.ajax({url, method});
+  };
+
+  fieldProps = field => {
+    return field.async
+      ? {
+        loadOptions: input => this.loadOptions(field, input),
+        cache: false,
+        autoload: false,
+        onSelectResetsInput: false,
+        onCloseResetsInput: false,
+        onBlurResetsInput: false,
+      }
+      : {};
+  };
+
   render() {
     const {sentryAppInstallation} = this.props;
     const config = this.props.config[this.props.action];
@@ -233,6 +252,7 @@ export class SentryAppExternalIssueForm extends React.Component {
               stacked
               flexibleControlStateSize
               required={true}
+              {...this.fieldProps(field)}
             />
           );
         })}
@@ -247,6 +267,7 @@ export class SentryAppExternalIssueForm extends React.Component {
               inline={false}
               stacked
               flexibleControlStateSize
+              {...this.fieldProps(field)}
             />
           );
         })}

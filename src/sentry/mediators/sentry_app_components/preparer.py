@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from six.moves.urllib.parse import urlparse
+
 from sentry.mediators import Mediator, Param
 from sentry.mediators.external_requests import SelectRequester
 
@@ -36,7 +38,14 @@ class Preparer(Mediator):
             field.update({'choices': field['options']})
 
         if 'uri' in field:
-            field.update(self._request(field['uri']))
+            if 'async' in field:
+                urlparts = urlparse(self.install.sentry_app.webhook_url)
+                url = u'{}://{}{}'.format(urlparts.scheme, urlparts.netloc, field['uri'])
+
+                # react-select expects a `url` prop
+                field.update({'url': url, 'autoload': True})
+            else:
+                field.update(self._request(field['uri']))
 
     def _request(self, uri):
         return SelectRequester.run(
