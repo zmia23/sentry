@@ -1,11 +1,13 @@
 from __future__ import absolute_import
 
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.utils.crypto import constant_time_compare
 from rest_framework.authentication import (BasicAuthentication, get_authorization_header)
 from rest_framework.exceptions import AuthenticationFailed
 
-from sentry.models import ApiApplication, ApiKey, ApiToken, ProjectKey, Relay
+from sentry import options
+from sentry.models import ApiApplication, ApiKey, ApiToken, ProjectKey, Relay, SystemToken
 from sentry.relay.utils import get_header_relay_id, get_header_relay_signature
 from sentry.utils.sdk import configure_scope
 
@@ -33,7 +35,7 @@ class StandardAuthentication(QuietBasicAuthentication):
             msg = 'Invalid token header. Token string should not contain spaces.'
             raise AuthenticationFailed(msg)
 
-        return self.authenticate_credentials(auth[1])
+        return self.authenticate_credentials(request, auth[1])
 
 
 class RelayAuthentication(BasicAuthentication):
@@ -126,11 +128,26 @@ class ClientIdSecretAuthentication(QuietBasicAuthentication):
 class TokenAuthentication(StandardAuthentication):
     token_name = b'bearer'
 
-    def authenticate_credentials(self, token):
+    def is_internal_ip(self, request):
+        if settings.INTERNAL_IPS:
+            ip = request.META['REMOTE_ADDR']
+            if not any(ip in addr for addr in settings.INTERNAL_IPS):
+                return False
+
+        return True
+
+    def authenticate_system_token(self, request, token):
+        system_token = options.get('system.secret-key')
+        if system_token \
+                and constant_time_compare(system_token, token) \
+                and self.is_internal_ip(request):
+            return SystemToken()
+        return None
+
+    def authenticate_credentials(self, request, token_str):
         try:
-            token = ApiToken.objects.filter(
-                token=token,
-            ).select_related('user', 'application').get()
+            token = self.authenticate_system_token(request, token_str) or \
+                ApiToken.objects.filter(token=token_str).select_related('user', 'application').get()
         except ApiToken.DoesNotExist:
             raise AuthenticationFailed('Invalid token')
 
@@ -153,7 +170,7 @@ class TokenAuthentication(StandardAuthentication):
 class DSNAuthentication(StandardAuthentication):
     token_name = b'dsn'
 
-    def authenticate_credentials(self, token):
+    def authenticate_credentials(self, request, token):
         try:
             key = ProjectKey.from_dsn(token)
         except ProjectKey.DoesNotExist:

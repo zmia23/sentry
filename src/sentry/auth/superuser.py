@@ -21,6 +21,7 @@ from django.core.signing import BadSignature
 from django.utils import timezone
 from django.utils.crypto import constant_time_compare, get_random_string
 
+from sentry.models import SystemUser
 from sentry.utils.auth import has_completed_sso
 
 logger = logging.getLogger('sentry.superuser')
@@ -53,6 +54,9 @@ UNSET = object()
 
 
 def is_active_superuser(request):
+    if isinstance(request.user, SystemUser):
+        return True
+
     su = getattr(request, 'superuser', None) or Superuser(request)
     return su.is_active
 
