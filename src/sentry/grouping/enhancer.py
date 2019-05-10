@@ -11,7 +11,7 @@ from parsimonious.grammar import Grammar, NodeVisitor
 from parsimonious.exceptions import ParseError
 
 from sentry.stacktraces.platform import get_behavior_family_for_platform
-from sentry.grouping.utils import get_rule_bool
+from sentry.grouping.utils import get_rule_bool, get_rule_range
 from sentry.utils.compat import implements_to_string
 from sentry.utils.glob import glob_match
 
@@ -27,7 +27,7 @@ rule = _ matchers actions
 
 matchers       = matcher+
 matcher        = _ matcher_type sep argument
-matcher_type   = "path" / "function" / "module" / "family" / "package" / "app"
+matcher_type   = "path" / "function" / "module" / "family" / "package" / "app" / "frames" / "app-frames"
 
 actions        = action+
 action         = _ range? flag action_name
@@ -65,6 +65,8 @@ MATCH_KEYS = {
     'family': 'F',
     'package': 'P',
     'app': 'a',
+    'frames': 's',
+    'app-frames': 'S',
 }
 SHORT_MATCH_KEYS = dict((v, k) for k, v in six.iteritems(MATCH_KEYS))
 
@@ -86,35 +88,61 @@ class InvalidEnhancerConfig(Exception):
 
 class Match(object):
 
-    def __init__(self, key, pattern):
+    def __init__(self, key, arg):
         self.key = key
-        self.pattern = pattern
+        if key == 'app':
+            self.arg = get_rule_bool(arg)
+        elif key in ('frames', 'app-frames'):
+            self.arg = get_rule_range(arg)
+        elif key == 'family':
+            self.arg = arg.split(',')
+        else:
+            self.arg = arg
 
     @property
     def description(self):
+        arg = self.arg
+        if self.key == 'app':
+            arg = {
+                True: 'true',
+                False: 'false',
+            }.get(arg, 'unknown')
+        elif self.key in ('frames', 'app-frames'):
+            if arg is None:
+                arg = 'unknown'
+            else:
+                arg = '%d..%d' % (
+                    arg[0] if arg[0] is not None else '',
+                    arg[1] if arg[1] is not None else '',
+                )
+        elif self.key == 'family':
+            arg = ','.join(arg)
+        else:
+            arg = arg.split() != [arg] and '"%s"' % arg or arg
         return '%s:%s' % (
             self.key,
-            self.pattern.split() != [self.pattern] and '"%s"' % self.pattern or self.pattern,
+            arg,
         )
 
-    def matches_frame(self, frame_data, platform):
+    def matches_frame(self, frame_data, platform, idx, app_idx,
+                      frame_count, app_frame_count):
         # Path matches are always case insensitive
         if self.key in ('path', 'package'):
             if self.key == 'package':
                 value = frame_data.get('package') or ''
             else:
                 value = frame_data.get('abs_path') or frame_data.get('filename') or ''
-            if glob_match(value, self.pattern, ignorecase=True,
+            if glob_match(value, self.arg, ignorecase=True,
                           doublestar=True, path_normalize=True):
                 return True
-            if not value.startswith('/') and glob_match('/' + value, self.pattern,
+            if not value.startswith('/') and glob_match('/' + value, self.arg,
                                                         ignorecase=True, doublestar=True, path_normalize=True):
                 return True
             return False
 
         # families need custom handling as well
         if self.key == 'family':
-            flags = self.pattern.split(',')
+            flags = self.arg
             if 'all' in flags:
                 return True
             family = get_behavior_family_for_platform(frame_data.get('platform') or platform)
@@ -122,8 +150,7 @@ class Match(object):
 
         # in-app matching is just a bool
         if self.key == 'app':
-            ref_val = get_rule_bool(self.pattern)
-            return ref_val is not None and ref_val == frame_data.get('in_app')
+            return self.arg is not None and self.arg == frame_data.get('in_app')
 
         # all other matches are case sensitive
         if self.key == 'function':
@@ -134,15 +161,15 @@ class Match(object):
         else:
             # should not happen :)
             value = '<unknown>'
-        return glob_match(value, self.pattern)
+        return glob_match(value, self.arg)
 
     def _to_config_structure(self):
         if self.key == 'family':
-            arg = ''.join(filter(None, [FAMILIES.get(x) for x in self.pattern.split(',')]))
+            arg = ''.join(filter(None, [FAMILIES.get(x) for x in self.arg]))
         elif self.key == 'app':
-            arg = {True: '1', False: '0'}.get(get_rule_bool(self.pattern), '')
+            arg = {True: '1', False: '0'}.get(self.arg, '')
         else:
-            arg = self.pattern
+            arg = self.arg
         return MATCH_KEYS[self.key] + arg
 
     @classmethod
@@ -238,19 +265,35 @@ class Enhancements(object):
         """This applies the frame modifications to the frames itself.  This
         does not affect grouping.
         """
+        frame_count = len(frames)
+        app_frame_count = sum(int(bool(x.in_app)) for x in frames)
+
         for rule in self.iter_rules():
+            app_idx = 0
             for idx, frame in enumerate(frames):
-                actions = rule.get_matching_frame_actions(frame, platform)
+                actions = rule.get_matching_frame_actions(
+                    frame, platform, idx=idx, app_idx=app_idx,
+                    frame_count=frame_count, app_frame_count=app_frame_count)
                 for action in actions or ():
                     action.apply_modifications_to_frame(frames, idx)
+                if frame.in_app:
+                    app_idx += 1
 
     def update_frame_components_contributions(self, components, frames, platform):
+        frame_count = len(frames)
+        app_frame_count = sum(int(bool(x.in_app)) for x in frames)
+
         for rule in self.iter_rules():
+            app_idx = 0
             for idx, (component, frame) in enumerate(izip(components, frames)):
-                actions = rule.get_matching_frame_actions(frame, platform)
+                actions = rule.get_matching_frame_actions(
+                    frame, platform, idx=idx, app_idx=app_idx,
+                    frame_count=frame_count, app_frame_count=app_frame_count)
                 for action in actions or ():
                     action.update_frame_components_contributions(
                         components, idx, rule=rule)
+                if frame.in_app:
+                    app_idx += 1
 
     def as_dict(self, with_rules=False):
         rv = {
@@ -333,11 +376,15 @@ class Rule(object):
             'actions': [six.text_type(x) for x in self.actions],
         }
 
-    def get_matching_frame_actions(self, frame_data, platform):
+    def get_matching_frame_actions(self, frame_data, platform,
+                                   idx, app_idx, frame_count,
+                                   app_frame_count):
         """Given a frame returns all the matching actions based on this rule.
         If the rule does not match `None` is returned.
         """
-        if self.matchers and all(m.matches_frame(frame_data, platform) for m in self.matchers):
+        if self.matchers and all(m.matches_frame(
+                frame_data, platform, idx, app_idx,
+                frame_count, app_frame_count) for m in self.matchers):
             return self.actions
 
     def _to_config_structure(self):

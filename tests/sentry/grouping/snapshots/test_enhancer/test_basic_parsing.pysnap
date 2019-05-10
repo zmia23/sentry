@@ -1,5 +1,5 @@
 ---
-created: '2019-05-10T09:19:47.569014Z'
+created: '2019-05-10T10:13:31.450810Z'
 creator: sentry
 source: tests/sentry/grouping/test_enhancer.py
 ---
@@ -13,8 +13,8 @@ rules:
     key: app
     range: null
   matchers:
-  - key: path
-    pattern: '*/code/game/whatever/*'
+  - arg: '*/code/game/whatever/*'
+    key: path
 - actions:
   - flag: false
     key: group
@@ -23,63 +23,66 @@ rules:
     key: group
     range: null
   matchers:
-  - key: function
-    pattern: panic_handler
+  - arg: panic_handler
+    key: function
 - actions:
   - flag: false
     key: group
     range: down
   matchers:
-  - key: function
-    pattern: ThreadStartWin32
+  - arg: ThreadStartWin32
+    key: function
 - actions:
   - flag: false
     key: group
     range: down
   matchers:
-  - key: function
-    pattern: ThreadStartLinux
+  - arg: ThreadStartLinux
+    key: function
 - actions:
   - flag: false
     key: group
     range: down
   matchers:
-  - key: function
-    pattern: ThreadStartMac
+  - arg: ThreadStartMac
+    key: function
 - actions:
   - flag: false
     key: app
     range: null
   matchers:
-  - key: family
-    pattern: native
-  - key: module
-    pattern: std::*
+  - arg:
+    - native
+    key: family
+  - arg: std::*
+    key: module
 - actions:
   - flag: false
     key: app
     range: null
   matchers:
-  - key: module
-    pattern: core::*
+  - arg: core::*
+    key: module
 - actions:
   - flag: false
     key: app
     range: null
   matchers:
-  - key: family
-    pattern: javascript
-  - key: path
-    pattern: '*/test.js'
+  - arg:
+    - javascript
+    key: family
+  - arg: '*/test.js'
+    key: path
 - actions:
   - flag: false
     key: app
     range: null
   matchers:
-  - key: family
-    pattern: javascript
-  - key: app
-    pattern: '1'
-  - key: path
-    pattern: '*/test.js'
+  - arg:
+    - javascript
+    key: family
+  - arg: true
+    key: app
+  - arg: '*/test.js'
+    key: path
 version: 1
