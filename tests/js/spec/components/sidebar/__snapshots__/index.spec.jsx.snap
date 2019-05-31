@@ -167,12 +167,30 @@ exports[`Sidebar SidebarDropdown can open Sidebar org/name dropdown menu 1`] = `
       "teams": Array [],
     }
   }
+  style={
+    Object {
+      "left": 0,
+      "opacity": 0,
+      "pointerEvents": "none",
+      "position": "absolute",
+      "top": 0,
+    }
+  }
 >
   <div
     className="css-1edm9sw-OrgAndUserMenu-SidebarDropdownMenu e1fowdfw9"
     onClick={[Function]}
     onMouseEnter={[Function]}
     onMouseLeave={[Function]}
+    style={
+      Object {
+        "left": 0,
+        "opacity": 0,
+        "pointerEvents": "none",
+        "position": "absolute",
+        "top": 0,
+      }
+    }
   >
     <SidebarOrgSummary
       organization={
@@ -3565,12 +3583,30 @@ exports[`Sidebar renders without org and router 1`] = `
   onMouseEnter={[Function]}
   onMouseLeave={[Function]}
   org={null}
+  style={
+    Object {
+      "left": 0,
+      "opacity": 0,
+      "pointerEvents": "none",
+      "position": "absolute",
+      "top": 0,
+    }
+  }
 >
   <div
     className="css-1edm9sw-OrgAndUserMenu-SidebarDropdownMenu e1fowdfw9"
     onClick={[Function]}
     onMouseEnter={[Function]}
     onMouseLeave={[Function]}
+    style={
+      Object {
+        "left": 0,
+        "opacity": 0,
+        "pointerEvents": "none",
+        "position": "absolute",
+        "top": 0,
+      }
+    }
   >
     <UserSummary
       to="/settings/account/details/"

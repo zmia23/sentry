@@ -1,8 +1,11 @@
+import {Manager, Reference, Popper} from 'react-popper';
 import PropTypes from 'prop-types';
 import React from 'react';
+import ReactDOM from 'react-dom';
 import * as Sentry from '@sentry/browser';
 
 import {MENU_CLOSE_DELAY} from 'app/constants';
+import {domId} from 'app/utils/domId';
 
 class DropdownMenu extends React.Component {
   static propTypes = {
@@ -54,6 +57,17 @@ class DropdownMenu extends React.Component {
     this.state = {
       isOpen: false,
     };
+  }
+
+  componentDidMount() {
+    let portal = document.getElementById('dropdown-portal');
+    if (!portal) {
+      portal = document.createElement('div');
+      portal.setAttribute('id', 'dropdown-portal');
+      document.body.appendChild(portal);
+    }
+    this.portalEl = portal;
+    this.dropdownId = domId('dropdown-');
   }
 
   componentWillUnmount() {
@@ -191,7 +205,11 @@ class DropdownMenu extends React.Component {
   // When dropdown menu is displayed and mounted to DOM,
   // bind a click handler to `document` to listen for clicks outside of
   // this component and close menu if so
-  handleMenuMount = ref => {
+  handleMenuMount = (popperRef, ref) => {
+    if (popperRef) {
+      popperRef(ref);
+    }
+
     if (ref && !(ref instanceof HTMLElement)) {
       return;
     }
@@ -213,7 +231,11 @@ class DropdownMenu extends React.Component {
     }
   };
 
-  handleActorMount = ref => {
+  handleActorMount = (popperRef, ref) => {
+    if (popperRef) {
+      popperRef(ref);
+    }
+
     if (ref && !(ref instanceof HTMLElement)) {
       return;
     }
@@ -247,6 +269,7 @@ class DropdownMenu extends React.Component {
     onKeyDown,
     isStyled,
     style,
+    popperRef,
     ...props
   } = {}) => {
     const {isNestedDropdown, closeOnEscape} = this.props;
@@ -256,12 +279,12 @@ class DropdownMenu extends React.Component {
     // `isStyled`: with styled-components we need to pass `innerRef` to get DOM el's ref vs `ref` otherwise
     return {
       ...props,
-      ...((isStyled && {innerRef: this.handleActorMount}) || {}),
+      ...((isStyled && {innerRef: this.handleActorMount.bind(this, popperRef)}) || {}),
       style: {
         ...(style || {}),
         outline: 'none',
       },
-      ref: !isStyled ? this.handleActorMount : undefined,
+      ref: !isStyled ? this.handleActorMount.bind(this, popperRef) : undefined,
       tabIndex: -1,
       onKeyDown: e => {
         if (typeof onKeyDown === 'function') {
@@ -315,14 +338,21 @@ class DropdownMenu extends React.Component {
   };
 
   // Menu is the menu component that <DropdownMenu> will control
-  getMenuProps = ({onClick, onMouseLeave, onMouseEnter, isStyled, ...props} = {}) => {
+  getMenuProps = ({
+    onClick,
+    onMouseLeave,
+    onMouseEnter,
+    isStyled,
+    ref,
+    ...props
+  } = {}) => {
     // Props that the menu needs to have <DropdownMenu> work
     //
     // `isStyled`: with styled-components we need to pass `innerRef` to get DOM el's ref vs `ref` otherwise
     return {
       ...props,
-      ...((isStyled && {innerRef: this.handleMenuMount}) || {}),
-      ref: !isStyled ? this.handleMenuMount : undefined,
+      ...((isStyled && {innerRef: this.handleMenuMount.bind(this, ref)}) || {}),
+      ref: !isStyled ? this.handleMenuMount.bind(this, ref) : undefined,
       onMouseEnter: (...args) => {
         if (typeof onMouseEnter === 'function') {
           onMouseEnter(...args);
@@ -367,6 +397,14 @@ class DropdownMenu extends React.Component {
         open: this.handleOpen,
         close: this.handleClose,
       },
+      Portal: ({children: portalRenderFunc, ...rest}) =>
+        shouldShowDropdown &&
+        ReactDOM.createPortal(
+          <Popper placement="bottom">
+            {props => portalRenderFunc({...props, id: this.dropdownId})}
+          </Popper>,
+          this.portalEl
+        ),
     });
   }
 }
