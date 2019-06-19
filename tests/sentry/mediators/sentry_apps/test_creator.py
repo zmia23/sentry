@@ -60,6 +60,12 @@ class TestCreator(TestCase):
         assert sentry_app
         assert sentry_app.scope_list == ['project:read']
 
+    def test_strips_tags_from_name(self):
+        self.creator.name = '<h2>hello</h2>'
+        sentry_app = self.creator.call()
+
+        assert sentry_app.name == 'hello'
+
     def test_expands_rolled_up_events(self):
         self.creator.events = ['issue']
         app = self.creator.call()

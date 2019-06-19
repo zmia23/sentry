@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import re
+
 from jsonschema.exceptions import ValidationError as SchemaValidationError
 
 from rest_framework import serializers
@@ -76,6 +78,11 @@ class SentryAppSerializer(Serializer):
         if not attrs.get('name'):
             return attrs
 
+        if not re.search('[a-zA-Z0-9\-_]+', attrs.get('name')):
+            raise ValidationError(
+                u'Name must contain at least one alphanumeric character.'
+            )
+
         queryset = SentryApp.with_deleted.filter(slug=slugify(attrs['name']))
 
         if self.instance:
@@ -85,6 +92,7 @@ class SentryAppSerializer(Serializer):
             raise ValidationError(
                 u'Name {} is already taken, please use another.'.format(attrs['name'])
             )
+
         return attrs
 
     def validate_events(self, attrs, source):

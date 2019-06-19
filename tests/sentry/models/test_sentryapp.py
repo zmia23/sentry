@@ -27,6 +27,11 @@ class SentryAppTest(TestCase):
         self.sentry_app.save()
         assert self.sentry_app.slug == 'nulldb'
 
+    def test_escapes_name(self):
+        self.sentry_app.name = '<h2>hi</h2>'
+        self.sentry_app.save()
+        assert self.sentry_app.name == 'hi'
+
     def test_internal_slug(self):
         self.sentry_app.status = SentryAppStatus.INTERNAL
         self.sentry_app.save()

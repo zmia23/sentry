@@ -160,6 +160,7 @@ class SentryApp(ParanoidModel, HasApiScopes):
 
     def save(self, *args, **kwargs):
         self._set_slug()
+        self._escape_name()
         self.date_updated = timezone.now()
         return super(SentryApp, self).save(*args, **kwargs)
 
@@ -182,6 +183,9 @@ class SentryApp(ParanoidModel, HasApiScopes):
                 self.slug,
                 hashlib.sha1(self.owner.slug).hexdigest()[0:6],
             )
+
+    def _escape_name(self):
+        self.name = re.sub(r'<.*?>', '', self.name)
 
     def _has_internal_slug(self):
         return re.match(r'\w+-[0-9a-zA-Z]+', self.slug)
