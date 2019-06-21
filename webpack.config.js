@@ -259,6 +259,7 @@ const appConfig = {
       app: path.join(staticPrefix, 'app'),
       'app-test': path.join(__dirname, 'tests', 'js'),
       'sentry-locale': path.join(__dirname, 'src', 'sentry', 'locale'),
+      'react-dom': '@hot-loader/react-dom',
     },
     modules: ['node_modules'],
     extensions: ['.jsx', '.js', '.json', '.ts', '.tsx'],
