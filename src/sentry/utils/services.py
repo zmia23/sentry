@@ -101,7 +101,8 @@ class LazyServiceWrapper(LazyObject):
     def expose(self, context):
         base = self._base
         for key in itertools.chain(base.__all__, ('validate', 'setup')):
-            if inspect.ismethod(getattr(base, key)):
+            # python 3 bound method detection requires actual class instance
+            if inspect.ismethod(getattr(base(), key)):
                 context[key] = (lambda f: lambda *a, **k: getattr(self, f)(*a, **k))(key)
             else:
                 context[key] = getattr(base, key)
