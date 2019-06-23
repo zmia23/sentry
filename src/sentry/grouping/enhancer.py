@@ -5,6 +5,7 @@ import six
 import base64
 import msgpack
 import inspect
+import zlib
 
 from parsimonious.grammar import Grammar, NodeVisitor
 from parsimonious.exceptions import ParseError
@@ -360,8 +361,11 @@ class Enhancements(object):
         return [self.version, self.bases, [x._to_config_structure() for x in self.rules]]
 
     def dumps(self):
-        return base64.urlsafe_b64encode(msgpack.dumps(
-            self._to_config_structure()).encode('zlib')).strip('=')
+        return base64.urlsafe_b64encode(
+            zlib.compress(
+                msgpack.dumps(self._to_config_structure())
+            )
+        ).decode('ascii').strip('=')
 
     def iter_rules(self):
         for base in self.bases:
@@ -385,12 +389,13 @@ class Enhancements(object):
 
     @classmethod
     def loads(cls, data):
-        if six.PY2 and isinstance(data, six.text_type):
-            data = data.encode('ascii', 'ignore')
-        padded = data + b'=' * (4 - (len(data) % 4))
+        padded = data + '=' * (4 - (len(data) % 4))
         try:
-            return cls._from_config_structure(msgpack.loads(
-                base64.urlsafe_b64decode(padded).decode('zlib')))
+            return cls._from_config_structure(
+                msgpack.loads(
+                    zlib.decompress(base64.urlsafe_b64decode(padded))
+                )
+            )
         except (LookupError, AttributeError, TypeError, ValueError) as e:
             raise ValueError('invalid grouping enhancement config: %s' % e)
 
