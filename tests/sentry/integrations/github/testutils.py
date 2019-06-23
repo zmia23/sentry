@@ -2,7 +2,8 @@
 from __future__ import absolute_import
 
 # we keep this as a raw string as order matters for hmac signing
-PUSH_EVENT_EXAMPLE_INSTALLATION = b"""{
+# XXX(py3 port): SyntaxError: bytes can only contain ASCII literal characters
+PUSH_EVENT_EXAMPLE_INSTALLATION = """{
   "ref": "refs/heads/changes",
   "installation" : {
     "id": 12345

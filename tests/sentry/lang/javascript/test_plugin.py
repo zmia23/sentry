@@ -7,6 +7,7 @@ import os.path
 import responses
 
 from mock import patch
+from base64 import b64encode
 from django.conf import settings
 
 from sentry.models import Event, File, Release, ReleaseFile
@@ -14,8 +15,7 @@ from sentry.testutils import TestCase
 
 
 BASE64_SOURCEMAP = 'data:application/json;base64,' + (
-    '{"version":3,"file":"generated.js","sources":["/test.js"],"names":[],"mappings":"AAAA","sourcesContent":["console.log(\\"hello, World!\\")"]}'.
-    encode('base64').replace('\n', '')
+    b64encode('{"version":3,"file":"generated.js","sources":["/test.js"],"names":[],"mappings":"AAAA","sourcesContent":["console.log(\\"hello, World!\\")"]}'.encode('utf-8')).decode('utf-8').replace('\n', '')
 )
 
 
