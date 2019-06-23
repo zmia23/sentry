@@ -108,7 +108,7 @@ class Event(object):
 
     def serialize(self):
         return {
-            'uuid': b64encode(self.uuid.bytes),
+            'uuid': b64encode(self.uuid.bytes).decode('ascii'),
             'timestamp': to_timestamp(self.datetime),
             'type': self.type,
             'data': self.data,
