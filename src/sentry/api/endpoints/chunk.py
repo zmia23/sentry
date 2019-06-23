@@ -4,7 +4,6 @@ import logging
 import six
 from io import BytesIO
 from gzip import GzipFile
-from itertools import izip
 from rest_framework import status
 from six.moves.urllib.parse import urljoin
 from rest_framework.response import Response
@@ -117,7 +116,7 @@ class ChunkUploadEndpoint(OrganizationEndpoint):
                             status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            FileBlob.from_files(izip(files, checksums),
+            FileBlob.from_files(zip(files, checksums),
                                 organization=organization,
                                 logger=logger)
         except IOError as err:

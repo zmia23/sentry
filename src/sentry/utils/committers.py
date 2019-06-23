@@ -11,7 +11,6 @@ from sentry.utils.safe import get_path
 
 from django.db.models import Q
 
-from itertools import izip
 from collections import defaultdict
 from six.moves import reduce
 
@@ -30,7 +29,7 @@ def tokenize_path(path):
 
 def score_path_match_length(path_a, path_b):
     score = 0
-    for a, b in izip(tokenize_path(path_a), tokenize_path(path_b)):
+    for a, b in zip(tokenize_path(path_a), tokenize_path(path_b)):
         if a != b:
             break
         score += 1

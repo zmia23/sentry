@@ -3,7 +3,6 @@ from __future__ import absolute_import
 import six
 
 from django.db import connections
-from itertools import izip
 
 from sentry.api.bases import OrganizationMemberEndpoint
 from sentry.api.serializers import serialize
@@ -76,6 +75,6 @@ class OrganizationMemberUnreleasedCommitsEndpoint(OrganizationMemberEndpoint):
                 'repositoryID': six.text_type(c.repository_id),
             } for c in results],
             'repositories': {
-                six.text_type(r.id): d for r, d in izip(repos, serialize(repos, request.user))
+                six.text_type(r.id): d for r, d in zip(repos, serialize(repos, request.user))
             }
         })
