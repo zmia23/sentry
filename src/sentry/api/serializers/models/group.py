@@ -90,7 +90,7 @@ class GroupSerializerBase(Serializer):
             GroupSubscription.objects.filter(
                 group__in=list(
                     itertools.chain.from_iterable(
-                        itertools.imap(
+                        map(
                             lambda project__groups: project__groups[1] if not options.get(
                                 project__groups[0].id,
                                 options.get(None)
