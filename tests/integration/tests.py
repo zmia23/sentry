@@ -18,7 +18,7 @@ from django.utils import timezone
 from exam import fixture
 from gzip import GzipFile
 from sentry_sdk import Hub, Client
-from six import StringIO
+from six import BytesIO
 
 from sentry.models import (Group, Event)
 from sentry.testutils import TestCase, TransactionTestCase
@@ -328,7 +328,7 @@ class SentryRemoteTest(TestCase):
     def test_content_encoding_deflate(self):
         kwargs = {'message': 'hello'}
 
-        message = zlib.compress(json.dumps(kwargs))
+        message = zlib.compress(json.dumps(kwargs).encode('ascii'))
 
         key = self.projectkey.public_key
         secret = self.projectkey.secret_key
@@ -352,15 +352,12 @@ class SentryRemoteTest(TestCase):
     def test_content_encoding_gzip(self):
         kwargs = {'message': 'hello'}
 
-        message = json.dumps(kwargs)
+        message = json.dumps(kwargs).encode('ascii')
 
-        fp = StringIO()
+        fp = BytesIO()
 
-        try:
-            f = GzipFile(fileobj=fp, mode='w')
+        with GzipFile(fileobj=fp, mode='wb') as f:
             f.write(message)
-        finally:
-            f.close()
 
         key = self.projectkey.public_key
         secret = self.projectkey.secret_key
