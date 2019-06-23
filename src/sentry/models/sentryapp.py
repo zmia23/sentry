@@ -63,7 +63,7 @@ VALID_EVENTS = tuple(itertools.chain(
 
 
 def default_uuid():
-    return six.binary_type(uuid.uuid4())
+    return six.binary_type(str(uuid.uuid4()).encode('ascii'))
 
 
 class SentryApp(ParanoidModel, HasApiScopes):

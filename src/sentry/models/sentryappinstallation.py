@@ -10,7 +10,7 @@ from sentry.db.models import (FlexibleForeignKey, ParanoidModel)
 
 
 def default_uuid():
-    return six.binary_type(uuid.uuid4())
+    return six.binary_type(str(uuid.uuid4()).encode('ascii'))
 
 
 class SentryAppInstallation(ParanoidModel):
