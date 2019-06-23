@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import mock
 import pytest
 import thread
-from Queue import Full
+from queue import Full
 from concurrent.futures import CancelledError, Future
 from contextlib import contextmanager
 from threading import Event
