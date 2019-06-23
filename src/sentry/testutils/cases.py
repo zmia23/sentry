@@ -245,6 +245,10 @@ class BaseTestCase(Fixtures, Exam):
             body = json.dumps({'csp-report': data})
         elif isinstance(data, six.string_types):
             body = data
+        else:
+            raise TypeError(
+                "data is type {}, expected either dict or str".format(type(data).__name__)
+            )
         path = reverse('sentry-api-csp-report', kwargs={'project_id': self.project.id})
         path += '?sentry_key=%s' % self.projectkey.public_key
         with self.tasks():
