@@ -294,7 +294,8 @@ class Factories(object):
     @staticmethod
     def create_release(project, user=None, version=None, date_added=None):
         if version is None:
-            version = os.urandom(20).encode('hex')
+            from binascii import hexlify
+            version = hexlify(os.urandom(20)).decode('ascii')
 
         if date_added is None:
             date_added = timezone.now()
@@ -370,7 +371,7 @@ class Factories(object):
         commit = Commit.objects.get_or_create(
             organization_id=repo.organization_id,
             repository_id=repo.id,
-            key=key or sha1(uuid4().hex).hexdigest(),
+            key=key or sha1(uuid4().hex.encode('ascii')).hexdigest(),
             defaults={
                 'message': message or make_sentence(),
                 'author': author or Factories.create_commit_author(organization_id=repo.organization_id),
