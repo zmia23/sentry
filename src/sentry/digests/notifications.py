@@ -160,7 +160,7 @@ def rewrite_record(record, project, groups, rules):
         record.key,
         Notification(
             event,
-            filter(None, [rules.get(id) for id in record.value.rules]),
+            list(filter(None, [rules.get(id) for id in record.value.rules])),
         ),
         record.timestamp,
     )
