@@ -219,7 +219,7 @@ class RedisBackend(Backend):
                     ]
                 )
             except ResponseError as e:
-                if 'err(invalid_state):' in e.message:
+                if 'err(invalid_state):' in str(e):
                     six.raise_from(
                         InvalidState('Timeline is not in the ready state.'),
                         e,
@@ -240,10 +240,10 @@ class RedisBackend(Backend):
             # If the record value is `None`, this means the record data was
             # missing (it was presumably evicted by Redis) so we don't need to
             # return it here.
-            yield filter(
+            yield list(filter(
                 lambda record: record.value is not None,
                 records,
-            )
+            ))
 
             script(
                 connection,
