@@ -22,7 +22,7 @@ class MinHashIndexBackendTestMixin(object):
 
         # comparison, without thresholding
         results = self.index.compare('example', '1', [('index', 0)])
-        assert results[0] == ('1', [1.0])
+        assert results[0] == ('1', [1.0]), results[0]
         assert results[1] == ('2', [1.0])  # identical contents
         assert results[2][0] in ('3', '4')  # equidistant pairs, order doesn't really matter
         assert results[3][0] in ('3', '4')

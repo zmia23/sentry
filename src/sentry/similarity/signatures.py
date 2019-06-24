@@ -9,7 +9,7 @@ class MinHashSignatureBuilder(object):
         self.rows = rows
 
     def __call__(self, features):
-        return map(
+        return list(map(
             lambda column: min(
                 map(
                     lambda feature: mmh3.hash(
@@ -20,4 +20,4 @@ class MinHashSignatureBuilder(object):
                 ),
             ),
             range(self.columns),
-        )
+        ))
