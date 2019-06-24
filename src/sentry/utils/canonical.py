@@ -56,7 +56,7 @@ def get_legacy_name(key):
     return LEGACY_KEY_MAPPING.get(key, (key,))[0]
 
 
-class CanonicalKeyView(collections.Mapping):
+class CanonicalKeyView(collections.abc.Mapping):
     def __init__(self, data):
         self.data = data
         self._len = len(set(get_canonical_name(key) for key in self.data))
@@ -91,7 +91,7 @@ class CanonicalKeyView(collections.Mapping):
         return self.data.__repr__()
 
 
-class CanonicalKeyDict(collections.MutableMapping):
+class CanonicalKeyDict(collections.abc.MutableMapping):
     def __init__(self, data, legacy=None):
         self.legacy = legacy
         self.__init(data)
