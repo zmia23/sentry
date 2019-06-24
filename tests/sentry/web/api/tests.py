@@ -734,7 +734,7 @@ class EventAttachmentStoreViewTest(TestCase):
 
     def test_event_attachments_feature_creates_attachment(self):
         out = BytesIO()
-        out.write('hi')
+        out.write(b'hi')
         with self.feature('organizations:event-attachments'):
             response = self._postEventAttachmentWithHeader({
                 'attachment1':
@@ -746,7 +746,7 @@ class EventAttachmentStoreViewTest(TestCase):
 
     def test_event_attachments_without_feature_returns_forbidden(self):
         out = BytesIO()
-        out.write('hi')
+        out.write(b'hi')
         with self.feature({'organizations:event-attachments': False}):
             response = self._postEventAttachmentWithHeader({
                 'attachment1':
@@ -758,7 +758,7 @@ class EventAttachmentStoreViewTest(TestCase):
 
     def test_event_attachments_without_files_returns_400(self):
         out = BytesIO()
-        out.write('hi')
+        out.write(b'hi')
         with self.feature('organizations:event-attachments'):
             response = self._postEventAttachmentWithHeader({}, format='multipart')
 
@@ -769,7 +769,7 @@ class EventAttachmentStoreViewTest(TestCase):
         with self.feature('organizations:event-attachments'):
             self.path = self.path.replace(self.event.event_id, 'z' * 32)
             out = BytesIO()
-            out.write('hi')
+            out.write(b'hi')
             response = self._postEventAttachmentWithHeader({
                 'attachment1':
                     SimpleUploadedFile('mapping.txt', out.getvalue(), content_type='text/plain'),
@@ -793,7 +793,7 @@ class EventAttachmentStoreViewTest(TestCase):
 
     def test_event_attachments_event_exists_without_group_id(self):
         out = BytesIO()
-        out.write('hi')
+        out.write(b'hi')
         event_id = 'z' * 32
         Event.objects.create(project_id=self.project.id, event_id=event_id)
         with self.feature('organizations:event-attachments'):
