@@ -74,7 +74,7 @@ class RepositoryProvider(ProviderMixin):
             return Response(
                 {
                     'errors': {
-                        '__all__': e.message
+                        '__all__': str(e)
                     },
                 }, status=400
             )

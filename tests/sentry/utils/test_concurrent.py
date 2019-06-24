@@ -158,7 +158,7 @@ def test_sychronous_executor():
     try:
         future.result()
     except Exception as e:
-        assert e.message is mock.sentinel.MESSAGE
+        assert str(e) is mock.sentinel.MESSAGE
     else:
         assert False, 'expected future to raise'
 

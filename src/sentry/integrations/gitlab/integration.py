@@ -276,7 +276,7 @@ class GitlabIntegrationProvider(IntegrationProvider):
                     'base_url': installation_data['url'],
                     'verify_ssl': installation_data['verify_ssl'],
                     'group': installation_data['group'],
-                    'error_message': e.message,
+                    'error_message': str(e),
                     'error_status': e.code,
                 }
             )
