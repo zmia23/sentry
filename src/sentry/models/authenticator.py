@@ -304,7 +304,8 @@ class RecoveryCodeInterface(AuthenticatorInterface):
 
     def generate_new_config(self):
         if six.PY3:
-            salt = int(os.urandom(16).decode('utf-8'), 16)
+            from binascii import hexlify
+            salt = hexlify(os.urandom(16)).decode('ascii')
         else:
             salt = os.urandom(16).encode('hex')
 
