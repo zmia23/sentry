@@ -61,7 +61,7 @@ def test_csp_validate(effective_directive, violated_directive, culprit_element):
     assert "errors" not in result
     assert 'logentry' in result
     assert result['culprit'] == culprit_element + " 'self'"
-    assert map(tuple, result['tags']) == [
+    assert list(map(tuple, result['tags'])) == [
         ('effective-directive', 'img-src'),
         ('blocked-uri', 'http://google.com'),
     ]
@@ -132,7 +132,7 @@ def test_csp_tag_value():
         }
     }
     result = validate_and_normalize(report)
-    assert map(tuple, result['tags']) == [
+    assert list(map(tuple, result['tags'])) == [
         ('effective-directive', 'img-src'),
         ('blocked-uri', 'http://google.com'),
     ]
@@ -159,7 +159,7 @@ def test_hpkp_validate_basic():
     assert 'errors' not in result
     assert 'logentry' in result
     assert not result.get('culprit')
-    assert sorted(map(tuple, result['tags'])) == [
+    assert sorted(list(map(tuple, result['tags']))) == [
         ('hostname', 'www.example.com'),
         ('include-subdomains', 'false'),
         ('port', '443'),

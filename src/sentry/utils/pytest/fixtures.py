@@ -328,7 +328,7 @@ def insta_snapshot(request, log):
 
         try:
             with open(reference_file) as f:
-                match = _yaml_snap_re.match(f.read().decode('utf-8'))
+                match = _yaml_snap_re.match(f.read())
                 if match is None:
                     raise IOError()
                 _header, refval = match.groups()
