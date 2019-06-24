@@ -71,14 +71,14 @@ def test_safely_load_json_string_unexpected_type():
 
 
 def test_valid_data():
-    data = decode_data('foo')
-    assert data == u'foo'
+    data = decode_data('foo'.encode('utf-8'))
+    assert data == 'foo'
     assert isinstance(data, six.text_type)
 
 
 def test_invalid_data():
     with pytest.raises(APIError):
-        decode_data('\x99')
+        decode_data(b'\x99')
 
 
 def test_get_interface_does_not_let_through_disallowed_name():
