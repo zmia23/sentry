@@ -47,7 +47,7 @@ class OrganizationMonitorsEndpoint(OrganizationEndpoint):
         except NoProjects:
             return self.respond([])
         except OrganizationEventsError as exc:
-            return self.respond({'detail': exc.message}, status=400)
+            return self.respond({'detail': str(exc)}, status=400)
 
         queryset = Monitor.objects.filter(
             organization_id=organization.id,

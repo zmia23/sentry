@@ -151,7 +151,7 @@ class ProviderMixin(object):
             context.update({
                 'error_type': 'validation',
                 'errors': {
-                    '__all__': error.message
+                    '__all__': str(error)
                 },
             })
             status = 400

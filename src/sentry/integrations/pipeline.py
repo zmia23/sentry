@@ -50,7 +50,7 @@ class IntegrationPipeline(Pipeline):
                     'provider_key': self.provider.key,
                 }
             )
-            return self.error(e.message)
+            return self.error(str(e))
 
         response = self._finish_pipeline(data)
         self.provider.post_install(self.integration, self.organization)

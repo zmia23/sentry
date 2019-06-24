@@ -102,7 +102,7 @@ class OrganizationReleasesEndpoint(OrganizationReleasesBaseEndpoint, Environment
         except NoProjects:
             return Response([])
         except OrganizationEventsError as exc:
-            return Response({'detail': exc.message}, status=400)
+            return Response({'detail': str(exc)}, status=400)
 
         queryset = Release.objects.filter(
             organization=organization,
@@ -253,7 +253,7 @@ class OrganizationReleasesEndpoint(OrganizationReleasesBaseEndpoint, Environment
                 try:
                     release.set_refs(refs, request.user, fetch=fetch_commits)
                 except InvalidRepository as exc:
-                    return Response({'refs': [exc.message]}, status=400)
+                    return Response({'refs': [str(exc)]}, status=400)
 
             if not created and not new_projects:
                 # This is the closest status code that makes sense, and we want

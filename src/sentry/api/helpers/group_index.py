@@ -80,7 +80,7 @@ def build_query_params_from_request(request, organization, projects, environment
                 environments,
             )
         except InvalidSearchQuery as e:
-            raise ValidationError(u'Your search query could not be parsed: {}'.format(e.message))
+            raise ValidationError(u'Your search query could not be parsed: {}'.format(str(e)))
 
         validate_search_filter_permissions(organization, search_filters, request.user)
         query_kwargs['search_filters'] = search_filters

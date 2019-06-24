@@ -56,7 +56,7 @@ class AcceptProjectTransferEndpoint(Endpoint):
         try:
             data, project = self.get_validated_data(data, request.user)
         except InvalidPayload as exc:
-            return Response({'detail': exc.message}, status=400)
+            return Response({'detail': str(exc)}, status=400)
 
         organizations = Organization.objects.filter(
             status=OrganizationStatus.ACTIVE,
@@ -89,7 +89,7 @@ class AcceptProjectTransferEndpoint(Endpoint):
         try:
             data, project = self.get_validated_data(data, request.user)
         except InvalidPayload as exc:
-            return Response({'detail': exc.message}, status=400)
+            return Response({'detail': str(exc)}, status=400)
 
         transaction_id = data['transaction_id']
 

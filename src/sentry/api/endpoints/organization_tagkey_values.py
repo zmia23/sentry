@@ -18,7 +18,7 @@ class OrganizationTagKeyValuesEndpoint(OrganizationEventsEndpointBase):
         try:
             filter_params = self.get_filter_params(request, organization)
         except OrganizationEventsError as exc:
-            return Response({'detail': exc.message}, status=400)
+            return Response({'detail': str(exc)}, status=400)
         except NoProjects:
             paginator = SequencePaginator([])
         else:

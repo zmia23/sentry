@@ -53,7 +53,7 @@ class JiraSearchEndpoint(IntegrationEndpoint):
             try:
                 resp = installation.search_issues(query)
             except IntegrationError as exc:
-                return Response({'detail': exc.message}, status=400)
+                return Response({'detail': str(exc)}, status=400)
             return Response([{
                 'label': '(%s) %s' % (i['key'], i['fields']['summary']),
                 'value': i['key']

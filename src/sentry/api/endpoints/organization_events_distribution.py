@@ -19,7 +19,7 @@ class OrganizationEventsDistributionEndpoint(OrganizationEventsEndpointBase):
         try:
             snuba_args = self.get_snuba_query_args(request, organization)
         except OrganizationEventsError as exc:
-            return Response({'detail': exc.message}, status=400)
+            return Response({'detail': str(exc)}, status=400)
         except NoProjects:
             return Response({'detail': 'A valid project must be included.'}, status=400)
 

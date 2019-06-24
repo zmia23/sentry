@@ -367,7 +367,7 @@ class APIView(BaseView):
                 value=json.dumps([meta, base64.b64encode(data)])
             )
         except Exception as e:
-            logger.debug("Cannot publish event to Kafka: {}".format(e.message))
+            logger.debug("Cannot publish event to Kafka: {}".format(str(e)))
 
     @csrf_exempt
     @never_cache

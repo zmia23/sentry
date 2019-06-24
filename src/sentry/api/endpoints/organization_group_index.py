@@ -165,7 +165,7 @@ class OrganizationGroupIndexEndpoint(OrganizationEventsEndpointBase):
         try:
             start, end = get_date_range_from_params(request.GET)
         except InvalidParams as exc:
-            return Response({'detail': exc.message}, status=400)
+            return Response({'detail': str(exc)}, status=400)
 
         try:
             cursor_result, query_kwargs = self._search(
