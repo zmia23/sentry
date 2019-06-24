@@ -74,7 +74,7 @@ class NotificationPlugin(Plugin):
         try:
             return self.notify_users(event.group, event, triggering_rules=[
                                      r.label for r in notification.rules])
-        except (SSLError, HTTPError, ApiError, PluginError, urllib3.HTTPError) as err:
+        except (SSLError, HTTPError, ApiError, PluginError, urllib3.exceptions.HTTPError) as err:
             self.logger.info('notification-plugin.notify-failed', extra={
                 'error': six.text_type(err),
                 'plugin': self.slug,
