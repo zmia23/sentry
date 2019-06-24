@@ -178,9 +178,9 @@ class SentryApp(ParanoidModel, HasApiScopes):
             self.slug = slugify(self.name)
 
         if self.is_internal and not self._has_internal_slug():
-            self.slug = u'{}-{}'.format(
+            self.slug = '{}-{}'.format(
                 self.slug,
-                hashlib.sha1(self.owner.slug).hexdigest()[0:6],
+                hashlib.sha1(self.owner.slug.encode('utf-8')).hexdigest()[0:6],
             )
 
     def _has_internal_slug(self):
