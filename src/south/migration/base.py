@@ -120,7 +120,7 @@ class Migrations(six.with_metaclass(MigrationsMetaclass, list)):
         full_name = '{}.south_migrations'.format(self._application.__name__)
         if full_name in sys.modules:
             return sys.modules[full_name]
-        return __import__(full_name, {}, {}, ['south_migrations'], -1)
+        return __import__(full_name, {}, {}, ['south_migrations'], 0)
 
     def get_application(self):
         return self._application
