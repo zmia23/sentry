@@ -245,7 +245,7 @@ class SearchVisitor(NodeVisitor):
             return children
 
         children = [child for group in children for child in _flatten(group)]
-        children = filter(None, _flatten(children))
+        children = list(filter(None, _flatten(children)))
 
         return children
 
