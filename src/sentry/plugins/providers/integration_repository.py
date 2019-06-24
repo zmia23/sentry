@@ -82,11 +82,11 @@ class IntegrationRepositoryProvider(object):
         }
 
         if isinstance(error, IntegrationError):
-            if '503' in error.message:
+            if '503' in str(error):
                 context.update({
                     'error_type': 'service unavailable',
                     'errors': {
-                        '__all__': error.message
+                        '__all__': str(error)
                     },
                 })
                 status = 503
@@ -95,7 +95,7 @@ class IntegrationRepositoryProvider(object):
                 context.update({
                     'error_type': 'validation',
                     'errors': {
-                        '__all__': error.message
+                        '__all__': str(error)
                     },
                 })
                 status = 400
@@ -103,7 +103,7 @@ class IntegrationRepositoryProvider(object):
             context.update({
                 'error_type': 'not found',
                 'errors': {
-                    '__all__': error.message
+                    '__all__': str(error)
                 },
             })
             status = 404

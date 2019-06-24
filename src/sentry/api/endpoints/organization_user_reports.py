@@ -49,7 +49,7 @@ class OrganizationUserReportsEndpoint(OrganizationEndpoint):
         except NoProjects:
             return Response([])
         except OrganizationEventsError as exc:
-            return Response({'detail': exc.message}, status=400)
+            return Response({'detail': str(exc)}, status=400)
 
         queryset = UserReport.objects.filter(
             project_id__in=filter_params['project_id'],

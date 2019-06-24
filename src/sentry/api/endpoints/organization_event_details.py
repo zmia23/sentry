@@ -26,7 +26,7 @@ class OrganizationEventDetailsEndpoint(OrganizationEventsEndpointBase):
             params = self.get_filter_params(request, organization)
             snuba_args = self.get_snuba_query_args_v2(request, organization, params)
         except OrganizationEventsError as exc:
-            return Response({'detail': exc.message}, status=400)
+            return Response({'detail': str(exc)}, status=400)
         except NoProjects:
             return Response(status=404)
 
@@ -63,7 +63,7 @@ class OrganizationEventsLatestOrOldest(OrganizationEventsEndpointBase):
             params = self.get_filter_params(request, organization)
             snuba_args = self.get_snuba_query_args_v2(request, organization, params)
         except OrganizationEventsError as exc:
-            return Response({'detail': exc.message}, status=400)
+            return Response({'detail': str(exc)}, status=400)
         except NoProjects:
             return Response(status=404)
 

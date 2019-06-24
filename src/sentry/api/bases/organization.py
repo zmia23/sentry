@@ -235,7 +235,7 @@ class OrganizationEndpoint(Endpoint):
                 optional=date_filter_optional,
             )
         except InvalidParams as exc:
-            raise OrganizationEventsError(exc.message)
+            raise OrganizationEventsError(str(exc))
 
         try:
             projects = self.get_projects(request, organization)

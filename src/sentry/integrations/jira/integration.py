@@ -478,7 +478,7 @@ class JiraIntegration(IntegrationInstallation, IssueSyncMixin):
                     'integration_id': self.model.id,
                     'organization_id': self.organization_id,
                     'jira_project': project_id,
-                    'error': exc.message,
+                    'error': str(exc),
                 }
             )
             raise IntegrationError(

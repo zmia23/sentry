@@ -59,7 +59,7 @@ class OrganizationEventsEndpointBase(OrganizationEndpoint):
         try:
             snuba_args = get_snuba_query_args(query=query, params=params)
         except InvalidSearchQuery as exc:
-            raise OrganizationEventsError(exc.message)
+            raise OrganizationEventsError(str(exc))
 
         # Filter out special aggregates.
         self._filter_unspecified_special_fields_in_conditions(snuba_args, set())
@@ -80,7 +80,7 @@ class OrganizationEventsEndpointBase(OrganizationEndpoint):
         try:
             snuba_args = get_snuba_query_args(query=query, params=params)
         except InvalidSearchQuery as exc:
-            raise OrganizationEventsError(exc.message)
+            raise OrganizationEventsError(str(exc))
 
         fields = request.GET.getlist('field')[:]
         aggregations = []

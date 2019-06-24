@@ -149,7 +149,7 @@ class GroupManager(BaseManager):
             logger.info(
                 'discarded.hash', extra={
                     'project_id': project,
-                    'description': exc.message,
+                    'description': str(exc),
                 }
             )
 

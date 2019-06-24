@@ -42,7 +42,7 @@ class SchemaField(serializers.WritableField):
         try:
             validate_schema(data)
         except SchemaValidationError as e:
-            raise ValidationError(e.message)
+            raise ValidationError(str(e))
 
 
 class URLField(serializers.URLField):
