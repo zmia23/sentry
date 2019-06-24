@@ -68,6 +68,6 @@ class OrganizationIntegrationDetailsEndpoint(OrganizationEndpoint):
         try:
             installation.update_organization_config(request.DATA)
         except IntegrationError as e:
-            return self.respond({'detail': e.message}, status=400)
+            return self.respond({'detail': str(e)}, status=400)
 
         return self.respond(status=200)

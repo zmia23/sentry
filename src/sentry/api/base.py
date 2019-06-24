@@ -249,7 +249,7 @@ class Endpoint(APIView):
                 cursor=input_cursor,
             )
         except BadPaginationError as e:
-            return Response({'detail': e.message}, status=400)
+            return Response({'detail': str(e)}, status=400)
 
         # map results based on callback
         if on_results:

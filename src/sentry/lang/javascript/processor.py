@@ -412,7 +412,7 @@ def fetch_sourcemap(url, project=None, release=None, dist=None, allow_scraping=T
         except TypeError as e:
             raise UnparseableSourcemap({
                 'url': '<base64>',
-                'reason': e.message,
+                'reason': str(e),
             })
     else:
         result = fetch_file(

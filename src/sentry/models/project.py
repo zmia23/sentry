@@ -444,7 +444,7 @@ class Project(Model, PendingDeletionMixin):
             logging.exception(
                 'Error occurred during copy project settings.',
                 extra={
-                    'error': e.message,
+                    'error': str(e),
                     'project_to': self.id,
                     'project_from': project_id,
                 }

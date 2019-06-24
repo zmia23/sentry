@@ -52,7 +52,7 @@ def get_user_info(access_token, installation_data):
                         'verify_ssl': installation_data['verify_ssl'],
                         'client_id': installation_data['client_id'],
                         'error_status': e.code,
-                        'error_message': e.message,
+                        'error_message': str(e),
                     }
                     )
         raise e
@@ -109,7 +109,7 @@ class GitlabIdentityProvider(OAuth2Provider):
                 extra={
                     'identity_id': identity.id,
                     'error_status': e.code,
-                    'error_message': e.message,
+                    'error_message': str(e),
                 }
             )
             payload = {}
