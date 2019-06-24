@@ -148,7 +148,7 @@ class OwnershipVisitor(NodeVisitor):
     visit_comment = visit_empty = lambda *a: None
 
     def visit_ownership(self, node, children):
-        return filter(None, children)
+        return list(filter(None, children))
 
     def visit_line(self, node, children):
         _, line, _ = children
