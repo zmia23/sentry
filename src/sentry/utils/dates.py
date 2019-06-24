@@ -87,7 +87,7 @@ def parse_timestamp(value):
         return value
     elif isinstance(value, six.integer_types + (float, )):
         return datetime.utcfromtimestamp(value).replace(tzinfo=pytz.utc)
-    value = (value or '').rstrip('Z').encode('ascii', 'replace').split('.', 1)
+    value = (value or '').rstrip('Z').split('.', 1)
     if not value:
         return None
     try:

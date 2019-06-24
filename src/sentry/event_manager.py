@@ -252,6 +252,7 @@ def _decode_event(data, content_encoding):
     if isinstance(data, six.text_type):
         data = safely_load_json_string(data)
 
+    # XXX(python3): if data is a dict containing bytes key values, then test_query_string_as_bytes will fail when it dumps invalid json
     return CanonicalKeyDict(data)
 
 
