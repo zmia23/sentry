@@ -160,7 +160,7 @@ def test_hpkp_validate_basic():
     assert 'errors' not in result
     assert 'logentry' in result
     assert not result.get('culprit')
-    assert sorted(map(tuple, result['tags'])) == [
+    assert sorted(list(map(tuple, result['tags']))) == [
         ('hostname', 'www.example.com'),
         ('include-subdomains', 'false'),
         ('port', '443'),
