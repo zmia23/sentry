@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import queryString from 'query-string';
 
 import ErrorBoundary from 'app/components/errorBoundary';
 import ExceptionContent from 'app/components/events/interfaces/exceptionContent';
@@ -7,6 +8,33 @@ import RawExceptionContent from 'app/components/events/interfaces/rawExceptionCo
 import SentryTypes from 'app/sentryTypes';
 import StacktraceContent from 'app/components/events/interfaces/stacktraceContent';
 import rawStacktraceContent from 'app/components/events/interfaces/rawStacktraceContent';
+
+class SearchOnStackoverflow extends React.Component {
+  componentDidMount() {
+    const exc = this.props.values[0];
+    const {type} = this.props;
+
+    const content =
+      exc.stacktrace &&
+      rawStacktraceContent(
+        type === 'original' ? exc.stacktrace : exc.rawStacktrace,
+        this.props.platform,
+        exc
+      );
+
+    const query = {
+      q: String(content).split(/\n/)[0],
+    };
+
+    window.location.href = `https://stackoverflow.com/search?${queryString.stringify(
+      query
+    )}`;
+  }
+
+  render() {
+    return null;
+  }
+}
 
 class CrashContent extends React.Component {
   static propTypes = {
@@ -21,23 +49,44 @@ class CrashContent extends React.Component {
 
   renderException = () => {
     const {event, stackView, stackType, newestFirst, exception, projectId} = this.props;
-    return stackView === 'raw' ? (
-      <RawExceptionContent
-        eventId={event.id}
-        projectId={projectId}
-        type={stackType}
-        values={exception.values}
-        platform={event.platform}
-      />
-    ) : (
-      <ExceptionContent
-        type={stackType}
-        view={stackView}
-        values={exception.values}
-        platform={event.platform}
-        newestFirst={newestFirst}
-      />
-    );
+
+    switch (stackView) {
+      case 'raw': {
+        return (
+          <RawExceptionContent
+            eventId={event.id}
+            projectId={projectId}
+            type={stackType}
+            values={exception.values}
+            platform={event.platform}
+          />
+        );
+      }
+
+      case 'search_on_stackoverflow': {
+        return (
+          <SearchOnStackoverflow
+            eventId={event.id}
+            projectId={projectId}
+            type={stackType}
+            values={exception.values}
+            platform={event.platform}
+          />
+        );
+      }
+
+      default: {
+        return (
+          <ExceptionContent
+            type={stackType}
+            view={stackView}
+            values={exception.values}
+            platform={event.platform}
+            newestFirst={newestFirst}
+          />
+        );
+      }
+    }
   };
 
   renderStacktrace = () => {

@@ -129,6 +129,12 @@ class CrashHeader extends React.Component {
           >
             {t('Raw')}
           </a>
+          <a
+            className={(stackView === 'search_on_stackoverflow' ? 'active' : '') + ' btn btn-default btn-sm'}
+            onClick={() => this.setStackView('search_on_stackoverflow')}
+          >
+            {t('Search on StackOverflow')}
+          </a>
         </div>
         <div className="btn-group">
           {this.hasMinified() && [
