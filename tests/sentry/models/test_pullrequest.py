@@ -18,7 +18,7 @@ class FindReferencedGroupsTest(TestCase):
         )
 
         commit = Commit.objects.create(
-            key=sha1(uuid4().hex).hexdigest(),
+            key=sha1(uuid4().hex.encode('ascii')).hexdigest(),
             repository_id=repo.id,
             organization_id=group.organization.id,
             message=u'Foo Biz\n\nFixes {}'.format(
