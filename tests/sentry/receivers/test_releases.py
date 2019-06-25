@@ -60,7 +60,7 @@ class ResolvedInCommitTest(TestCase):
         )
 
         commit = Commit.objects.create(
-            key=sha1(uuid4().hex).hexdigest(),
+            key=sha1(uuid4().hex.encode('ascii')).hexdigest(),
             repository_id=repo.id,
             organization_id=group.organization.id,
             message=u'Foo Biz\n\nFixes {}'.format(group.qualified_short_id),
@@ -77,7 +77,7 @@ class ResolvedInCommitTest(TestCase):
         )
 
         commit = Commit.objects.create(
-            key=sha1(uuid4().hex).hexdigest(),
+            key=sha1(uuid4().hex.encode('ascii')).hexdigest(),
             repository_id=repo.id,
             organization_id=group.organization.id,
         )
@@ -98,7 +98,7 @@ class ResolvedInCommitTest(TestCase):
         )
 
         commit = Commit.objects.create(
-            key=sha1(uuid4().hex).hexdigest(),
+            key=sha1(uuid4().hex.encode('ascii')).hexdigest(),
             repository_id=repo.id,
             organization_id=group.organization.id,
             message=u'Foo Biz\n\nFixes {}'.format(group.qualified_short_id),
@@ -120,7 +120,7 @@ class ResolvedInCommitTest(TestCase):
         )
 
         commit = Commit.objects.create(
-            key=sha1(uuid4().hex).hexdigest(),
+            key=sha1(uuid4().hex.encode('ascii')).hexdigest(),
             repository_id=repo.id,
             organization_id=group.organization.id,
             message=u'Foo Biz\n\nFixes {}'.format(group.qualified_short_id),
@@ -140,7 +140,7 @@ class ResolvedInCommitTest(TestCase):
         )
 
         commit = Commit.objects.create(
-            key=sha1(uuid4().hex).hexdigest(),
+            key=sha1(uuid4().hex.encode('ascii')).hexdigest(),
             repository_id=repo.id,
             organization_id=self.organization.id,
             message=u'Foo Biz\n\nFixes {}-12F'.format(
@@ -172,7 +172,7 @@ class ResolvedInCommitTest(TestCase):
         )
 
         commit = Commit.objects.create(
-            key=sha1(uuid4().hex).hexdigest(),
+            key=sha1(uuid4().hex.encode('ascii')).hexdigest(),
             organization_id=group.organization.id,
             repository_id=repo.id,
             message=u'Foo Biz\n\nFixes {}'.format(group.qualified_short_id),
@@ -223,7 +223,7 @@ class ResolvedInCommitTest(TestCase):
         )
 
         commit = Commit.objects.create(
-            key=sha1(uuid4().hex).hexdigest(),
+            key=sha1(uuid4().hex.encode('ascii')).hexdigest(),
             organization_id=group.organization.id,
             repository_id=repo.id,
             message=u'Foo Biz\n\nFixes {}'.format(group.qualified_short_id),
