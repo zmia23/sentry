@@ -90,11 +90,11 @@ def on_delete(instance, actor=None, **kwargs):
         return
 
     # TODO(lb): I'm assuming that this is used by integrations... is it?
-    def handle_exception(exc):
+    def handle_exception(e):
         from sentry.exceptions import InvalidIdentity, PluginError
         from sentry.integrations.exceptions import IntegrationError
-        if isinstance(exc, (IntegrationError, PluginError, InvalidIdentity)):
-            error = exc.message
+        if isinstance(e, (IntegrationError, PluginError, InvalidIdentity)):
+            error = str(e)
         else:
             error = 'An unknown error occurred'
         if actor is not None:
@@ -104,16 +104,16 @@ def on_delete(instance, actor=None, **kwargs):
     if instance.has_integration_provider():
         try:
             instance.get_provider().on_delete_repository(repo=instance)
-        except Exception as exc:
-            handle_exception(exc)
+        except Exception as e:
+            handle_exception(e)
     else:
         try:
             instance.get_provider().delete_repository(
                 repo=instance,
                 actor=actor,
             )
-        except Exception as exc:
-            handle_exception(exc)
+        except Exception as e:
+            handle_exception(e)
 
 
 pending_delete.connect(on_delete, sender=Repository, weak=False)
