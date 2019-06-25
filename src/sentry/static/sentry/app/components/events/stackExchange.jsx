@@ -9,12 +9,13 @@ import Pills from 'app/components/pills';
 import Pill from 'app/components/pill';
 import ToolbarHeader from 'app/components/toolbarHeader';
 import {t} from 'app/locale';
-// import SentryTypes from 'app/sentryTypes';
-import withApi from 'app/utils/withApi'; 
+import SentryTypes from 'app/sentryTypes';
+import withApi from 'app/utils/withApi';
+
 class EventStackExchange extends React.Component {
   static propTypes = {
     api: PropTypes.object.isRequired,
-    // event: SentryTypes.Event.isRequired,
+    event: SentryTypes.Event.isRequired,
   };
 
   constructor(...args) {
@@ -22,6 +23,8 @@ class EventStackExchange extends React.Component {
     this.state = {
       questions: [],
     };
+
+    this.renderStackExchangeQuestion = this.renderStackExchangeQuestion.bind(this);
   }
 
   componentDidMount() {
@@ -47,10 +50,10 @@ class EventStackExchange extends React.Component {
     return (
       <Sticky>
         <StyledFlex py={1}>
-          <Box w={16} mx={1} />
           <Box w={[8 / 12, 8 / 12, 6 / 12]} mx={1} flex="1">
-            <ToolbarHeader>{t('Title')}</ToolbarHeader>
+            <ToolbarHeader>{t('Question')}</ToolbarHeader>
           </Box>
+          <Box w={16} mx={2} justify="align-right" />
           <Box w={[40, 60, 80, 80]} mx={2} className="align-right">
             <ToolbarHeader>{t('Answers')}</ToolbarHeader>
           </Box>
@@ -62,18 +65,35 @@ class EventStackExchange extends React.Component {
     );
   }
 
+  decode(escapedHtml) {
+    const doc = new DOMParser().parseFromString(escapedHtml, 'text/html');
+    return doc.documentElement.textContent;
+  }
+
   renderStackExchangeQuestion(question) {
     return (
       <Group key={question.question_id} py={1} px={0} align="center">
-        <Box w={16} mx={1}>
-          <div>{question.is_answered && <span className="icon-checkmark" />}</div>
-        </Box>
         <Box w={[8 / 12, 8 / 12, 6 / 12]} mx={1} flex="1">
-          <div>{question.title}</div>
-          <Pills className="no-margin">
-            {question.tags.map(tag => <Pill key={tag} name={tag} />)}
-          </Pills>
+          <div>
+            <a href={question.link} target="_blank" rel="noopener noreferrer">
+              {this.decode(question.title)}
+            </a>
+          </div>
+          <StyledTags>
+            {question.tags.map(tag => (
+              <a
+                style={{cursor: 'default'}}
+                className="btn btn-default btn-sm"
+                key={tag}
+              >
+                {tag}
+              </a>
+            ))}
+          </StyledTags>
         </Box>
+        <Flex w={16} mx={2} justify="flex-end">
+          {question.is_answered && <span className="icon-checkmark" />}
+        </Flex>
         <Flex w={[40, 60, 80, 80]} mx={2} justify="flex-end">
           <StyledCount value={question.answer_count} />
         </Flex>
@@ -122,6 +142,13 @@ const StyledFlex = styled(Flex)`
 const StyledCount = styled(Count)`
   font-size: 18px;
   color: ${p => p.theme.gray3};
+`;
+
+const StyledTags = styled('div')`
+  float: left;
+  position: relative;
+  margin-top: 8px;
+  margin-bottom: 8px;
 `;
 
 export default withApi(EventStackExchange);
