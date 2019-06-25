@@ -257,14 +257,14 @@ app:
             filename*
               'lib.rs'
             function*
-              u"<tokio_current_thread::Entered<'a, P>>::block_on"
+              "<tokio_current_thread::Entered<'a, P>>::block_on"
             lineno (function takes precedence)
               488
           frame*
             filename*
               'lib.rs'
             function*
-              u"<tokio_current_thread::Entered<'a, P>>::tick"
+              "<tokio_current_thread::Entered<'a, P>>::tick"
             lineno (function takes precedence)
               605
           frame*
@@ -278,7 +278,7 @@ app:
             filename*
               'lib.rs'
             function*
-              u"<tokio_current_thread::Borrow<'a, U>>::enter"
+              "<tokio_current_thread::Borrow<'a, U>>::enter"
             lineno (function takes precedence)
               776
           frame (non app frame)
@@ -299,7 +299,7 @@ app:
             filename*
               'lib.rs'
             function*
-              u"<tokio_current_thread::Borrow<'a, U>>::enter::{{closure}}"
+              "<tokio_current_thread::Borrow<'a, U>>::enter::{{closure}}"
             lineno (function takes precedence)
               778
           frame*
@@ -313,7 +313,7 @@ app:
             filename*
               'lib.rs'
             function*
-              u"<tokio_current_thread::Borrow<'a, U>>::enter::{{closure}}::{{closure}}"
+              "<tokio_current_thread::Borrow<'a, U>>::enter::{{closure}}::{{closure}}"
             lineno (function takes precedence)
               779
           frame*
@@ -327,7 +327,7 @@ app:
             filename*
               'scheduler.rs'
             function*
-              u"<tokio_current_thread::scheduler::Scheduled<'a, U>>::tick"
+              "<tokio_current_thread::scheduler::Scheduled<'a, U>>::tick"
             lineno (function takes precedence)
               354
           frame*
@@ -799,14 +799,14 @@ system:
             filename*
               'lib.rs'
             function*
-              u"<tokio_current_thread::Entered<'a, P>>::block_on"
+              "<tokio_current_thread::Entered<'a, P>>::block_on"
             lineno (function takes precedence)
               488
           frame*
             filename*
               'lib.rs'
             function*
-              u"<tokio_current_thread::Entered<'a, P>>::tick"
+              "<tokio_current_thread::Entered<'a, P>>::tick"
             lineno (function takes precedence)
               605
           frame*
@@ -820,7 +820,7 @@ system:
             filename*
               'lib.rs'
             function*
-              u"<tokio_current_thread::Borrow<'a, U>>::enter"
+              "<tokio_current_thread::Borrow<'a, U>>::enter"
             lineno (function takes precedence)
               776
           frame*
@@ -841,7 +841,7 @@ system:
             filename*
               'lib.rs'
             function*
-              u"<tokio_current_thread::Borrow<'a, U>>::enter::{{closure}}"
+              "<tokio_current_thread::Borrow<'a, U>>::enter::{{closure}}"
             lineno (function takes precedence)
               778
           frame*
@@ -855,7 +855,7 @@ system:
             filename*
               'lib.rs'
             function*
-              u"<tokio_current_thread::Borrow<'a, U>>::enter::{{closure}}::{{closure}}"
+              "<tokio_current_thread::Borrow<'a, U>>::enter::{{closure}}::{{closure}}"
             lineno (function takes precedence)
               779
           frame*
@@ -869,7 +869,7 @@ system:
             filename*
               'scheduler.rs'
             function*
-              u"<tokio_current_thread::scheduler::Scheduled<'a, U>>::tick"
+              "<tokio_current_thread::scheduler::Scheduled<'a, U>>::tick"
             lineno (function takes precedence)
               354
           frame*

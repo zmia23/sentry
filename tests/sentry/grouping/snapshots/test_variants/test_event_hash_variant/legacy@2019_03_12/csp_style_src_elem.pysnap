@@ -14,4 +14,4 @@ default:
         uri*
           'use.fontawesome.com'
       message (csp takes precedence)
-        u"Blocked 'style' from 'use.fontawesome.com'"
+        "Blocked 'style' from 'use.fontawesome.com'"

@@ -26,7 +26,7 @@ app:
             filename (module takes precedence)
               '/usr/src/getsentry/src/sentry/node_modules/core-js/modules/es6.promise.js'
             context-line*
-              u"    while (chain.length > i) run(chain[i++]); // variable length - can't use forEach"
+              "    while (chain.length > i) run(chain[i++]); // variable length - can't use forEach"
             function (function name is used only if module or filename are available)
               'fn'
             lineno (line number is used only if module or filename are available)
@@ -229,7 +229,7 @@ system:
             filename (module takes precedence)
               '/usr/src/getsentry/src/sentry/node_modules/core-js/modules/es6.promise.js'
             context-line*
-              u"    while (chain.length > i) run(chain[i++]); // variable length - can't use forEach"
+              "    while (chain.length > i) run(chain[i++]); // variable length - can't use forEach"
             function (function name is used only if module or filename are available)
               'fn'
             lineno (line number is used only if module or filename are available)

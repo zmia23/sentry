@@ -89,7 +89,7 @@ app:
             function*
               'handle'
             context-line*
-              u"email = request.POST['user']"
+              "email = request.POST['user']"
           frame (non app frame)
             module*
               'django.utils.datastructures'
@@ -190,7 +190,7 @@ system:
             function*
               'handle'
             context-line*
-              u"email = request.POST['user']"
+              "email = request.POST['user']"
           frame*
             module*
               'django.utils.datastructures'

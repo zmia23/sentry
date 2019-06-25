@@ -24,7 +24,7 @@ app:
         type*
           'TypeError'
         value*
-          u"Cannot read property 'submitError' of null"
+          "Cannot read property 'submitError' of null"
 --------------------------------------------------------------------------
 system:
   hash: '8717a0fb8a1ddcabdd21bc2b7ca9ebee'
@@ -47,4 +47,4 @@ system:
         type*
           'TypeError'
         value (ignored because stacktrace takes precedence)
-          u"Cannot read property 'submitError' of null"
+          "Cannot read property 'submitError' of null"

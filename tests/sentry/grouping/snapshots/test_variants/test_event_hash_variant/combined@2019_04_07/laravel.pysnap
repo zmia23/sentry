@@ -13,7 +13,7 @@ app:
             filename*
               '/server.php'
             context-line*
-              u"require_once __DIR__.'/public/index.php';"
+              "require_once __DIR__.'/public/index.php';"
             lineno (line number is used only if module or filename are available)
               21
           frame*
@@ -443,7 +443,7 @@ app:
             filename*
               '/vendor/laravel/framework/src/Illuminate/Routing/Route.php'
             context-line*
-              u"            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])"
+              "            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])"
             function (function name is used only if module or filename are available)
               'Illuminate\\Routing\\Route::runCallable'
             lineno (line number is used only if module or filename are available)
@@ -452,7 +452,7 @@ app:
             filename*
               '/routes/web.php'
             context-line*
-              u"    throw new Exception('LARAVEL TEST');"
+              "    throw new Exception('LARAVEL TEST');"
             function (function name is used only if module or filename are available)
               'Illuminate\\Routing\\RouteFileRegistrar::{closure}'
             lineno (line number is used only if module or filename are available)
@@ -472,7 +472,7 @@ system:
             filename*
               '/server.php'
             context-line*
-              u"require_once __DIR__.'/public/index.php';"
+              "require_once __DIR__.'/public/index.php';"
             lineno (line number is used only if module or filename are available)
               21
           frame*
@@ -902,7 +902,7 @@ system:
             filename*
               '/vendor/laravel/framework/src/Illuminate/Routing/Route.php'
             context-line*
-              u"            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])"
+              "            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])"
             function (function name is used only if module or filename are available)
               'Illuminate\\Routing\\Route::runCallable'
             lineno (line number is used only if module or filename are available)
@@ -911,7 +911,7 @@ system:
             filename*
               '/routes/web.php'
             context-line*
-              u"    throw new Exception('LARAVEL TEST');"
+              "    throw new Exception('LARAVEL TEST');"
             function (function name is used only if module or filename are available)
               'Illuminate\\Routing\\RouteFileRegistrar::{closure}'
             lineno (line number is used only if module or filename are available)

@@ -89,7 +89,7 @@ app:
         type*
           'ConnectionError'
         value (ignored because stacktrace takes precedence)
-          u"Error while reading from socket: ('Connection closed by server.',)"
+          "Error while reading from socket: ('Connection closed by server.',)"
 --------------------------------------------------------------------------
 default:
   hash: None
@@ -184,4 +184,4 @@ system:
         type*
           'ConnectionError'
         value (ignored because stacktrace takes precedence)
-          u"Error while reading from socket: ('Connection closed by server.',)"
+          "Error while reading from socket: ('Connection closed by server.',)"
