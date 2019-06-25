@@ -7,6 +7,7 @@ sentry.tagstore.legacy.models.eventtag
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -26,7 +27,7 @@ class EventTag(Model):
     # maintain a date column for easy removal
     date_added = models.DateTimeField(default=timezone.now, db_index=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_eventtag'
         unique_together = (('event_id', 'key_id', 'value_id'), )

@@ -58,7 +58,7 @@ class SlugsUpdateEndpoint(OrganizationEndpoint):
                     slug=slug, organization=organization
                 ).exclude(id=project.id).first()
                 if other is not None:
-                    if len(slugs) != len(slugs.values()):
+                    if len(slugs) != len(list(slugs.values())):
                         return Response({'detail': 'Duplicate slug %s' % slug}, status=400)
                 project.slug = slug
                 project.update_option('sentry:reviewed-slug', True)

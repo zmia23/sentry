@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import str
 import base64
 import math
 
@@ -352,7 +353,7 @@ class APIView(BaseView):
 
             # We want to send only serializable items from request.META
             meta = {}
-            for key, value in request.META.items():
+            for key, value in list(request.META.items()):
                 try:
                     json.dumps([key, value])
                     meta[key] = value

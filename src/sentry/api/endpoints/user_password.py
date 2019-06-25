@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.utils.crypto import constant_time_compare
 from rest_framework import serializers, status
 from rest_framework.response import Response
@@ -15,7 +16,7 @@ class UserPasswordSerializer(serializers.ModelSerializer):
     passwordNew = serializers.CharField(required=True)
     passwordVerify = serializers.CharField(required=True)
 
-    class Meta:
+    class Meta(object):
         model = User
         fields = ('password', 'passwordNew', 'passwordVerify', )
 

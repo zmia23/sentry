@@ -8,6 +8,8 @@ sentry.models.file
 
 from __future__ import absolute_import
 
+from builtins import bytes
+from builtins import object
 import os
 import six
 import mmap
@@ -113,7 +115,7 @@ class FileBlob(Model):
     checksum = models.CharField(max_length=40, unique=True)
     timestamp = models.DateTimeField(default=timezone.now, db_index=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_fileblob'
 
@@ -338,7 +340,7 @@ class File(Model):
 
     # </Legacy fields>
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_file'
 
@@ -479,7 +481,7 @@ class FileBlobIndex(Model):
     blob = FlexibleForeignKey('sentry.FileBlob')
     offset = BoundedPositiveIntegerField()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_fileblobindex'
         unique_together = (('file', 'blob', 'offset'), )
@@ -641,7 +643,7 @@ class FileBlobOwner(Model):
     blob = FlexibleForeignKey('sentry.FileBlob')
     organization = FlexibleForeignKey('sentry.Organization')
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_fileblobowner'
         unique_together = (('blob', 'organization'), )

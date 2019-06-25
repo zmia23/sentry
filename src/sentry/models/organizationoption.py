@@ -7,6 +7,7 @@ sentry.models.organizationoption
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from celery.signals import task_postrun
 from django.core.signals import request_finished
 from django.db import models
@@ -124,7 +125,7 @@ class OrganizationOption(Model):
 
     objects = OrganizationOptionManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_organizationoptions'
         unique_together = (('organization', 'key', ), )

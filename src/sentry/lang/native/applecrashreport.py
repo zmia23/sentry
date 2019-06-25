@@ -1,5 +1,8 @@
 from __future__ import absolute_import
 
+from builtins import hex
+from builtins import str
+from builtins import object
 import posixpath
 
 from sentry.constants import NATIVE_UNKNOWN_STRING
@@ -166,12 +169,9 @@ class AppleCrashReport(object):
         # We dont need binary images on symbolicated crashreport
         if self.symbolicated or self.debug_images is None:
             return ''
-        binary_images = map(
-            lambda i: self._convert_debug_meta_to_binary_image_row(
-                debug_image=i),
-            sorted(self.debug_images,
-                   key=lambda i: parse_addr(i['image_addr']))
-        )
+        binary_images = [self._convert_debug_meta_to_binary_image_row(
+                debug_image=i) for i in sorted(self.debug_images,
+                   key=lambda i: parse_addr(i['image_addr']))]
         return 'Binary Images:\n' + '\n'.join(binary_images)
 
     def _convert_debug_meta_to_binary_image_row(self, debug_image):

@@ -5,6 +5,7 @@ rather than direct inspection of models.py.
 
 from __future__ import print_function
 
+from builtins import str
 import datetime
 import re
 import decimal
@@ -307,7 +308,7 @@ def get_value(field, descriptor):
     # Some are made from a formatting string and several attrs (e.g. db_table)
     if "default_attr_concat" in options:
         format, attrs = options['default_attr_concat'][0], options['default_attr_concat'][1:]
-        default_value = format % tuple(map(lambda x: get_attribute(field, x), attrs))
+        default_value = format % tuple([get_attribute(field, x) for x in attrs])
         if value == default_value:
             raise IsDefault
     # Clean and return the value
@@ -392,7 +393,7 @@ def introspector(field):
             args.append(get_value(field, defn))
         except IsDefault:
             pass
-    for kwd, defn in kwarg_defs.items():
+    for kwd, defn in list(kwarg_defs.items()):
         try:
             kwargs[kwd] = get_value(field, defn)
         except IsDefault:
@@ -461,7 +462,7 @@ def get_model_meta(model):
 
     # Get the introspected attributes
     meta_def = {}
-    for kwd, defn in meta_details.items():
+    for kwd, defn in list(meta_details.items()):
         try:
             meta_def[kwd] = get_value(model._meta, defn)
         except IsDefault:

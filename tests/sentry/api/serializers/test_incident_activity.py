@@ -2,6 +2,7 @@
 
 from __future__ import absolute_import
 
+from builtins import range
 from datetime import timedelta
 from uuid import uuid4
 

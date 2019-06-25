@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from six import text_type
 from symbolic import SourceView
 from sentry.utils.strings import codec_lookup

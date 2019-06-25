@@ -1,5 +1,8 @@
 from __future__ import absolute_import, unicode_literals
+from __future__ import division
 
+from builtins import next
+from past.utils import old_div
 import uuid
 from copy import copy
 from collections import defaultdict
@@ -149,7 +152,7 @@ class SQLPanel(Panel):
             for n, db in enumerate(self._databases.values()):
                 rgb = [0, 0, 0]
                 color = n % 3
-                rgb[color] = 256 - n / 3 * factor
+                rgb[color] = 256 - old_div(n, 3 * factor)
                 nn = color
                 # XXX: pretty sure this is horrible after so many aliases
                 while rgb[color] < factor:
@@ -195,7 +198,7 @@ class SQLPanel(Panel):
                     query['sql'] = reformat_sql(query['sql'])
                 query['rgb_color'] = self._databases[alias]['rgb_color']
                 try:
-                    query['width_ratio'] = (query['duration'] / self._sql_time) * 100
+                    query['width_ratio'] = (old_div(query['duration'], self._sql_time)) * 100
                     query['width_ratio_relative'
                           ] = (100.0 * query['width_ratio'] / (100.0 - width_ratio_tally))
                 except ZeroDivisionError:
@@ -217,10 +220,10 @@ class SQLPanel(Panel):
         query_duplicates = dict(
             (
                 alias, dict(
-                    (query, duplicate_count) for query, duplicate_count in queries.items()
+                    (query, duplicate_count) for query, duplicate_count in list(queries.items())
                     if duplicate_count >= 2
                 )
-            ) for alias, queries in query_duplicates.items()
+            ) for alias, queries in list(query_duplicates.items())
         )
 
         for alias, query in self._queries:
@@ -230,15 +233,15 @@ class SQLPanel(Panel):
             except KeyError:
                 pass
 
-        for alias, alias_info in self._databases.items():
+        for alias, alias_info in list(self._databases.items()):
             try:
-                alias_info["duplicate_count"] = sum(e for e in query_duplicates[alias].values())
+                alias_info["duplicate_count"] = sum(e for e in list(query_duplicates[alias].values()))
             except KeyError:
                 pass
 
         self.record_stats(
             {
-                'databases': sorted(self._databases.items(), key=lambda x: -x[1]['time_spent']),
+                'databases': sorted(list(self._databases.items()), key=lambda x: -x[1]['time_spent']),
                 'queries': [q for a, q in self._queries],
                 'sql_time': self._sql_time,
             }

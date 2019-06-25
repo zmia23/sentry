@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from builtins import object
 from django.db import models, transaction
 from sentry.db.models.fields import JSONField
 from sentry.db.models import (
@@ -12,7 +13,7 @@ class DiscoverSavedQueryProject(Model):
     project = FlexibleForeignKey('sentry.Project')
     discover_saved_query = FlexibleForeignKey('sentry.DiscoverSavedQuery')
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_discoversavedqueryproject'
         unique_together = (('project', 'discover_saved_query'), )
@@ -32,7 +33,7 @@ class DiscoverSavedQuery(Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_discoversavedquery'
 

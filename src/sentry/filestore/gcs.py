@@ -234,7 +234,7 @@ class GoogleCloudStorage(Storage):
     def __init__(self, **settings):
         # check if some of the settings we've provided as class attributes
         # need to be overwritten with values passed in here
-        for name, value in settings.items():
+        for name, value in list(settings.items()):
             if hasattr(self, name):
                 setattr(self, name, value)
 

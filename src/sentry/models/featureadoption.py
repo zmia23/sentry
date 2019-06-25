@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import logging
 
 from django.db import models, IntegrityError, transaction
@@ -194,7 +195,7 @@ class FeatureAdoption(Model):
 
     __repr__ = sane_repr('organization_id', 'feature_id', 'complete', 'applicable')
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_featureadoption'
         unique_together = (('organization', 'feature_id'), )

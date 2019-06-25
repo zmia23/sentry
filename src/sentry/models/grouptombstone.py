@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import logging
 
 from django.db import models
@@ -18,7 +19,7 @@ class GroupTombstone(Model):
     previous_group_id = BoundedPositiveIntegerField(unique=True)
     project = FlexibleForeignKey('sentry.Project')
     level = BoundedPositiveIntegerField(
-        choices=LOG_LEVELS.items(), default=logging.ERROR, blank=True
+        choices=list(LOG_LEVELS.items()), default=logging.ERROR, blank=True
     )
     message = models.TextField()
     culprit = models.CharField(
@@ -29,7 +30,7 @@ class GroupTombstone(Model):
     data = GzippedDictField(blank=True, null=True)
     actor_id = BoundedPositiveIntegerField(null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_grouptombstone'
 

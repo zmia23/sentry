@@ -165,7 +165,7 @@ class MailPlugin(NotificationPlugin):
 
                 alert_settings = project.get_member_alert_settings(self.alert_option_key)
                 disabled_users = set(
-                    user for user, setting in alert_settings.items() if setting == 0
+                    user for user, setting in list(alert_settings.items()) if setting == 0
                 )
                 return send_to_list - disabled_users
             else:
@@ -251,7 +251,7 @@ class MailPlugin(NotificationPlugin):
             'link': link,
             'rules': rules,
             'enhanced_privacy': enhanced_privacy,
-            'commits': sorted(commits.values(), key=lambda x: x['score'], reverse=True),
+            'commits': sorted(list(commits.values()), key=lambda x: x['score'], reverse=True),
             'environment': environment
         }
 
@@ -412,7 +412,7 @@ class MailPlugin(NotificationPlugin):
         # TODO(dcramer): this is copypasta'd from activity notifications
         # and while it'd be nice to re-use all of that, they are currently
         # coupled to <Activity> instances which makes this tough
-        for user, reason in participants.items():
+        for user, reason in list(participants.items()):
             context.update({
                 'reason': GroupSubscriptionReason.descriptions.get(
                     reason,

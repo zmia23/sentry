@@ -1,5 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
+from builtins import map
+from builtins import object
 import json
 from threading import local
 from time import time
@@ -86,7 +88,7 @@ class NormalCursorWrapper(object):
         if not params:
             return params
         if isinstance(params, dict):
-            return dict((key, self._quote_expr(value)) for key, value in params.items())
+            return dict((key, self._quote_expr(value)) for key, value in list(params.items()))
         return list(map(self._quote_expr, params))
 
     def _decode(self, param):

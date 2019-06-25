@@ -6,6 +6,9 @@ sentry.event_manager
 """
 from __future__ import absolute_import, print_function
 
+from builtins import str
+from builtins import map
+from builtins import object
 import time
 import jsonschema
 import logging
@@ -312,7 +315,7 @@ class EventManager(object):
             raise APIError('Invalid security report: %s' % str(e).splitlines()[0])
 
         def clean(d):
-            return dict(filter(lambda x: x[1], d.items()))
+            return dict([x for x in list(d.items()) if x[1]])
 
         data.update(
             {
@@ -403,7 +406,7 @@ class EventManager(object):
 
         for exc in get_path(self._data, 'exception', 'values', filter=True, default=[]):
             message = u': '.join(
-                filter(None, map(exc.get, ['type', 'value']))
+                [_f for _f in map(exc.get, ['type', 'value']) if _f]
             )
             if message and not is_valid_error_message(self._project, message):
                 return (True, FilterStatKeys.ERROR_MESSAGE)
@@ -967,13 +970,13 @@ class EventManager(object):
         return euser
 
     def _find_hashes(self, project, hash_list):
-        return map(
+        return list(map(
             lambda hash: GroupHash.objects.get_or_create(
                 project=project,
                 hash=hash,
             )[0],
             hash_list,
-        )
+        ))
 
     def _save_aggregate(self, event, hashes, release, **kwargs):
         project = event.project

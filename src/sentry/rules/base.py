@@ -37,6 +37,7 @@ by the rule's logic. Each rule condition may be associated with a form.
 
 from __future__ import absolute_import
 
+from builtins import object
 import logging
 import six
 

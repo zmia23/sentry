@@ -1,5 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
+from builtins import map
+from builtins import object
 import inspect
 import os.path
 import re
@@ -65,7 +67,7 @@ def tidy_stacktrace(stack):
 def render_stacktrace(trace):
     stacktrace = []
     for frame in trace:
-        params = map(escape, frame[0].rsplit(os.path.sep, 1) + list(frame[1:]))
+        params = list(map(escape, frame[0].rsplit(os.path.sep, 1) + list(frame[1:])))
         params_dict = dict((six.text_type(idx), v) for idx, v in enumerate(params))
         try:
             stacktrace.append(

@@ -7,6 +7,7 @@ sentry.models.groupseen
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -25,7 +26,7 @@ class GroupSeen(Model):
     user = FlexibleForeignKey(settings.AUTH_USER_MODEL, db_index=False)
     last_seen = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_groupseen'
         unique_together = (('user', 'group'), )

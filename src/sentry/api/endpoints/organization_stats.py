@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import map
 from rest_framework.response import Response
 
 from sentry import tsdb
@@ -70,7 +71,7 @@ class OrganizationStatsEndpoint(OrganizationEndpoint, EnvironmentMixin, StatsMix
             raise ValueError('Invalid group: %s' % group)
 
         if 'id' in request.GET:
-            id_filter_set = frozenset(map(int, request.GET.getlist('id')))
+            id_filter_set = frozenset(list(map(int, request.GET.getlist('id'))))
             keys = [k for k in keys if k in id_filter_set]
 
         if not keys:

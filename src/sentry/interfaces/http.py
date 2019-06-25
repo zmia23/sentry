@@ -8,6 +8,7 @@ sentry.interfaces.http
 
 from __future__ import absolute_import
 
+from builtins import map
 __all__ = ('Http', )
 
 import re
@@ -33,7 +34,7 @@ def format_headers(value):
         return ()
 
     if isinstance(value, dict):
-        value = value.items()
+        value = list(value.items())
 
     result = []
     cookie_header = None
@@ -62,7 +63,7 @@ def format_cookies(value):
         value = parse_qsl(value, keep_blank_values=True)
 
     if isinstance(value, dict):
-        value = value.items()
+        value = list(value.items())
 
     return [list(map(fix_broken_encoding, (k.strip(), v))) for k, v in value]
 

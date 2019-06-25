@@ -7,6 +7,9 @@ sentry.api.paginator
 """
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import zip
+from builtins import object
 import bisect
 import functools
 import math
@@ -174,7 +177,7 @@ class BasePaginator(object):
     def count_hits(self, max_hits):
         if not max_hits:
             return 0
-        hits_query = self.queryset.values()[:max_hits].query
+        hits_query = list(self.queryset.values())[:max_hits].query
         # clear out any select fields (include select_related) and pull just the id
         hits_query.clear_select_clause()
         hits_query.add_fields(['id'])
@@ -292,10 +295,10 @@ def reverse_bisect_left(a, x, lo=0, hi=None):
 
 class SequencePaginator(object):
     def __init__(self, data, reverse=False, max_limit=MAX_LIMIT, on_results=None):
-        self.scores, self.values = map(
+        self.scores, self.values = list(map(
             list,
-            zip(*sorted(data, reverse=reverse)),
-        ) if data else ([], [])
+            list(zip(*sorted(data, reverse=reverse))),
+        )) if data else ([], [])
         self.reverse = reverse
         self.search = functools.partial(
             reverse_bisect_left if reverse else bisect.bisect_left,

@@ -193,7 +193,7 @@ class CachePanel(Panel):
             else:
                 self.hits += 1
         elif name == 'get_many':
-            for key, value in return_value.items():
+            for key, value in list(return_value.items()):
                 if value is None:
                     self.misses += 1
                 else:

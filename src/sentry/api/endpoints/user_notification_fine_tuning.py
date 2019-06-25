@@ -94,7 +94,7 @@ class UserNotificationFineTuningEndpoint(UserEndpoint):
 
             # set of org ids that user is a member of
             org_ids = self.get_org_ids(user)
-            for org_id, enabled in request.DATA.items():
+            for org_id, enabled in list(request.DATA.items()):
                 org_id = int(org_id)
                 # We want "0" to be falsey
                 enabled = int(enabled)
@@ -122,7 +122,7 @@ class UserNotificationFineTuningEndpoint(UserEndpoint):
             parent_ids = set(self.get_org_ids(user))
 
         try:
-            ids_to_update = set([int(i) for i in request.DATA.keys()])
+            ids_to_update = set([int(i) for i in list(request.DATA.keys())])
         except ValueError:
             return Response({
                 'detail': 'Invalid id value provided. Id values should be integers.'

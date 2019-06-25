@@ -4,6 +4,7 @@ Data migration creation command
 
 from __future__ import print_function
 
+from builtins import map
 import sys
 import os
 import re

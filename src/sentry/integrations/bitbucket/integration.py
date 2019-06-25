@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import filter
 from sentry.integrations import (
     IntegrationInstallation, IntegrationFeatures, IntegrationProvider,
     IntegrationMetadata, FeatureDescription,
@@ -119,10 +120,10 @@ class BitbucketIntegration(IntegrationInstallation, BitbucketIssueBasicMixin, Re
             r['identifier'] for r in self.get_repositories()
         ]
 
-        return filter(
+        return list(filter(
             lambda repo: repo.name not in accessible_repos,
             repos,
-        )
+        ))
 
     def reinstall(self):
         self.reinstall_repositories()

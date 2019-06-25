@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import map
 import os
 import re
 import logging
@@ -32,8 +33,8 @@ def load_registry(path):
 
 
 def get_highest_browser_sdk_version(versions):
-    full_versions = filter(lambda x: _version_regexp.match(x), versions)
-    return six.binary_type(max(map(parse_version, full_versions))
+    full_versions = [x for x in versions if _version_regexp.match(x)]
+    return six.binary_type(max(list(map(parse_version, full_versions)))
                            ) if full_versions else settings.JS_SDK_LOADER_SDK_VERSION
 
 
@@ -60,7 +61,7 @@ def get_highest_selected_browser_sdk_version(selected_version):
     if selected_version == 'latest':
         return get_highest_browser_sdk_version(versions)
     return get_highest_browser_sdk_version(
-        filter(lambda x: x.startswith(selected_version[0]), versions))
+        [x for x in versions if x.startswith(selected_version[0])])
 
 
 def get_browser_sdk_version(project_key):

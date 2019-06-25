@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.conf import settings
 from django.db import (
     IntegrityError,
@@ -28,7 +29,7 @@ class IncidentProject(Model):
     project = FlexibleForeignKey('sentry.Project', db_index=False, db_constraint=False)
     incident = FlexibleForeignKey('sentry.Incident')
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_incidentproject'
         unique_together = (('project', 'incident'), )
@@ -40,7 +41,7 @@ class IncidentGroup(Model):
     group = FlexibleForeignKey('sentry.Group', db_index=False, db_constraint=False)
     incident = FlexibleForeignKey('sentry.Incident')
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_incidentgroup'
         unique_together = (('group', 'incident'), )
@@ -53,7 +54,7 @@ class IncidentSeen(Model):
     user = FlexibleForeignKey(settings.AUTH_USER_MODEL, db_index=False)
     last_seen = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_incidentseen'
         unique_together = (('user', 'incident'), )
@@ -133,7 +134,7 @@ class Incident(Model):
     date_added = models.DateTimeField(default=timezone.now)
     date_closed = models.DateTimeField(null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_incident'
         unique_together = (('organization', 'identifier'),)
@@ -160,7 +161,7 @@ class TimeSeriesSnapshot(Model):
     period = models.IntegerField()
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_timeseriessnapshot'
 
@@ -193,7 +194,7 @@ class IncidentActivity(Model):
     event_stats_snapshot = FlexibleForeignKey('sentry.TimeSeriesSnapshot', null=True)
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_incidentactivity'
 
@@ -205,7 +206,7 @@ class IncidentSubscription(Model):
     user = FlexibleForeignKey(settings.AUTH_USER_MODEL)
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_incidentsubscription'
         unique_together = (('incident', 'user'), )
@@ -220,7 +221,7 @@ class IncidentSuspectCommit(Model):
     commit = FlexibleForeignKey('sentry.Commit', db_constraint=False)
     order = models.SmallIntegerField()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_incidentsuspectcommit'
         unique_together = (('incident', 'commit'), )

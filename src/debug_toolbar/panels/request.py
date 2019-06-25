@@ -55,7 +55,7 @@ class RequestPanel(Panel):
                 {
                     'session': [
                         (k, request.session.get(k))
-                        for k in sorted(request.session.keys(), key=force_text)
+                        for k in sorted(list(request.session.keys()), key=force_text)
                     ]
                 }
             )

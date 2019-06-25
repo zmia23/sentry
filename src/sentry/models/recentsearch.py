@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -26,7 +27,7 @@ class RecentSearch(Model):
     last_seen = models.DateTimeField(default=timezone.now)
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_recentsearch'
         unique_together = (('user', 'organization', 'type', 'query_hash'),)

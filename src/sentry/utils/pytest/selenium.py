@@ -3,6 +3,8 @@ from __future__ import absolute_import
 # TODO(dcramer): this heavily inspired by pytest-selenium, and it's possible
 # we could simply inherit from the plugin at this point
 
+from builtins import map
+from builtins import object
 import logging
 import os
 import pytest

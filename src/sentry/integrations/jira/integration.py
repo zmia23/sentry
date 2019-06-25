@@ -182,7 +182,7 @@ class JiraIntegration(IntegrationInstallation, IssueSyncMixin):
             project_mappings = data.pop('sync_status_forward')
 
             if any(not mapping['on_unresolve'] or not mapping['on_resolve']
-                    for mapping in project_mappings.values()):
+                    for mapping in list(project_mappings.values())):
                 raise IntegrationError('Resolve and unresolve status are required.')
 
             data['sync_status_forward'] = bool(project_mappings)
@@ -191,7 +191,7 @@ class JiraIntegration(IntegrationInstallation, IssueSyncMixin):
                 organization_integration_id=self.org_integration.id,
             ).delete()
 
-            for project_id, statuses in project_mappings.items():
+            for project_id, statuses in list(project_mappings.items()):
                 IntegrationExternalProject.objects.create(
                     organization_integration_id=self.org_integration.id,
                     external_id=project_id,
@@ -338,7 +338,7 @@ class JiraIntegration(IntegrationInstallation, IssueSyncMixin):
         if data.get('errors'):
             if message:
                 message += ' '
-            message += ' '.join(['%s: %s' % (k, v) for k, v in data.get('errors').items()])
+            message += ' '.join(['%s: %s' % (k, v) for k, v in list(data.get('errors').items())])
         return message
 
     def error_fields_from_json(self, data):
@@ -346,7 +346,7 @@ class JiraIntegration(IntegrationInstallation, IssueSyncMixin):
         if not errors:
             return None
 
-        return {key: [error] for key, error in data.get('errors').items()}
+        return {key: [error] for key, error in list(data.get('errors').items())}
 
     def search_url(self, org_slug):
         """
@@ -550,7 +550,7 @@ class JiraIntegration(IntegrationInstallation, IssueSyncMixin):
         # otherwise weird ordering occurs.
         anti_gravity = {"priority": -150, "fixVersions": -125, "components": -100, "security": -50}
 
-        dynamic_fields = issue_type_meta['fields'].keys()
+        dynamic_fields = list(issue_type_meta['fields'].keys())
         dynamic_fields.sort(key=lambda f: anti_gravity.get(f) or 0)
 
         # build up some dynamic fields based on required shit.
@@ -596,7 +596,7 @@ class JiraIntegration(IntegrationInstallation, IssueSyncMixin):
         user_id_field = client.user_id_field()
 
         fs = issue_type_meta['fields']
-        for field in fs.keys():
+        for field in list(fs.keys()):
             f = fs[field]
             if field == 'description':
                 cleaned_data[field] = data[field]
@@ -612,7 +612,7 @@ class JiraIntegration(IntegrationInstallation, IssueSyncMixin):
                 ]
                 cleaned_data['labels'] = labels
                 continue
-            if field in data.keys():
+            if field in list(data.keys()):
                 v = data.get(field)
                 if not v:
                     continue

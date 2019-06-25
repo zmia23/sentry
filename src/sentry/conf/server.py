@@ -9,6 +9,7 @@ These settings act as the default (base) settings for the Sentry-provided web-se
 """
 from __future__ import absolute_import
 
+from builtins import range
 from django.conf.global_settings import *  # NOQA
 
 import os

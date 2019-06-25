@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import filter
 import logging
 import six
 import time
@@ -227,7 +229,7 @@ class RedisBackend(Backend):
                 else:
                     raise
 
-            records = map(
+            records = list(map(
                 lambda key__value__timestamp: Record(
                     key__value__timestamp[0],
                     self.codec.decode(
@@ -235,15 +237,15 @@ class RedisBackend(Backend):
                     float(key__value__timestamp[2]),
                 ),
                 response,
-            )
+            ))
 
             # If the record value is `None`, this means the record data was
             # missing (it was presumably evicted by Redis) so we don't need to
             # return it here.
-            yield filter(
+            yield list(filter(
                 lambda record: record.value is not None,
                 records,
-            )
+            ))
 
             script(
                 connection,

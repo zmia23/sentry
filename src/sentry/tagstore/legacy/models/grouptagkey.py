@@ -7,6 +7,7 @@ sentry.tagstore.legacy.models.grouptagkey
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models, router, transaction, DataError
 
 from sentry.constants import MAX_TAG_KEY_LENGTH
@@ -30,7 +31,7 @@ class GroupTagKey(Model):
 
     objects = BaseManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_grouptagkey'
         unique_together = (('project_id', 'group_id', 'key'), )

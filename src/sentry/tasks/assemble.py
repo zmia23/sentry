@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import str
 from os import path
 
 import hashlib

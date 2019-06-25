@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import pytz
 import six
 
@@ -123,7 +124,7 @@ class Monitor(Model):
     last_checkin = models.DateTimeField(null=True)
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_monitor'
         index_together = (('type', 'next_checkin'),)

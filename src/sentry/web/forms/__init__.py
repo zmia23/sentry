@@ -7,6 +7,7 @@ sentry.web.forms
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
@@ -25,7 +26,7 @@ class NewUserForm(BaseUserForm):
         help_text=_("Send this user a welcome email which will contain their generated password.")
     )
 
-    class Meta:
+    class Meta(object):
         fields = ('name', 'username', 'email')
         model = User
 
@@ -45,7 +46,7 @@ class ChangeUserForm(BaseUserForm):
         )
     )
 
-    class Meta:
+    class Meta(object):
         fields = ('name', 'username', 'email', 'is_active', 'is_staff', 'is_superuser')
         model = User
 

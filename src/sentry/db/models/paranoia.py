@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
@@ -28,7 +29,7 @@ class ParanoidManager(BaseManager):
 
 
 class ParanoidModel(Model):
-    class Meta:
+    class Meta(object):
         abstract = True
 
     date_deleted = models.DateTimeField(null=True, blank=True)

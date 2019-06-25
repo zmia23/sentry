@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -18,7 +19,7 @@ class Email(Model):
     email = CIEmailField(_('email address'), unique=True, max_length=75)
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_email'
 

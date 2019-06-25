@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import six
 
 from celery import Task
@@ -43,7 +44,7 @@ class DictContaining(object):
 
     def _args_match(self, other):
         for key in self.args:
-            if key not in other.keys():
+            if key not in list(other.keys()):
                 return False
         return True
 

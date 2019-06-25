@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -51,7 +52,7 @@ class SavedSearch(Model):
     is_global = models.NullBooleanField(null=True, default=False, db_index=True)
     owner = FlexibleForeignKey('sentry.User', null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_savedsearch'
         # Note that we also have a partial unique constraint on:
@@ -91,7 +92,7 @@ class SavedSearchUserDefault(Model):
     project = FlexibleForeignKey('sentry.Project')
     user = FlexibleForeignKey('sentry.User')
 
-    class Meta:
+    class Meta(object):
         unique_together = (('project', 'user'), )
         app_label = 'sentry'
         db_table = 'sentry_savedsearch_userdefault'

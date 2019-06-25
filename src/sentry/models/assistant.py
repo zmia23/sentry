@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.conf import settings
 from django.db import models
 
@@ -28,7 +29,7 @@ class AssistantActivity(Model):
         'dismissed_ts',
         'useful')
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_assistant_activity'
         unique_together = (('user', 'guide_id'), )

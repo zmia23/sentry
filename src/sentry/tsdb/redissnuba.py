@@ -85,7 +85,7 @@ def make_method(key):
 # So we need to actually apply methods on top to override them.
 class RedisSnubaTSDBMeta(type):
     def __new__(cls, name, bases, attrs):
-        for key in method_specifications.keys():
+        for key in list(method_specifications.keys()):
             attrs[key] = make_method(key)
         return type.__new__(cls, name, bases, attrs)
 

@@ -10,6 +10,7 @@ sentry.coreapi
 #       metadata (rather than generic log messages which aren't useful).
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import abc
 import base64
 import logging
@@ -171,7 +172,7 @@ class ClientApiHelper(object):
 
         # we might be passed some subclasses of dict that fail dumping
         if isinstance(data, CANONICAL_TYPES):
-            data = dict(data.items())
+            data = dict(list(data.items()))
 
         cache_timeout = 3600
         cache_key = cache_key_for_event(data)

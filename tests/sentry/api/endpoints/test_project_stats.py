@@ -94,7 +94,7 @@ class ProjectStatsTest(APITestCase):
                 'project_slug': project1.slug,
             }
         )
-        for stat in STAT_OPTS.keys():
+        for stat in list(STAT_OPTS.keys()):
             response = self.client.get(url, {'stat': stat}, format='json')
             assert response.status_code == 200, response.content
             assert len(response.data) == 24

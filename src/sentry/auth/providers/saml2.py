@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
@@ -300,7 +301,7 @@ class SAML2Provider(Provider):
             raise IdentityNotValid
 
         name = (attributes[k] for k in (Attributes.FIRST_NAME, Attributes.LAST_NAME))
-        name = ' '.join(filter(None, name))
+        name = ' '.join([_f for _f in name if _f])
 
         return {
             'id': attributes[Attributes.IDENTIFIER],

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from datetime import timedelta
 
 from django.conf import settings
@@ -32,7 +33,7 @@ class UserEmail(Model):
         help_text=_('Designates whether this user has confirmed their email.')
     )
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_useremail'
         unique_together = (('user', 'email'), )

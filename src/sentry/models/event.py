@@ -7,6 +7,8 @@ sentry.models.event
 """
 from __future__ import absolute_import
 
+from builtins import zip
+from builtins import object
 import six
 import string
 import warnings
@@ -170,8 +172,8 @@ class EventCommon(object):
             if hashes is not None:
                 return hashes
 
-        return filter(None, [
-            x.get_hash() for x in self.get_grouping_variants(force_config).values()])
+        return [_f for _f in [
+            x.get_hash() for x in list(self.get_grouping_variants(force_config).values())] if _f]
 
     def get_grouping_variants(self, force_config=None, normalize_stacktraces=False):
         """
@@ -291,7 +293,7 @@ class EventCommon(object):
 
     def get_raw_data(self):
         """Returns the internal raw event data dict."""
-        return dict(self.data.items())
+        return dict(list(self.data.items()))
 
     @property
     def size(self):
@@ -700,7 +702,7 @@ class Event(EventCommon, Model):
 
     objects = EventManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_message'
         verbose_name = _('message')

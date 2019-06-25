@@ -29,9 +29,9 @@ class SystemHealthEndpoint(Endpoint):
                         'severity': problem.severity,
                         'url': problem.url,
                     } for problem in
-                    sort_by_severity(itertools.chain.from_iterable(results.values()))
+                    sort_by_severity(itertools.chain.from_iterable(list(results.values())))
                 ],
                 'healthy':
-                {type(check).__name__: not problems for check, problems in results.items()},
+                {type(check).__name__: not problems for check, problems in list(results.items())},
             }
         )

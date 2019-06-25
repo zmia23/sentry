@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -12,11 +13,11 @@ class GroupResolution(Model):
     """
     __core__ = False
 
-    class Type:
+    class Type(object):
         in_release = 0
         in_next_release = 1
 
-    class Status:
+    class Status(object):
         pending = 0
         resolved = 1
 
@@ -35,7 +36,7 @@ class GroupResolution(Model):
         choices=((Status.pending, _('Pending')), (Status.resolved, _('Resolved')), ),
     )
 
-    class Meta:
+    class Meta(object):
         db_table = 'sentry_groupresolution'
         app_label = 'sentry'
 

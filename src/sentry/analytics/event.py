@@ -1,5 +1,7 @@
 from __future__ import absolute_import, print_function
 
+from builtins import map
+from builtins import object
 __all__ = ('Attribute', 'Event', 'Map')
 
 import six

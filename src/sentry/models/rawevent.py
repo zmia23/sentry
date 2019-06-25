@@ -7,6 +7,7 @@ sentry.models.rawevent
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -36,7 +37,7 @@ class RawEvent(Model):
 
     objects = EventManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_rawevent'
         unique_together = (('project', 'event_id'), )

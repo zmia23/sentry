@@ -7,6 +7,7 @@ sentry.tsdb.inmemory
 """
 from __future__ import absolute_import
 
+from builtins import map
 from collections import Counter, defaultdict
 
 import six
@@ -50,7 +51,7 @@ class InMemoryTSDB(BaseTSDB):
         for environment_id in environment_ids:
             destination = self.data[model][(destination, environment_id)]
             for source in sources:
-                for bucket, count in self.data[model].pop((source, environment_id), {}).items():
+                for bucket, count in list(self.data[model].pop((source, environment_id), {}).items()):
                     destination[bucket] += count
 
     def delete(self, models, keys, start=None, end=None, timestamp=None, environment_ids=None):
@@ -62,7 +63,7 @@ class InMemoryTSDB(BaseTSDB):
 
         rollups = self.get_active_series(start, end, timestamp)
 
-        for rollup, series in rollups.items():
+        for rollup, series in list(rollups.items()):
             for model in models:
                 for key in keys:
                     for environment_id in environment_ids:
@@ -170,7 +171,7 @@ class InMemoryTSDB(BaseTSDB):
         for environment_id in environment_ids:
             destination = self.sets[model][(destination, environment_id)]
             for source in sources:
-                for bucket, values in self.sets[model].pop((source, environment_id), {}).items():
+                for bucket, values in list(self.sets[model].pop((source, environment_id), {}).items()):
                     destination[bucket].update(values)
 
     def delete_distinct_counts(self, models, keys, start=None, end=None,
@@ -183,7 +184,7 @@ class InMemoryTSDB(BaseTSDB):
 
         rollups = self.get_active_series(start, end, timestamp)
 
-        for rollup, series in rollups.items():
+        for rollup, series in list(rollups.items()):
             for model in models:
                 for key in keys:
                     for environment_id in environment_ids:
@@ -231,8 +232,8 @@ class InMemoryTSDB(BaseTSDB):
             timestamp = timezone.now()
 
         for model, request in requests:
-            for key, items in request.items():
-                items = {k: float(v) for k, v in items.items()}
+            for key, items in list(request.items()):
+                items = {k: float(v) for k, v in list(items.items())}
                 for environment_id in environment_ids:
                     source = self.frequencies[model][(key, environment_id)]
                     for rollup in self.rollups:
@@ -251,7 +252,7 @@ class InMemoryTSDB(BaseTSDB):
             for timestamp in series:
                 result.update(source[self.normalize_ts_to_rollup(timestamp, rollup)])
 
-        for key, counter in results.items():
+        for key, counter in list(results.items()):
             results[key] = counter.most_common(limit)
 
         return results
@@ -278,7 +279,7 @@ class InMemoryTSDB(BaseTSDB):
         rollup, series = self.get_optimal_rollup_series(start, end, rollup)
 
         results = {}
-        for key, members in items.items():
+        for key, members in list(items.items()):
             result = results[key] = []
             source = self.frequencies[model][(key, environment_id)]
             for timestamp in series:
@@ -297,7 +298,7 @@ class InMemoryTSDB(BaseTSDB):
         ):
             result = results[key] = {}
             for timestamp, scores in series:
-                for member, score in scores.items():
+                for member, score in list(scores.items()):
                     result[member] = result.get(member, 0.0) + score
 
         return results
@@ -312,7 +313,7 @@ class InMemoryTSDB(BaseTSDB):
         for environment_id in environment_ids:
             destination = self.frequencies[model][(destination, environment_id)]
             for source in sources:
-                for bucket, counter in self.data[model].pop((source, environment_id), {}).items():
+                for bucket, counter in list(self.data[model].pop((source, environment_id), {}).items()):
                     destination[bucket].update(counter)
 
     def delete_frequencies(self, models, keys, start=None, end=None,
@@ -325,7 +326,7 @@ class InMemoryTSDB(BaseTSDB):
 
         rollups = self.get_active_series(start, end, timestamp)
 
-        for rollup, series in rollups.items():
+        for rollup, series in list(rollups.items()):
             for model in models:
                 for key in keys:
                     for environment_id in environment_ids:

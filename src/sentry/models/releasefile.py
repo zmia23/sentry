@@ -8,6 +8,7 @@ sentry.models.releasefile
 
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from six.moves.urllib.parse import urlsplit, urlunsplit
 
@@ -35,7 +36,7 @@ class ReleaseFile(Model):
 
     __repr__ = sane_repr('release', 'ident')
 
-    class Meta:
+    class Meta(object):
         unique_together = (('release', 'ident'), )
         index_together = (('release', 'name'), )
         app_label = 'sentry'

@@ -7,6 +7,7 @@ sentry.models.processingissue
 """
 from __future__ import absolute_import
 
+from builtins import object
 from hashlib import sha1
 from django.db import models
 from django.db.models.aggregates import Count
@@ -118,7 +119,7 @@ class ProcessingIssue(Model):
 
     objects = ProcessingIssueManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_processingissue'
         unique_together = (('project', 'checksum', 'type'), )
@@ -140,7 +141,7 @@ class EventProcessingIssue(Model):
     raw_event = FlexibleForeignKey('sentry.RawEvent')
     processing_issue = FlexibleForeignKey('sentry.ProcessingIssue')
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_eventprocessingissue'
         unique_together = (('raw_event', 'processing_issue'), )

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import six
 
 from sentry.mediators import Param

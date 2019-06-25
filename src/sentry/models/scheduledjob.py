@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -24,7 +25,7 @@ class ScheduledJob(Model):
     date_added = models.DateTimeField(default=timezone.now)
     date_scheduled = models.DateTimeField()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_scheduledjob'
 

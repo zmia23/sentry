@@ -7,6 +7,7 @@ sentry.models.group
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import logging
 import math
 import re
@@ -248,7 +249,7 @@ class Group(Model):
         default=DEFAULT_LOGGER_NAME,
         db_index=True)
     level = BoundedPositiveIntegerField(
-        choices=LOG_LEVELS.items(), default=logging.ERROR, blank=True, db_index=True
+        choices=list(LOG_LEVELS.items()), default=logging.ERROR, blank=True, db_index=True
     )
     message = models.TextField()
     culprit = models.CharField(
@@ -281,7 +282,7 @@ class Group(Model):
 
     objects = GroupManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_groupedmessage'
         verbose_name_plural = _('grouped messages')

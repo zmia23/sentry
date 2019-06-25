@@ -26,7 +26,7 @@ def load_dist(results):
     if not dists:
         return results
 
-    for dist in Distribution.objects.filter(pk__in=dists.keys()):
+    for dist in Distribution.objects.filter(pk__in=list(dists.keys())):
         dists[dist.id] = dist
 
     for result in results:

@@ -80,7 +80,7 @@ class ParseSearchQueryTest(TestCase):
         ]
 
     def test_is_query_status(self):
-        for status_string, status_val in STATUS_CHOICES.items():
+        for status_string, status_val in list(STATUS_CHOICES.items()):
             assert parse_search_query('is:%s' % status_string) == [
                 SearchFilter(
                     key=SearchKey(name='status'),

@@ -1,5 +1,9 @@
 from __future__ import absolute_import
+from __future__ import division
 
+from builtins import map
+from builtins import range
+from past.utils import old_div
 from collections import (
     namedtuple,
     OrderedDict,
@@ -211,7 +215,7 @@ def options_override(overrides):
     previous = {}
     delete = []
 
-    for k, v in overrides.items():
+    for k, v in list(overrides.items()):
         try:
             previous[k] = OVERRIDE_OPTIONS[k]
         except KeyError:
@@ -221,7 +225,7 @@ def options_override(overrides):
     try:
         yield
     finally:
-        for k, v in previous.items():
+        for k, v in list(previous.items()):
             OVERRIDE_OPTIONS[k] = v
         for k in delete:
             OVERRIDE_OPTIONS.pop(k)
@@ -248,8 +252,8 @@ def to_naive_timestamp(value):
 
 def zerofill(data, start, end, rollup, orderby):
     rv = []
-    start = (int(to_naive_timestamp(naiveify_datetime(start)) / rollup) * rollup)
-    end = (int(to_naive_timestamp(naiveify_datetime(end)) / rollup) * rollup) + rollup
+    start = (int(old_div(to_naive_timestamp(naiveify_datetime(start)), rollup)) * rollup)
+    end = (int(old_div(to_naive_timestamp(naiveify_datetime(end)), rollup)) * rollup) + rollup
     data_by_time = {}
 
     for obj in data:
@@ -345,7 +349,7 @@ def parse_columns_in_functions(col, context=None, index=None):
         # that should be converted to snuba column names
         # e.g. ['func1', ['column', 'func2', ['arg1']]]
         if function_name_index > 0:
-            for i in xrange(0, function_name_index):
+            for i in range(0, function_name_index):
                 if context is not None:
                     context[i] = get_snuba_column_name(col[i])
 
@@ -480,7 +484,7 @@ def transform_aliases_and_query(skip_conditions=False, **kwargs):
         col['name'] = translated_columns.get(col['name'], col['name'])
 
     def get_row(row):
-        return {translated_columns.get(key, key): value for key, value in row.items()}
+        return {translated_columns.get(key, key): value for key, value in list(row.items())}
 
     if len(translated_columns):
         result['data'] = [get_row(row) for row in result['data']]
@@ -545,7 +549,7 @@ def raw_query(start, end, groupby=None, conditions=None, filter_keys=None,
         # Otherwise infer the project_ids from any related models
         with timer('get_related_project_ids'):
             ids = [get_related_project_ids(k, filter_keys[k]) for k in filter_keys]
-            project_ids = list(set.union(*map(set, ids)))
+            project_ids = list(set.union(*list(map(set, ids))))
     else:
         project_ids = []
 

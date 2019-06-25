@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import inspect
 import json
 import logging
@@ -213,14 +214,14 @@ class RavenShim(object):
 
     def tags_context(self, tags):
         with sentry_sdk.configure_scope() as scope:
-            for k, v in tags.items():
+            for k, v in list(tags.items()):
                 scope.set_tag(k, v)
 
     def _kwargs_into_scope(self, scope, extra=None, tags=None,
                            fingerprint=None, request=None):
-        for key, value in (extra.items() if extra else ()):
+        for key, value in (list(extra.items()) if extra else ()):
             scope.set_extra(key, value)
-        for key, value in (tags.items() if tags else ()):
+        for key, value in (list(tags.items()) if tags else ()):
             scope.set_tag(key, value)
         if fingerprint is not None:
             scope.fingerprint = fingerprint

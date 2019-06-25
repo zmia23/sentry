@@ -7,6 +7,7 @@ sentry.models.useroption
 """
 from __future__ import absolute_import
 
+from builtins import object
 from datetime import timedelta
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -26,7 +27,7 @@ class LostPasswordHash(Model):
     hash = models.CharField(max_length=32)
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_lostpasswordhash'
 

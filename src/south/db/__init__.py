@@ -16,13 +16,13 @@ from django.db import DEFAULT_DB_ALIAS
 db_engines = dict([
     # Note we check to see if contrib.gis has overridden us.
     (alias, "south.db.%s" % engine_modules[db_settings['ENGINE']])
-    for alias, db_settings in settings.DATABASES.items()
+    for alias, db_settings in list(settings.DATABASES.items())
     if db_settings['ENGINE'] in engine_modules
 ])
 # Update with any overrides
 db_engines.update(getattr(settings, "SOUTH_DATABASE_ADAPTERS", {}))
 # Check there's no None engines, or...
-for alias, engine in db_engines.items():
+for alias, engine in list(db_engines.items()):
     if engine is None:
         # They've used a backend we don't support
         sys.stderr.write(
@@ -38,7 +38,7 @@ for alias, engine in db_engines.items():
 # Now, turn that into a dict of <alias: south db module>
 dbs = {}
 try:
-    for alias, module_name in db_engines.items():
+    for alias, module_name in list(db_engines.items()):
         module = __import__(module_name, {}, {}, [''])
         dbs[alias] = module.DatabaseOperations(alias)
 except ImportError:

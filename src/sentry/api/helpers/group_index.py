@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import zip
 import logging
 import six
 
@@ -244,8 +245,8 @@ class StatusDetailsValidator(serializers.Serializer):
 
 
 class GroupValidator(serializers.Serializer):
-    status = serializers.ChoiceField(choices=zip(
-        STATUS_CHOICES.keys(), STATUS_CHOICES.keys()))
+    status = serializers.ChoiceField(choices=list(zip(
+        list(STATUS_CHOICES.keys()), list(STATUS_CHOICES.keys()))))
     statusDetails = StatusDetailsValidator()
     hasSeen = serializers.BooleanField()
     isBookmarked = serializers.BooleanField()

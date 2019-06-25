@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import range
+from builtins import object
 import logging
 import sys
 import threading
@@ -189,7 +191,7 @@ class ThreadedExecutor(Executor):
             if self.__started:
                 return
 
-            for i in xrange(self.__worker_count):
+            for i in range(self.__worker_count):
                 t = threading.Thread(target=self.__worker)
                 t.daemon = True
                 t.start()

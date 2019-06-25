@@ -2,6 +2,7 @@
 
 from __future__ import absolute_import
 
+from builtins import range
 import pytest
 
 from sentry.interfaces.exception import Exception, slim_exception_data

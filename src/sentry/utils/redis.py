@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import object
 import functools
 import logging
 import posixpath
@@ -105,7 +107,7 @@ class _RedisCluster(object):
         # StrictRedisCluster expects a list of { host, port } dicts. Coerce the
         # configuration into the correct format if necessary.
         hosts = config.get('hosts')
-        hosts = hosts.values() if isinstance(hosts, dict) else hosts
+        hosts = list(hosts.values()) if isinstance(hosts, dict) else hosts
 
         # Redis cluster does not wait to attempt to connect. We'd prefer to not
         # make TCP connections on boot. Wrap the client in a lazy proxy object.
@@ -205,12 +207,12 @@ def check_cluster_versions(cluster, required, recommended=None, label=None):
         raise InvalidConfiguration(six.text_type(e))
 
     versions = {}
-    for id, info in results.value.items():
+    for id, info in list(results.value.items()):
         host = cluster.hosts[id]
         # NOTE: This assumes there is no routing magic going on here, and
         # all requests to this host are being served by the same database.
         key = u'{host}:{port}'.format(host=host.host, port=host.port)
-        versions[key] = Version(map(int, info['redis_version'].split('.', 3)))
+        versions[key] = Version(list(map(int, info['redis_version'].split('.', 3))))
 
     check_versions(
         'Redis' if label is None else 'Redis (%s)' % (label, ),

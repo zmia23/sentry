@@ -4,6 +4,7 @@ Startmigration command, version 2.
 
 from __future__ import print_function
 
+from builtins import map
 import sys
 import os
 import re
@@ -102,11 +103,11 @@ class Command(DataCommand):
                     migrations.app_label())
             # Alright, construct two model dicts to run the differ on.
             old_defs = dict(
-                (k, v) for k, v in last_migration.migration_class().models.items()
+                (k, v) for k, v in list(last_migration.migration_class().models.items())
                 if k.split(".")[0] == migrations.app_label()
             )
             new_defs = dict(
-                (k, v) for k, v in freezer.freeze_apps([migrations.app_label()]).items()
+                (k, v) for k, v in list(freezer.freeze_apps([migrations.app_label()]).items())
                 if k.split(".")[0] == migrations.app_label()
             )
             change_source = changes.AutoChanges(

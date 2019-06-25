@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from datetime import timedelta
 from django.conf import settings
 from django.db import models
@@ -19,7 +20,7 @@ class AuthIdentity(Model):
     last_synced = models.DateTimeField(default=timezone.now)
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_authidentity'
         unique_together = (('auth_provider', 'ident'), ('auth_provider', 'user'))

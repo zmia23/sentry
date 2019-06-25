@@ -84,7 +84,7 @@ class KafkaEventStream(SnubaProtocolEventStream):
         def commit(partitions):
             results = consumer.commit(offsets=partitions, asynchronous=False)
 
-            errors = filter(lambda i: i.error is not None, results)
+            errors = [i for i in results if i.error is not None]
             if errors:
                 raise Exception(
                     'Failed to commit %s/%s partitions: %r' %
@@ -154,7 +154,7 @@ class KafkaEventStream(SnubaProtocolEventStream):
 
         def commit_offsets():
             offsets_to_commit = []
-            for (topic, partition), offset in owned_partition_offsets.items():
+            for (topic, partition), offset in list(owned_partition_offsets.items()):
                 if offset is None:
                     logger.debug('Skipping commit of unprocessed partition: %r', (topic, partition))
                     continue

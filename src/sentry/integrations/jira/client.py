@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import datetime
 import jwt
 import re

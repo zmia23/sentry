@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from sentry import options
 from sentry.models import Integration
 from sentry.utils import json
@@ -83,7 +84,7 @@ class SlackRequest(object):
         if self.integration:
             data['integration_id'] = self.integration.id
 
-        return dict((k, v) for k, v in data.items() if v)
+        return dict((k, v) for k, v in list(data.items()) if v)
 
     def _validate_data(self):
         try:

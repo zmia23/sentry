@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import range
+from builtins import object
 from datetime import datetime
 
 import pytz
@@ -76,7 +78,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(BaseUserSerializer):
-    class Meta:
+    class Meta(object):
         model = User
         fields = ('name', 'username')
 
@@ -90,7 +92,7 @@ class UserSerializer(BaseUserSerializer):
 class AdminUserSerializer(BaseUserSerializer):
     isActive = serializers.BooleanField(source='is_active')
 
-    class Meta:
+    class Meta(object):
         model = User
         # no idea wtf is up with django rest framework, but we need is_active
         # and isActive

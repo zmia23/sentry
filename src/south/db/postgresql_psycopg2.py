@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+from builtins import str
 import uuid
 from django.db.backends.util import truncate_name
 from south.db import generic

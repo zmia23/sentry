@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import functools
 import inspect
 import itertools
@@ -243,7 +244,7 @@ class ServiceDelegator(Service):
             return executor_cls(**options.get('options', {}))
 
         self.__backends = {}
-        for name, options in backends.items():
+        for name, options in list(backends.items()):
             self.__backends[name] = (
                 import_string(options['path'])(**options.get('options', {})),
                 load_executor(options.get('executor', {})),
@@ -257,11 +258,11 @@ class ServiceDelegator(Service):
             self.__callback_func = None
 
     def validate(self):
-        for backend, executor in self.__backends.values():
+        for backend, executor in list(self.__backends.values()):
             backend.validate()
 
     def setup(self):
-        for backend, executor in self.__backends.values():
+        for backend, executor in list(self.__backends.values()):
             backend.setup()
 
     def __getattr__(self, attribute_name):
@@ -403,7 +404,7 @@ class ServiceDelegator(Service):
             )
 
             if self.__callback_func is not None:
-                FutureSet(filter(None, results)).add_done_callback(
+                FutureSet([_f for _f in results if _f]).add_done_callback(
                     lambda *a, **k: self.__callback_func(
                         context,
                         attribute_name,

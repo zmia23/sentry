@@ -7,6 +7,8 @@ sentry.management.commands.collectstatic
 """
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import zip
 import os
 
 from click import echo
@@ -46,7 +48,7 @@ class Command(BaseCommand):
             pass
 
         collected = super(Command, self).collect()
-        paths = sorted(set(chain(*itemgetter(*collected.keys())(collected))))
+        paths = sorted(set(chain(*itemgetter(*list(collected.keys()))(collected))))
         abs_paths = list(map(self.storage.path, paths))
         version = get_bundle_version(list(zip(paths, abs_paths)))
         echo('-----------------')

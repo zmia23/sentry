@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import pytest
 import six
 
@@ -28,7 +29,7 @@ def test_builtin_types():
     ]
 
     try:
-        values.append(long(1))  # noqa
+        values.append(int(1))  # noqa
     except NameError:
         pass
 

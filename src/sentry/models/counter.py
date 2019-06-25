@@ -8,6 +8,7 @@ sentry.models.counter
 
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import connection, connections
 from django.db.models.signals import post_syncdb
 
@@ -23,7 +24,7 @@ class Counter(Model):
 
     __repr__ = sane_repr('project')
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_projectcounter'
 

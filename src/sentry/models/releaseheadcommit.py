@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from sentry.db.models import (BoundedPositiveIntegerField, FlexibleForeignKey, Model, sane_repr)
 
 
@@ -11,7 +12,7 @@ class ReleaseHeadCommit(Model):
     release = FlexibleForeignKey('sentry.Release')
     commit = FlexibleForeignKey('sentry.Commit')
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_releaseheadcommit'
         unique_together = (('repository_id', 'release'), )

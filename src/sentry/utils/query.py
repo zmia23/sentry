@@ -7,6 +7,7 @@ sentry.utils.query
 """
 from __future__ import absolute_import
 
+from builtins import object
 import progressbar
 import re
 import six
@@ -301,11 +302,11 @@ def bulk_delete_objects(model, limit=10000, transaction_id=None,
     partition_query = []
 
     if partition_key:
-        for column, value in partition_key.items():
+        for column, value in list(partition_key.items()):
             partition_query.append('%s = %%s' % (quote_name(column), ))
             params.append(value)
 
-    for column, value in filters.items():
+    for column, value in list(filters.items()):
         query.append('%s = %%s' % (quote_name(column), ))
         params.append(value)
 
@@ -342,7 +343,7 @@ def bulk_delete_objects(model, limit=10000, transaction_id=None,
         logger.info(
             'object.delete.bulk_executed',
             extra=dict(
-                filters.items() + [
+                list(filters.items()) + [
                     ('model', model.__name__),
                     ('transaction_id', transaction_id),
                 ]

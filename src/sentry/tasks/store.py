@@ -264,7 +264,7 @@ def _do_process_event(cache_key, start_time, event_id, process_task,
     # We cannot persist canonical types in the cache, so we need to
     # downgrade this.
     if isinstance(data, CANONICAL_TYPES):
-        data = dict(data.items())
+        data = dict(list(data.items()))
 
     if has_changed:
         # Run some of normalization again such that we don't:

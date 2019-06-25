@@ -230,7 +230,7 @@ def status_warnings(request):
         'sentry/admin/status/warnings.html',
         {
             'groups':
-            sorted([(groupings[key], sort_by_message(values)) for key, values in groups.items()]),
+            sorted([(groupings[key], sort_by_message(values)) for key, values in list(groups.items())]),
             'warnings':
             sort_by_message(warnings),
         },

@@ -1,5 +1,10 @@
 from __future__ import absolute_import
+from __future__ import division
 
+from builtins import zip
+from builtins import filter
+from builtins import map
+from past.utils import old_div
 import itertools
 import time
 
@@ -13,7 +18,7 @@ index = load_script('similarity/index.lua')
 
 def band(n, value):
     assert len(value) % n == 0
-    return list(chunked(value, len(value) / n))
+    return list(chunked(value, old_div(len(value), n)))
 
 
 def flatten(value):
@@ -57,22 +62,22 @@ class RedisScriptMinHashIndexBackend(AbstractIndexBackend):
             key, scores = result
             return (
                 key,
-                map(
+                list(map(
                     lambda score: score_replacements.get(score, score),
-                    map(float, scores),
-                )
+                    list(map(float, scores)),
+                ))
             )
 
         def get_comparison_key(result):
             key, scores = result
 
-            scores = filter(
+            scores = list(filter(
                 lambda score: score is not None,
                 scores,
-            )
+            ))
 
             return (
-                sum(scores) / len(scores) * -1,  # average score, descending
+                old_div(sum(scores), len(scores) * -1),  # average score, descending
                 len(scores) * -1,  # number of indexes with scores, descending
                 key,  # lexicographical sort on key, ascending
             )
@@ -210,7 +215,7 @@ class RedisScriptMinHashIndexBackend(AbstractIndexBackend):
         cursors = {idx: 0 for idx in indices}
         while cursors:
             requests = []
-            for idx, cursor in cursors.items():
+            for idx, cursor in list(cursors.items()):
                 requests.append([idx, cursor, batch])
 
             responses = self.__index(scope, arguments + flatten(requests))

@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from sentry.db.models import (
     BoundedBigIntegerField, Model, sane_repr
 )
@@ -18,7 +19,7 @@ class LatestRelease(Model):
     deploy_id = BoundedBigIntegerField(null=True)
     commit_id = BoundedBigIntegerField(null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_latestrelease'
         unique_together = (('repository_id', 'environment_id'),)

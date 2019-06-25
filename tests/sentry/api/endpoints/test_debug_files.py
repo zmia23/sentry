@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import range
 import zipfile
 from uuid import uuid4
 from six import BytesIO, text_type

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import range
 from base64 import b64encode
 
 from exam import fixture

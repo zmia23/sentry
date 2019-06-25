@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.conf import settings
 
 from sentry.auth.superuser import logger, Superuser

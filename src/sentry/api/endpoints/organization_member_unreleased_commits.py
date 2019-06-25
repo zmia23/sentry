@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import zip
 import six
 
 from django.db import connections

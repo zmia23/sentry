@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import map
 from collections import namedtuple, defaultdict
 from datetime import timedelta
 
@@ -111,7 +112,7 @@ class OrganizationHealthEndpointBase(OrganizationEndpoint, EnvironmentMixin):
 
             conditions[lookup.filter_key].append(value)
 
-        return [[k, 'IN', v] for k, v in conditions.items()]
+        return [[k, 'IN', v] for k, v in list(conditions.items())]
 
 
 class OrganizationHealthTopEndpoint(OrganizationHealthEndpointBase):

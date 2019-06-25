@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import range
 from datetime import timedelta
 from django.utils import timezone
 
@@ -120,7 +121,7 @@ class UtilitiesHelpersTestCase(TestCase):
             user3.id: team1_events.union(team2_events),
             user4.id: user4_events,
         }
-        assert convert_actors_to_users(events_by_actor, user_by_events.keys()) == user_by_events
+        assert convert_actors_to_users(events_by_actor, list(user_by_events.keys())) == user_by_events
 
 
 class GetPersonalizedDigestsTestCase(TestCase):

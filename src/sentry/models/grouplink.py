@@ -7,6 +7,7 @@ sentry.models.grouplink
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -26,12 +27,12 @@ class GroupLink(Model):
     """
     __core__ = False
 
-    class Relationship:
+    class Relationship(object):
         unknown = 0
         resolves = 1
         references = 2
 
-    class LinkedType:
+    class LinkedType(object):
         unknown = 0
         commit = 1
         pull_request = 2
@@ -54,7 +55,7 @@ class GroupLink(Model):
     data = JSONField()
     datetime = models.DateTimeField(default=timezone.now, db_index=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_grouplink'
         unique_together = (('group_id', 'linked_type', 'linked_id'), )

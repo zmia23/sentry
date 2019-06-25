@@ -12,6 +12,6 @@ class GroupingConfigsEndpoint(Endpoint):
 
     def get(self, request):
         return Response(serialize([
-            config.as_dict() for config in sorted(CONFIGURATIONS.values(),
+            config.as_dict() for config in sorted(list(CONFIGURATIONS.values()),
                                                   key=lambda x: x.id)
         ]))

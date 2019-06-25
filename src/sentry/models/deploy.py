@@ -5,6 +5,7 @@ sentry.models.deploy
 
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -25,7 +26,7 @@ class Deploy(Model):
     url = models.URLField(null=True, blank=True)
     notified = models.NullBooleanField(null=True, db_index=True, default=False)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_deploy'
 

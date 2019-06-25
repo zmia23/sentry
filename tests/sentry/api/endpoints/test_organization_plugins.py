@@ -35,7 +35,7 @@ class OrganizationPluginsTest(APITestCase):
         # plugins are not bound by a project
         plugins = [
             p for p in
-            filter(lambda p: 'enabled' in p, response.data)
+            [p for p in response.data if 'enabled' in p]
         ]
         assert len(plugins) == 0
         assert len(response.data) > 0
@@ -55,7 +55,7 @@ class OrganizationPluginsTest(APITestCase):
 
         enabled_plugins = [
             (p['project']['id'], p['slug']) for p in
-            filter(lambda p: p['enabled'], response.data)
+            [p for p in response.data if p['enabled']]
         ]
 
         assert (self.projectA.id, 'webhooks') in enabled_plugins
@@ -75,7 +75,7 @@ class OrganizationPluginsTest(APITestCase):
 
         enabled_plugins = [
             (p['project']['id'], p['slug']) for p in
-            filter(lambda p: p['enabled'], response.data)
+            [p for p in response.data if p['enabled']]
         ]
 
         assert (self.projectA.id, 'webhooks') not in enabled_plugins
@@ -95,7 +95,7 @@ class OrganizationPluginsTest(APITestCase):
 
         enabled_plugins = [
             (p['project']['id'], p['slug']) for p in
-            filter(lambda p: p['enabled'], response.data)
+            [p for p in response.data if p['enabled']]
         ]
 
         assert enabled_plugins == [(self.projectB.id, 'mail')]

@@ -6,7 +6,10 @@ sentry.tsdb.base
 :license: BSD, see LICENSE for more details.
 """
 from __future__ import absolute_import
+from __future__ import division
 
+from builtins import map
+from past.utils import old_div
 import collections
 import six
 
@@ -195,13 +198,13 @@ class BaseTSDB(Service):
         Given a ``timestamp`` (datetime object) normalize to an epoch rollup.
         """
         epoch = int(to_timestamp(timestamp))
-        return int(epoch / seconds)
+        return int(old_div(epoch, seconds))
 
     def normalize_ts_to_rollup(self, epoch, seconds):
         """
         Given a ``epoch`` normalize to an epoch rollup.
         """
-        return int(epoch / seconds)
+        return int(old_div(epoch, seconds))
 
     def get_optimal_rollup(self, start_timestamp, end_timestamp):
         """
@@ -249,7 +252,7 @@ class BaseTSDB(Service):
 
     def get_active_series(self, start=None, end=None, timestamp=None):
         rollups = {}
-        for rollup, samples in self.rollups.items():
+        for rollup, samples in list(self.rollups.items()):
             _, series = self.get_optimal_rollup_series(
                 start if start is not None else to_datetime(
                     self.get_earliest_timestamp(
@@ -260,7 +263,7 @@ class BaseTSDB(Service):
                 end,
                 rollup=rollup,
             )
-            rollups[rollup] = map(to_datetime, series)
+            rollups[rollup] = list(map(to_datetime, series))
         return rollups
 
     def make_series(self, default, start, end=None, rollup=None):

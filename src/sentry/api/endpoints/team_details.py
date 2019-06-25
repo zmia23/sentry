@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import logging
 from uuid import uuid4
 
@@ -36,7 +37,7 @@ def update_team_scenario(runner):
 class TeamSerializer(serializers.ModelSerializer):
     slug = serializers.RegexField(r'^[a-z0-9_\-]+$', max_length=50)
 
-    class Meta:
+    class Meta(object):
         model = Team
         fields = ('name', 'slug')
 

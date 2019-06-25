@@ -2,6 +2,7 @@
 
 from __future__ import absolute_import
 
+from builtins import range
 import pytest
 import os.path
 import responses

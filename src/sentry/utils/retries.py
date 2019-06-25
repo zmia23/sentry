@@ -1,5 +1,8 @@
 from __future__ import absolute_import
+from __future__ import division
 
+from past.utils import old_div
+from builtins import object
 import itertools
 import logging
 import random
@@ -63,7 +66,7 @@ class TimedRetryPolicy(RetryPolicy):
         if delay is None:
             # 100ms +/- 50ms of randomized jitter
             def delay(i):
-                return 0.1 + ((random.random() - 0.5) / 10)
+                return 0.1 + (old_div((random.random() - 0.5), 10))
 
         self.timeout = timeout
         self.delay = delay

@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
 import json
 import os
 import six
@@ -48,7 +50,8 @@ def index():
                     url_for('login'),
                 )
 
-    from urllib2 import Request, urlopen, URLError
+    from urllib.request import Request, urlopen
+    from urllib.error import URLError
     headers = {'Authorization': 'Bearer {}'.format(access_token)}
     req = Request('{}/api/0/organizations/'.format(BASE_URL), None, headers)
     try:

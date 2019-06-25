@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from mock import patch
 
 from sentry.coreapi import APIUnauthorized
@@ -14,7 +15,7 @@ class DictContaining(object):
         self.keys = keys
 
     def __eq__(self, other):
-        return all([k in other.keys() for k in self.keys])
+        return all([k in list(other.keys()) for k in self.keys])
 
 
 class TestInstallationNotifier(TestCase):

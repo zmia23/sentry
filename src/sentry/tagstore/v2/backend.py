@@ -8,6 +8,7 @@ sentry.tagstore.v2.backend
 
 from __future__ import absolute_import
 
+from builtins import map
 import collections
 import six
 
@@ -392,7 +393,7 @@ class V2TagStorage(TagStorage):
         tagkeys = self.get_or_create_tag_keys_bulk(project_id, environment_id, [t[0] for t in tags])
         tagvalues = self.get_or_create_tag_values_bulk(
             project_id, [(tagkeys[t[0]], t[1]) for t in tags])
-        tag_ids = [(tk.id, tv.id) for (tk, _), tv in tagvalues.items()]
+        tag_ids = [(tk.id, tv.id) for (tk, _), tv in list(tagvalues.items())]
 
         try:
             # don't let a duplicate break the outer transaction
@@ -992,7 +993,7 @@ class V2TagStorage(TagStorage):
         return DateTimePaginator(
             queryset=qs,
             order_by=order_by,
-            on_results=lambda results: map(transformers[models.TagValue], results)
+            on_results=lambda results: list(map(transformers[models.TagValue], results))
         )
 
     def get_group_tag_value_iter(self, project_id, group_id, environment_id, key, callbacks=()):
@@ -1020,7 +1021,7 @@ class V2TagStorage(TagStorage):
         return paginator_cls(
             queryset=qs,
             order_by=order_by,
-            on_results=lambda results: map(transformers[models.GroupTagValue], results)
+            on_results=lambda results: list(map(transformers[models.GroupTagValue], results))
         )
 
     def get_group_tag_value_qs(self, project_id, group_id, environment_id, key, value=None):

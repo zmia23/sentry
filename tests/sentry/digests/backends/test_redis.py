@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import range
 import pytest
 import time
 
@@ -45,7 +46,7 @@ class RedisBackendTestCase(TestCase):
     def test_truncation(self):
         backend = RedisBackend(capacity=2, truncation_chance=1.0)
 
-        records = [Record(u'record:{}'.format(i), 'value', time.time()) for i in xrange(4)]
+        records = [Record(u'record:{}'.format(i), 'value', time.time()) for i in range(4)]
         for record in records:
             backend.add('timeline', record)
 
@@ -89,7 +90,7 @@ class RedisBackendTestCase(TestCase):
         t = time.time()
 
         # Add 10 items to the timeline.
-        for i in xrange(10):
+        for i in range(10):
             backend.add('timeline', Record(u'record:{}'.format(i), u'{}'.format(i), t + i))
 
         try:
@@ -102,7 +103,7 @@ class RedisBackendTestCase(TestCase):
         # prevented the close operation from occurring, so they were never
         # deleted from Redis or removed from the digest set.) If we add 10 more
         # items, they should be added to the timeline set (not the digest set.)
-        for i in xrange(10, 20):
+        for i in range(10, 20):
             backend.add('timeline', Record(u'record:{}'.format(i), u'{}'.format(i), t + i))
 
         # Maintenance should move the timeline back to the waiting state, ...
@@ -114,7 +115,7 @@ class RedisBackendTestCase(TestCase):
         # Only the new records should exist -- the older one should have been
         # trimmed to avoid the digest growing beyond the timeline capacity.
         with backend.digest('timeline', 0) as records:
-            expected_keys = set(u'record:{}'.format(i) for i in xrange(10, 20))
+            expected_keys = set(u'record:{}'.format(i) for i in range(10, 20))
             assert set(record.key for record in records) == expected_keys
 
     def test_delete(self):
@@ -149,7 +150,7 @@ class RedisBackendTestCase(TestCase):
 
         n = 8192
         t = time.time()
-        for i in xrange(n):
+        for i in range(n):
             backend.add('timeline', Record(u'record:{}'.format(i), u'{}'.format(i), t))
 
         with backend.digest('timeline', 0) as records:

@@ -5,6 +5,9 @@ Roughly emulates the real Django ORM, to a point.
 
 from __future__ import print_function
 
+from builtins import str
+from builtins import map
+from builtins import object
 import inspect
 
 from django.db import models
@@ -91,7 +94,7 @@ class _FakeORM(object):
         # We first make entries for each model that are just its name
         # This allows us to have circular model dependency loops
         model_names = []
-        for name, data in self.models_source.items():
+        for name, data in list(self.models_source.items()):
             # Make sure there's some kind of Meta
             if "Meta" not in data:
                 data['Meta'] = {}
@@ -135,14 +138,14 @@ class _FakeORM(object):
         self.retry_failed_fields()
 
         # Force evaluation of relations on the models now
-        for model in self.models.values():
+        for model in list(self.models.values()):
             model._meta.get_all_field_names()
 
         # Reset AppCache
         hacks.unclear_app_cache()
 
     def __iter__(self):
-        return iter(self.models.values())
+        return iter(list(self.models.values()))
 
     def __getattr__(self, key):
         fullname = (self.default_app + "." + key).lower()
@@ -185,7 +188,7 @@ class _FakeORM(object):
         # excluding all models from that (i.e. from modern models.py), to stop pollution
         fake_locals = dict(
             (key, value)
-            for key, value in inspect.getmodule(self.cls).__dict__.items()
+            for key, value in list(inspect.getmodule(self.cls).__dict__.items())
             if not (
                 isinstance(value, type)
                 and issubclass(value, models.Model)
@@ -196,13 +199,13 @@ class _FakeORM(object):
         # We add our models into the locals for the eval
         fake_locals.update(dict([
             (name.split(".")[-1], model)
-            for name, model in self.models.items()
+            for name, model in list(self.models.items())
         ]))
 
         # Make sure the ones for this app override.
         fake_locals.update(dict([
             (name.split(".")[-1], model)
-            for name, model in self.models.items()
+            for name, model in list(self.models.items())
             if name.split(".")[0] == app
         ]))
 
@@ -216,7 +219,7 @@ class _FakeORM(object):
         fake_locals['datetime'] = datetime_utils
 
         # Now, go through the requested imports and import them.
-        for name, value in extra_imports.items():
+        for name, value in list(extra_imports.items()):
             # First, try getting it out of locals.
             parts = value.split(".")
             try:
@@ -245,7 +248,7 @@ class _FakeORM(object):
     def make_meta(self, app, model, data, stub=False):
         "Makes a Meta class out of a dict of eval-able arguments."
         results = {'app_label': app}
-        for key, code in data.items():
+        for key, code in list(data.items()):
             # Some things we never want to use.
             if key in ["_bases", "_ormbases"]:
                 continue
@@ -278,7 +281,7 @@ class _FakeORM(object):
             bases = [self.models[key.lower()] for key in data['Meta']['_ormbases']]
         # Perhaps the old style?
         elif "_bases" in data['Meta']:
-            bases = map(ask_for_it_by_name, data['Meta']['_bases'])
+            bases = list(map(ask_for_it_by_name, data['Meta']['_bases']))
         # Ah, bog standard, then.
         else:
             bases = [models.Model]
@@ -291,7 +294,7 @@ class _FakeORM(object):
         stub = False
 
         # Now, make some fields!
-        for fname, params in data.items():
+        for fname, params in list(data.items()):
             # If it's the stub marker, ignore it.
             if fname == "_stub":
                 stub = bool(params)
@@ -314,7 +317,7 @@ class _FakeORM(object):
                 if len(params) == 3:
                     code = "SouthFieldClass(%s)" % ", ".join(
                         params[1] +
-                        ["%s=%s" % (n, v) for n, v in params[2].items()]
+                        ["%s=%s" % (n, v) for n, v in list(params[2].items())]
                     )
                     extra_imports = {"SouthFieldClass": params[0]}
                 else:
@@ -368,10 +371,10 @@ class _FakeORM(object):
 
     def retry_failed_fields(self):
         "Tries to re-evaluate the _failed_fields for each model."
-        for modelkey, model in self.models.items():
+        for modelkey, model in list(self.models.items()):
             app, modelname = modelkey.split(".", 1)
             if hasattr(model, "_failed_fields"):
-                for fname, (code, extra_imports) in model._failed_fields.items():
+                for fname, (code, extra_imports) in list(model._failed_fields.items()):
                     try:
                         field = self.eval_in_context(code, app, extra_imports)
                     except (NameError, AttributeError, AssertionError, KeyError) as e:

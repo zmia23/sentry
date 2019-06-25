@@ -1,5 +1,8 @@
 from __future__ import absolute_import
 
+from builtins import filter
+from builtins import map
+from builtins import range
 import re
 from collections import namedtuple, defaultdict
 from datetime import datetime
@@ -161,7 +164,7 @@ class SearchFilter(namedtuple('SearchFilter', 'key operator value')):
 
     def __str__(self):
         return ''.join(
-            map(six.text_type, (self.key.name, self.operator, self.value.raw_value)),
+            list(map(six.text_type, (self.key.name, self.operator, self.value.raw_value))),
         )
 
     @cached_property
@@ -225,7 +228,7 @@ class SearchVisitor(NodeVisitor):
     @cached_property
     def key_mappings_lookup(self):
         lookup = {}
-        for target_field, source_fields in self.key_mappings.items():
+        for target_field, source_fields in list(self.key_mappings.items()):
             for source_field in source_fields:
                 lookup[source_field] = target_field
         return lookup
@@ -245,19 +248,19 @@ class SearchVisitor(NodeVisitor):
             return children
 
         children = [child for group in children for child in _flatten(group)]
-        children = filter(None, _flatten(children))
+        children = [_f for _f in _flatten(children) if _f]
 
         return children
 
     def remove_optional_nodes(self, children):
         def is_not_optional(child):
             return not(isinstance(child, Node) and isinstance(child.expr, Optional))
-        return filter(is_not_optional, children)
+        return list(filter(is_not_optional, children))
 
     def remove_space(self, children):
         def is_not_space(child):
             return not(isinstance(child, Node) and child.text == ' ')
-        return filter(is_not_space, children)
+        return list(filter(is_not_space, children))
 
     def visit_search(self, node, children):
         return self.flatten(children)

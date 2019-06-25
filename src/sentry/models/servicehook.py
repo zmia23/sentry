@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import hmac
 import six
 
@@ -34,7 +35,7 @@ class ServiceHookProject(Model):
     service_hook = FlexibleForeignKey('sentry.ServiceHook')
     project_id = BoundedPositiveIntegerField(db_index=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_servicehookproject'
         unique_together = (('service_hook', 'project_id'), )
@@ -68,7 +69,7 @@ class ServiceHook(Model):
 
     objects = BaseManager(cache_fields=('guid', ))
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_servicehook'
 

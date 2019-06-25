@@ -7,6 +7,10 @@ sentry.utils.email
 """
 from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from builtins import object
 import logging
 import os
 import six
@@ -323,7 +327,7 @@ class MessageBuilder(object):
         return self._txt_body
 
     def add_users(self, user_ids, project=None):
-        self._send_to.update(get_email_addresses(user_ids, project).values())
+        self._send_to.update(list(get_email_addresses(user_ids, project).values()))
 
     def build(self, to, reply_to=None, cc=None, bcc=None):
         if self.headers is None:

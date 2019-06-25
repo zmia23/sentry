@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -80,7 +81,7 @@ class WidgetDataSource(Model):
         choices=ObjectStatus.as_choices(),
     )
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_widgetdatasource'
         unique_together = (('widget', 'name'), ('widget', 'order'))
@@ -105,7 +106,7 @@ class Widget(Model):
         choices=ObjectStatus.as_choices(),
     )
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_widget'
         unique_together = (('dashboard', 'order'), ('dashboard', 'title'), )

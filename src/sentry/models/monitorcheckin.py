@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -49,7 +50,7 @@ class MonitorCheckIn(Model):
     date_updated = models.DateTimeField(default=timezone.now)
     objects = BaseManager(cache_fields=('guid', ))
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_monitorcheckin'
 

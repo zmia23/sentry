@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import zip
 import logging
 import six
 from io import BytesIO
@@ -116,7 +117,7 @@ class ChunkUploadEndpoint(OrganizationEndpoint):
                             status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            FileBlob.from_files(zip(files, checksums),
+            FileBlob.from_files(list(zip(files, checksums)),
                                 organization=organization,
                                 logger=logger)
         except IOError as err:

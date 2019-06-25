@@ -34,7 +34,7 @@ class ProjectPluginsTest(APITestCase):
         assert auto_tag['isHidden'] is False
         self.assert_plugin_shape(auto_tag)
 
-        issues = filter(lambda p: p['slug'] == 'issuetrackingplugin2', response.data)[0]
+        issues = [p for p in response.data if p['slug'] == 'issuetrackingplugin2'][0]
         assert issues['name'] == 'IssueTrackingPlugin2'
         assert issues['enabled'] is False
         assert issues['isHidden'] is True

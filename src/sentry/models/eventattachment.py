@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -16,7 +17,7 @@ class EventAttachment(Model):
     name = models.TextField()
     date_added = models.DateTimeField(default=timezone.now, db_index=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_eventattachment'
         index_together = (('project_id', 'date_added'),)

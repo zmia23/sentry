@@ -8,6 +8,7 @@ sentry.interfaces.exception
 
 from __future__ import absolute_import
 
+from builtins import next
 __all__ = ('Exception', 'Mechanism', 'upgrade_legacy_mechanism')
 
 import re

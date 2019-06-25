@@ -7,6 +7,7 @@ sentry.tagstore.legacy.models.grouptagvalue
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models, router, transaction, DataError
 from django.utils import timezone
 
@@ -34,7 +35,7 @@ class GroupTagValue(Model):
 
     objects = BaseManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_messagefiltervalue'
         unique_together = (('group_id', 'key', 'value'), )

@@ -1,4 +1,6 @@
 from __future__ import absolute_import
+from builtins import range
+from builtins import object
 import io
 import msgpack
 from sentry.lang.native.minidump import merge_attached_breadcrumbs, merge_attached_event

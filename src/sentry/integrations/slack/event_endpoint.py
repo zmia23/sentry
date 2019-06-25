@@ -113,7 +113,7 @@ class SlackEventEndpoint(Endpoint):
             return
 
         results = {}
-        for event_type, instance_map in parsed_events.items():
+        for event_type, instance_map in list(parsed_events.items()):
             results.update(self.event_handlers[event_type](integration, instance_map))
 
         if not results:

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import six
 
 from bitfield import BitField
@@ -66,7 +67,7 @@ class HasApiScopes(models.Model):
     Mixin for models that hold a list of OAuth Scopes.
     """
 
-    class Meta:
+    class Meta(object):
         abstract = True
 
     # List of scopes in bit form

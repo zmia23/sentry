@@ -6,7 +6,10 @@ sentry.management.commands.send_fake_data
 :license: BSD, see LICENSE for more details.
 """
 from __future__ import absolute_import
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 import datetime
 import itertools
 import random
@@ -30,7 +33,7 @@ def funcs():
     )
     loggers = itertools.cycle(['root', 'foo', 'foo.bar'])
     emails = itertools.cycle(['foo@example.com', 'bar@example.com', 'baz@example.com'])
-    timestamps = range(24 * 60 * 60)
+    timestamps = list(range(24 * 60 * 60))
     random.shuffle(timestamps)
     timestamps = itertools.cycle(timestamps)
 
@@ -117,8 +120,8 @@ class Command(BaseCommand):
             total_time = time.time() - s
             self.stdout.write('%d requests serviced in %.3fs\n' % (r, total_time))
             if r:
-                avg = total_time / r
-                ravg = 1 / avg
+                avg = old_div(total_time, r)
+                ravg = old_div(1, avg)
             else:
                 avg = ravg = 0
             self.stdout.write('avg of %.3fs/req, %d req/s\n' % (avg, ravg))

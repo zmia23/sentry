@@ -11,6 +11,7 @@ In Sentry a user must achieve the following to be treated as a superuser:
 
 from __future__ import absolute_import
 
+from builtins import object
 import ipaddress
 import logging
 import six

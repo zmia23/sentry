@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import six
 
 from django.db import models, transaction
@@ -26,7 +27,7 @@ class AvatarBase(Model):
     file = FlexibleForeignKey('sentry.File', unique=True, null=True, on_delete=models.SET_NULL)
     ident = models.CharField(max_length=32, unique=True, db_index=True)
 
-    class Meta:
+    class Meta(object):
         abstract = True
 
     def save(self, *args, **kwargs):

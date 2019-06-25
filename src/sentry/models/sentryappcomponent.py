@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 
 from sentry.db.models import (
@@ -19,6 +20,6 @@ class SentryAppComponent(Model):
     type = models.CharField(max_length=64)
     schema = EncryptedJsonField()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_sentryappcomponent'

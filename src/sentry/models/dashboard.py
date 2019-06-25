@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -22,7 +23,7 @@ class Dashboard(Model):
         choices=ObjectStatus.as_choices(),
     )
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_dashboard'
         unique_together = (('organization', 'title'), )

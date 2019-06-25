@@ -8,6 +8,9 @@ sentry.nodestore.riak.client
 
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import range
+from builtins import object
 import functools
 import six
 import sys
@@ -207,7 +210,7 @@ class ConnectionManager(object):
         else:
             self.max_retries = max_retries
 
-        self.connections = map(self.create_pool, hosts)
+        self.connections = list(map(self.create_pool, hosts))
         # Shuffle up the order to prevent stampeding the same hosts
         if randomize:
             shuffle(self.connections)

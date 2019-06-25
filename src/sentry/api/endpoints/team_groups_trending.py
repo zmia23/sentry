@@ -32,7 +32,7 @@ class TeamGroupsTrendingEndpoint(TeamEndpoint, EnvironmentMixin):
         sort_value = 'score'
         group_list = list(
             Group.objects.filter(
-                project__in=project_dict.keys(),
+                project__in=list(project_dict.keys()),
                 status=GroupStatus.UNRESOLVED,
                 last_seen__gte=cutoff_dt,
             ).extra(

@@ -33,7 +33,7 @@ class GroupEventsTest(APITestCase):
 
         assert response.status_code == 200, response.content
         assert len(response.data) == 2
-        assert sorted(map(lambda x: x['id'], response.data)) == sorted(
+        assert sorted([x['id'] for x in response.data]) == sorted(
             [
                 six.text_type(event_1.id),
                 six.text_type(event_2.id),
@@ -176,7 +176,7 @@ class GroupEventsTest(APITestCase):
 
         assert response.status_code == 200, response.content
         assert len(response.data) == 2
-        assert sorted(map(lambda x: x['id'], response.data)) == sorted(
+        assert sorted([x['id'] for x in response.data]) == sorted(
             [
                 six.text_type(event_1.id),
                 six.text_type(event_2.id),
@@ -224,7 +224,7 @@ class GroupEventsTest(APITestCase):
         response = self.client.get(url + '?environment=production', format='json')
 
         assert response.status_code == 200, response.content
-        assert set(map(lambda x: x['id'], response.data)) == set([
+        assert set([x['id'] for x in response.data]) == set([
             six.text_type(events['production'].id),
         ])
 
@@ -259,7 +259,7 @@ class GroupEventsTest(APITestCase):
 
         assert response.status_code == 200, response.content
         assert len(response.data) == 1
-        assert sorted(map(lambda x: x['id'], response.data)) == sorted(
+        assert sorted([x['id'] for x in response.data]) == sorted(
             [
                 six.text_type(event_2.id),
             ]
@@ -287,7 +287,7 @@ class GroupEventsTest(APITestCase):
 
         assert response.status_code == 200, response.content
         assert len(response.data) == 2
-        assert sorted(map(lambda x: x['id'], response.data)) == sorted(
+        assert sorted([x['id'] for x in response.data]) == sorted(
             [
                 six.text_type(event_1.id),
                 six.text_type(event_2.id),

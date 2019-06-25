@@ -11,6 +11,8 @@ enabled.
 """
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import object
 import logging
 import requests
 import six

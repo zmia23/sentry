@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import functools
 import logging
 import threading
@@ -252,7 +253,7 @@ class SynchronizedConsumer(object):
             }
 
             for i in self.__consumer.committed([TopicPartition(topic, partition) for (
-                    topic, partition), offset in assignment.items() if offset is None]):
+                    topic, partition), offset in list(assignment.items()) if offset is None]):
                 k = (i.topic, i.partition)
                 if i.offset > -1:
                     assignment[k] = i.offset
@@ -260,9 +261,9 @@ class SynchronizedConsumer(object):
                     assignment[k] = self.initial_offset_reset(consumer, i.topic, i.partition)
 
             self.__consumer.assign([TopicPartition(topic, partition, offset)
-                                    for (topic, partition), offset in assignment.items()])
+                                    for (topic, partition), offset in list(assignment.items())])
 
-            for (topic, partition), offset in assignment.items():
+            for (topic, partition), offset in list(assignment.items()):
                 # Setting the local offsets will either cause the partition to be
                 # paused (if the remote offset is unknown or the local offset is
                 # not trailing the remote offset) or resumed.
@@ -271,7 +272,7 @@ class SynchronizedConsumer(object):
 
             if on_assign is not None:
                 on_assign(self, [TopicPartition(topic, partition)
-                                 for topic, partition in assignment.keys()])
+                                 for topic, partition in list(assignment.keys())])
 
         def revocation_callback(consumer, assignment):
             for item in assignment:

@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+from builtins import str
+from builtins import object
 import datetime
 import os
 import re
@@ -316,7 +318,7 @@ class Migration(object):
         return self.migrations[index]
     previous = memoize(previous)
 
-    def next(self):
+    def __next__(self):
         "Returns the migration that comes after this one in the sequence."
         index = self.migrations.index(self) + 1
         if index >= len(self.migrations):

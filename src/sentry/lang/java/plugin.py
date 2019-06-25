@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import map
 import six
 
 from symbolic import ProguardMappingView

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 from sentry.db.models import (BoundedPositiveIntegerField, Model, sane_repr)
@@ -15,7 +16,7 @@ class GroupCommitResolution(Model):
     commit_id = BoundedPositiveIntegerField(db_index=True)
     datetime = models.DateTimeField(default=timezone.now, db_index=True)
 
-    class Meta:
+    class Meta(object):
         db_table = 'sentry_groupcommitresolution'
         app_label = 'sentry'
         unique_together = (('group_id', 'commit_id'), )

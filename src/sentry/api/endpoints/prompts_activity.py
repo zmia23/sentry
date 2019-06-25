@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import zip
 import calendar
 from django.db import IntegrityError, transaction
 from django.http import HttpResponse
@@ -23,7 +24,7 @@ VALID_STATUSES = frozenset(('snoozed', 'dismissed'))
 class PromptsActivitySerializer(serializers.Serializer):
     feature = serializers.CharField(required=True)
     status = serializers.ChoiceField(
-        choices=zip(VALID_STATUSES, VALID_STATUSES),
+        choices=list(zip(VALID_STATUSES, VALID_STATUSES)),
         required=True,
     )
 
@@ -76,7 +77,7 @@ class PromptsActivityEndpoint(Endpoint):
         required_fields = PROMPTS[feature]['required_fields']
         fields = {k: request.DATA.get(k) for k in required_fields}
 
-        if any(elem is None for elem in fields.values()):
+        if any(elem is None for elem in list(fields.values())):
             return Response({'detail': 'Missing required field'}, status=400)
 
         # if project_id or organization_id in required fields make sure they exist

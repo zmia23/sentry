@@ -7,6 +7,7 @@ sentry.models.team
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import warnings
 from collections import defaultdict
 
@@ -126,7 +127,7 @@ class Team(Model):
 
     objects = TeamManager(cache_fields=('pk', 'slug', ))
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_team'
         unique_together = (('organization', 'slug'), )

@@ -6,7 +6,12 @@ sentry.utils.debug
 :license: BSD, see LICENSE for more details.
 """
 from __future__ import absolute_import
+from __future__ import division
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+from past.utils import old_div
 import cProfile
 import re
 import pstats
@@ -58,7 +63,7 @@ class ProfileMiddleware(object):
 
         res = "      tottime\n"
         for item in results:
-            res += "%4.1f%% %7.3f %s\n" % (100 * item[0] / total if total else 0, item[0], item[1])
+            res += "%4.1f%% %7.3f %s\n" % (old_div(100 * item[0], total) if total else 0, item[0], item[1])
 
         return res
 

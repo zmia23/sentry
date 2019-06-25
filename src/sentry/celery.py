@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
 from django.conf import settings
 
 from celery import Celery

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
@@ -35,7 +36,7 @@ class IdentityProvider(Model):
     date_added = models.DateTimeField(default=timezone.now, null=True)
     external_id = models.CharField(max_length=64, null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_identityprovider'
         unique_together = (('type', 'external_id'),)
@@ -56,7 +57,7 @@ class Identity(Model):
     date_verified = models.DateTimeField(default=timezone.now)
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_identity'
         unique_together = (('idp', 'external_id'), ('idp', 'user'))

@@ -7,6 +7,7 @@ sentry.models.useroption
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from celery.signals import task_postrun
 from django.conf import settings
 from django.core.signals import request_finished
@@ -167,7 +168,7 @@ class UserOption(Model):
 
     objects = UserOptionManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_useroption'
         unique_together = (('user', 'project', 'key', ), ('user', 'organization', 'key', ))

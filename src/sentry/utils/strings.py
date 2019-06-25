@@ -7,6 +7,8 @@ sentry.utils.strings
 """
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import range
 import base64
 import codecs
 import re

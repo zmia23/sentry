@@ -59,7 +59,7 @@ class OrganizationSerializer(Serializer):
         status = OrganizationStatus(obj.status)
 
         # Retrieve all registered organization features
-        org_features = features.all(feature_type=OrganizationFeature).keys()
+        org_features = list(features.all(feature_type=OrganizationFeature).keys())
         feature_list = set()
 
         for feature_name in org_features:

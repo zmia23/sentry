@@ -1,4 +1,5 @@
 # flake8: noqa
+from builtins import range
 from sentry.conf.server import *
 
 import os

@@ -55,7 +55,7 @@ class ProjectUserReportListTest(APITestCase):
 
         assert response.status_code == 200, response.content
         assert len(response.data) == 1
-        assert sorted(map(lambda x: x['id'], response.data)) == sorted(
+        assert sorted([x['id'] for x in response.data]) == sorted(
             [
                 six.text_type(report_1.id),
             ]
@@ -100,7 +100,7 @@ class ProjectUserReportListTest(APITestCase):
 
         assert response.status_code == 200, response.content
         assert len(response.data) == 1
-        assert sorted(map(lambda x: x['id'], response.data)) == sorted(
+        assert sorted([x['id'] for x in response.data]) == sorted(
             [
                 six.text_type(report_1.id),
             ]

@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import zip
+from builtins import object
 import mock
 import six
 

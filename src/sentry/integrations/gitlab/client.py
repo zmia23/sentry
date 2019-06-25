@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.core.urlresolvers import reverse
 
 from sentry.integrations.client import ApiClient

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import logging
 import threading
 from collections import defaultdict, namedtuple
@@ -23,7 +24,7 @@ class MessageNotReady(Exception):
     pass
 
 
-class SynchronizedPartitionState:
+class SynchronizedPartitionState(object):
     # The ``SYNCHRONIZED`` state represents that the local offset is equal to
     # the remote offset. The local consumer should be paused to avoid advancing
     # further beyond the remote consumer.

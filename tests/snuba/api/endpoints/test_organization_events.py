@@ -16,7 +16,7 @@ class OrganizationEventsEndpointTest(APITestCase, SnubaTestCase):
         self.day_ago = timezone.now() - timedelta(days=1)
 
     def assert_events_in_response(self, response, event_ids):
-        assert sorted(map(lambda x: x['eventID'], response.data)) == sorted(event_ids)
+        assert sorted([x['eventID'] for x in response.data]) == sorted(event_ids)
 
     def test_simple(self):
         self.login_as(user=self.user)

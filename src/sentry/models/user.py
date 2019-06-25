@@ -7,6 +7,7 @@ sentry.models.user
 """
 from __future__ import absolute_import
 
+from builtins import object
 import logging
 import warnings
 
@@ -130,7 +131,7 @@ class User(BaseModel, AbstractBaseUser):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'auth_user'
         verbose_name = _('user')

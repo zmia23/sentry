@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import inspect
 
 from sentry import projectoptions
@@ -137,7 +138,7 @@ class Strategy(object):
                         component.update(
                             contributes=False,
                             hint='ignored because %s variant is not used' % (
-                                mandatory_component_hashes.values()[0]
+                                list(mandatory_component_hashes.values())[0]
                                 if len(mandatory_component_hashes) == 1 else
                                 'other mandatory'
                             )
@@ -180,7 +181,7 @@ class StrategyConfiguration(object):
 
     def iter_strategies(self):
         """Iterates over all strategies by highest score to lowest."""
-        return iter(sorted(self.strategies.values(), key=lambda x: -x.score))
+        return iter(sorted(list(self.strategies.values()), key=lambda x: -x.score))
 
     def get_grouping_component(self, interface, *args, **kwargs):
         """Invokes a delegate grouping strategy.  If no such delegate is
@@ -202,7 +203,7 @@ class StrategyConfiguration(object):
             'id': self.id,
             'strategies': sorted(self.strategies),
             'changelog': self.changelog,
-            'delegates': sorted(x.id for x in self.delegates.values()),
+            'delegates': sorted(x.id for x in list(self.delegates.values())),
             'latest': projectoptions.lookup_well_known_key('sentry:grouping_config')
             .get_default(epoch=projectoptions.LATEST_EPOCH) == self.id,
         }

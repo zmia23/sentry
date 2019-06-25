@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import range
 from rest_framework.response import Response
 from six.moves import range
 

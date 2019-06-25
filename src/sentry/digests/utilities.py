@@ -14,7 +14,7 @@ def get_digest_metadata(digest):
 
     counts = Counter()
     for rule, groups in six.iteritems(digest):
-        counts.update(groups.keys())
+        counts.update(list(groups.keys()))
 
         for group, records in six.iteritems(groups):
             for record in records:

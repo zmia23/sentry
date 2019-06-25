@@ -7,6 +7,7 @@ sentry.models.environment
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import IntegrityError, models, transaction
 from django.utils import timezone
 
@@ -29,7 +30,7 @@ class EnvironmentProject(Model):
     environment = FlexibleForeignKey('sentry.Environment')
     is_hidden = models.NullBooleanField()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_environmentproject'
         unique_together = (('project', 'environment'), )
@@ -45,7 +46,7 @@ class Environment(Model):
     name = models.CharField(max_length=64)
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_environment'
         unique_together = (('organization_id', 'name'), )

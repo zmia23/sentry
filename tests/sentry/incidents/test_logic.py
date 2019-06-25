@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import next
 from datetime import timedelta
 from exam import patcher
 from freezegun import freeze_time

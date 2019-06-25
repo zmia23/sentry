@@ -6,7 +6,10 @@ sentry.templatetags.sentry_helpers
 :license: BSD, see LICENSE for more details.
 """
 from __future__ import absolute_import
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 import functools
 import os.path
 from collections import namedtuple
@@ -243,10 +246,10 @@ def duration(value):
     value = value / 1000.0
     hours, minutes, seconds = 0, 0, 0
     if value > 3600:
-        hours = value / 3600
+        hours = old_div(value, 3600)
         value = value % 3600
     if value > 60:
-        minutes = value / 60
+        minutes = old_div(value, 60)
         value = value % 60
     seconds = value
     output = []

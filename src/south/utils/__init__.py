@@ -3,6 +3,7 @@ Generally helpful utility functions.
 """
 
 
+from builtins import str
 def _ask_for_it_by_name(name):
     "Returns an object referenced by absolute path."
     bits = str(name).split(".")

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import range
 import responses
 from mock import patch
 from time import time

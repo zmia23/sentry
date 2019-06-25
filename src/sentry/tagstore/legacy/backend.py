@@ -8,6 +8,7 @@ sentry.tagstore.legacy.backend
 
 from __future__ import absolute_import
 
+from builtins import map
 import collections
 import six
 
@@ -451,7 +452,7 @@ class LegacyTagStorage(TagStorage):
         tagkeys = dict(
             models.TagKey.objects.filter(
                 project_id=project_id,
-                key__in=tags.keys(),
+                key__in=list(tags.keys()),
                 status=TagKeyStatus.VISIBLE,
             ).values_list('key', 'id')
         )
@@ -669,7 +670,7 @@ class LegacyTagStorage(TagStorage):
         return DateTimePaginator(
             queryset=queryset,
             order_by=order_by,
-            on_results=lambda results: map(transformers[models.TagValue], results)
+            on_results=lambda results: list(map(transformers[models.TagValue], results))
         )
 
     def get_group_tag_value_iter(self, project_id, group_id, environment_id, key, callbacks=()):
@@ -697,7 +698,7 @@ class LegacyTagStorage(TagStorage):
         return paginator_cls(
             queryset=qs,
             order_by=order_by,
-            on_results=lambda results: map(transformers[models.GroupTagValue], results)
+            on_results=lambda results: list(map(transformers[models.GroupTagValue], results))
         )
 
     def get_group_tag_value_qs(self, project_id, group_id, environment_id, key, value=None):

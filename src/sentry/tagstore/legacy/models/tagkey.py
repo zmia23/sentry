@@ -8,6 +8,7 @@ sentry.tagstore.legacy.models.tagkey
 
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -35,7 +36,7 @@ class TagKey(Model):
         default=TagKeyStatus.VISIBLE
     )
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_filterkey'
         unique_together = (('project_id', 'key'), )

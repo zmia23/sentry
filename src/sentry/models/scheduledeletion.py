@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from datetime import timedelta
 from django.db import models
 from django.db.models import get_model
@@ -35,7 +36,7 @@ class ScheduledDeletion(Model):
     in_progress = models.BooleanField(default=False)
     aborted = models.BooleanField(default=False)
 
-    class Meta:
+    class Meta(object):
         unique_together = (('app_label', 'model_name', 'object_id'), )
         app_label = 'sentry'
         db_table = 'sentry_scheduleddeletion'

@@ -8,6 +8,8 @@ sentry.attachments.base
 
 from __future__ import absolute_import
 
+from builtins import range
+from builtins import object
 import zlib
 
 from sentry.utils import metrics

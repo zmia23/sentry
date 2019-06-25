@@ -121,7 +121,7 @@ class OrganizationAuthSettingsView(OrganizationView):
 
             if form.initial != form.cleaned_data:
                 changed_data = {}
-                for key, value in form.cleaned_data.items():
+                for key, value in list(form.cleaned_data.items()):
                     if form.initial.get(key) != value:
                         changed_data[key] = u'to {}'.format(value)
 

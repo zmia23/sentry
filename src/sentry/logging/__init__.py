@@ -7,6 +7,7 @@ sentry.logging
 
 from __future__ import absolute_import
 
+from builtins import object
 from structlog import get_logger
 
 

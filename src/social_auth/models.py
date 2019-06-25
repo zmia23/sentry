@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import time
 import re
 import six
@@ -36,7 +37,7 @@ class UserSocialAuth(models.Model):
     uid = models.CharField(max_length=UID_LENGTH)
     extra_data = JSONField(default='{}')
 
-    class Meta:
+    class Meta(object):
         """Meta data"""
         unique_together = ('provider', 'uid', 'user')
         app_label = 'social_auth'

@@ -8,6 +8,7 @@ sentry.interfaces.contexts
 
 from __future__ import absolute_import
 
+from builtins import object
 import six
 import string
 

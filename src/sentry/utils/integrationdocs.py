@@ -2,6 +2,8 @@
 # process.  Thus we do not want to import non stdlib things here.
 from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
 import os
 import sys
 import json
@@ -29,7 +31,7 @@ else:
     def iteritems(d, **kw):
         return d.iteritems(**kw)  # NOQA
 
-    from urllib2 import urlopen
+    from urllib.request import urlopen
 """
 Looking to add a new framework/language to /settings/install?
 

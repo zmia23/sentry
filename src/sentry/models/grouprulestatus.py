@@ -7,6 +7,7 @@ sentry.models.grouprulestatus
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -26,7 +27,7 @@ class GroupRuleStatus(Model):
     date_added = models.DateTimeField(default=timezone.now)
     last_active = models.DateTimeField(null=True)
 
-    class Meta:
+    class Meta(object):
         db_table = 'sentry_grouprulestatus'
         app_label = 'sentry'
         unique_together = (('rule', 'group'), )

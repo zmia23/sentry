@@ -1,5 +1,9 @@
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import zip
+from builtins import range
+from builtins import object
 import bisect
 import functools
 import itertools
@@ -138,7 +142,7 @@ def merge_mappings(target, other, function=lambda x, y: x + y):
     mappings must be equal.
     """
     assert set(target) == set(other), 'keys must match'
-    return {k: function(v, other[k]) for k, v in target.items()}
+    return {k: function(v, other[k]) for k, v in list(target.items())}
 
 
 def merge_series(target, other, function=operator.add):
@@ -163,9 +167,9 @@ def prepare_project_series(start__stop, project, rollup=60 * 60 * 24):
     return merge_series(
         reduce(
             merge_series,
-            map(
+            list(map(
                 clean,
-                tsdb.get_range(
+                list(tsdb.get_range(
                     tsdb.models.group,
                     list(
                         project.group_set.filter(
@@ -177,8 +181,8 @@ def prepare_project_series(start__stop, project, rollup=60 * 60 * 24):
                     start,
                     stop,
                     rollup=rollup,
-                ).values(),
-            ),
+                ).values()),
+            )),
             clean([(timestamp, 0) for timestamp in series]),
         ),
         clean(
@@ -341,7 +345,7 @@ def clean_calendar_data(project, series, start, stop, rollup, timestamp=None):
             value = None
         return (timestamp, value)
 
-    return map(
+    return list(map(
         remove_invalid_values,
         clean_series(
             start,
@@ -349,7 +353,7 @@ def clean_calendar_data(project, series, start, stop, rollup, timestamp=None):
             rollup,
             series,
         ),
-    )
+    ))
 
 
 def prepare_project_calendar_series(interval, project):
@@ -374,7 +378,7 @@ def prepare_project_calendar_series(interval, project):
 
 
 def build(name, fields):
-    names, prepare_fields, merge_fields = zip(*fields)
+    names, prepare_fields, merge_fields = list(zip(*fields))
 
     cls = namedtuple(name, names)
 
@@ -441,14 +445,14 @@ class DummyReportBackend(ReportBackend):
 
     def fetch(self, timestamp, duration, organization, projects):
         assert all(project.organization_id == organization.id for project in projects)
-        return map(
+        return list(map(
             functools.partial(
                 self.build,
                 timestamp,
                 duration,
             ),
             projects,
-        )
+        ))
 
 
 class RedisReportBackend(ReportBackend):
@@ -711,9 +715,7 @@ def deliver_organization_user_report(timestamp, duration, organization_id, user_
     ]
 
     reports = dict(
-        filter(
-            lambda item: all(predicate(interval, item) for predicate in inclusion_predicates),
-            zip(
+        [item for item in zip(
                 projects,
                 backend.fetch(
                     timestamp,
@@ -721,8 +723,7 @@ def deliver_organization_user_report(timestamp, duration, organization_id, user_
                     organization,
                     projects,
                 ),
-            )
-        )
+            ) if all(predicate(interval, item) for predicate in inclusion_predicates)]
     )
 
     if not reports:
@@ -775,22 +776,22 @@ def build_project_breakdown_series(reports):
 
     # Find the reports with the most total events. (The number of reports to
     # keep is the same as the number of colors available to use in the legend.)
-    instances = map(
+    instances = list(map(
         operator.itemgetter(0),
         sorted(
-            reports.items(),
+            list(reports.items()),
             key=lambda instance__report: sum(sum(values)
                                              for timestamp, values in instance__report[1][0]),
             reverse=True,
         ),
-    )[:len(colors)]
+    ))[:len(colors)]
 
     # Starting building the list of items to include in the report chart. This
     # is a list of [Key, Report] pairs, in *ascending* order of the total sum
     # of values in the series. (This is so when we render the series, the
     # largest color blocks are at the bottom and it feels appropriately
     # weighted.)
-    selections = map(
+    selections = list(map(
         lambda instance__color: (
             Key(
                 instance__color[0].slug,
@@ -800,11 +801,11 @@ def build_project_breakdown_series(reports):
             ),
             reports[instance__color[0]],
         ),
-        zip(
+        list(zip(
             instances,
             colors,
-        ),
-    )[::-1]
+        )),
+    ))[::-1]
 
     # Collect any reports that weren't in the selection set, merge them
     # together and add it at the top (front) of the stack.
@@ -850,7 +851,7 @@ def build_project_breakdown_series(reports):
 
 
 def to_context(organization, interval, reports):
-    report = reduce(merge_reports, reports.values())
+    report = reduce(merge_reports, list(reports.values()))
     series = [(to_datetime(timestamp), Point(*values)) for timestamp, values in report.series]
     return {
         'series': {
@@ -862,7 +863,7 @@ def to_context(organization, interval, reports):
         'distribution': {
             'types':
             list(
-                zip(
+                list(zip(
                     (
                         DistributionType(
                             'New', '#8477e0'), DistributionType(
@@ -870,7 +871,7 @@ def to_context(organization, interval, reports):
                         DistributionType('Existing', '#534a92'),
                     ),
                     report.issue_summaries,
-                ),
+                )),
             ),
             'total':
             sum(report.issue_summaries),
@@ -919,7 +920,7 @@ def colorize(spectrum, values):
 
     find_index = functools.partial(
         bisect.bisect_left,
-        legend.values(),
+        list(legend.values()),
     )
 
     results = []
@@ -968,11 +969,11 @@ def to_calendar(interval, series):
 
     calendar = Calendar(6)
     sheets = []
-    for year, month in map(index_to_month, range(start, stop + 1)):
+    for year, month in map(index_to_month, list(range(start, stop + 1))):
         weeks = []
 
         for week in calendar.monthdatescalendar(year, month):
-            weeks.append(map(get_data_for_date, week))
+            weeks.append(list(map(get_data_for_date, week)))
 
         sheets.append((datetime(year, month, 1, tzinfo=pytz.utc), weeks, ))
 

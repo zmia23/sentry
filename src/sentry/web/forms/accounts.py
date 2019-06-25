@@ -7,6 +7,8 @@ sentry.web.forms.accounts
 """
 from __future__ import absolute_import
 
+from builtins import range
+from builtins import object
 import pytz
 import six
 
@@ -220,7 +222,7 @@ class PasswordlessRegistrationForm(forms.ModelForm):
             self.fields['subscribe'].help_text = mark_safe(
                 notice.format(privacy_link=settings.PRIVACY_URL))
 
-    class Meta:
+    class Meta(object):
         fields = ('username', 'name')
         model = User
 

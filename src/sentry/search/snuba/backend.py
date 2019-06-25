@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import filter
+from builtins import object
 import functools
 import logging
 import time
@@ -347,10 +349,10 @@ class SnubaSearchBackend(SearchBackend):
 
         now = timezone.now()
         end = None
-        end_params = filter(
+        end_params = list(filter(
             None,
             [date_to, get_search_filter(search_filters, 'date', '<')],
-        )
+        ))
         if end_params:
             end = min(end_params)
 
@@ -381,10 +383,10 @@ class SnubaSearchBackend(SearchBackend):
         # apparently `retention_window_start` can be None(?), so we need a
         # fallback.
         retention_date = max(
-            filter(None, [
+            [_f for _f in [
                 retention_window_start,
                 now - timedelta(days=90)
-            ])
+            ] if _f]
         )
 
         # TODO: We should try and consolidate all this logic together a little
@@ -395,7 +397,7 @@ class SnubaSearchBackend(SearchBackend):
             retention_date,
             get_search_filter(search_filters, 'date', '>'),
         ]
-        start = max(filter(None, start_params))
+        start = max([_f for _f in start_params if _f])
 
         end = max([
             retention_date,

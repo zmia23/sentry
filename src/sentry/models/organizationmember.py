@@ -7,6 +7,7 @@ sentry.models.organizationmember
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import six
 
 from bitfield import BitField
@@ -45,7 +46,7 @@ class OrganizationMemberTeam(BaseModel):
     # but still allows them to re-join without request
     is_active = models.BooleanField(default=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_organizationmember_teams'
         unique_together = (('team', 'organizationmember'), )
@@ -96,7 +97,7 @@ class OrganizationMember(Model):
     # Deprecated -- no longer used
     type = BoundedPositiveIntegerField(default=50, blank=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_organizationmember'
         unique_together = (('organization', 'user'), ('organization', 'email'), )

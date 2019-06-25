@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 
 from sentry.db.models import BoundedPositiveIntegerField, Model, sane_repr
@@ -13,7 +14,7 @@ class CommitAuthor(Model):
     email = models.EmailField(max_length=75)
     external_id = models.CharField(max_length=164, null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_commitauthor'
         unique_together = (('organization_id', 'email'), ('organization_id', 'external_id'), )

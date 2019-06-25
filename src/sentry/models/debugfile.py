@@ -8,6 +8,7 @@ sentry.models.debugfile
 
 from __future__ import absolute_import
 
+from builtins import object
 import re
 import os
 import six
@@ -41,7 +42,7 @@ ONE_DAY_AND_A_HALF = int(ONE_DAY * 1.5)
 # 10 minutes is assumed to be a reasonable value here.
 CONVERSION_ERROR_TTL = 60 * 10
 
-DIF_MIMETYPES = dict((v, k) for k, v in KNOWN_DIF_FORMATS.items())
+DIF_MIMETYPES = dict((v, k) for k, v in list(KNOWN_DIF_FORMATS.items()))
 
 _proguard_file_re = re.compile(r'/proguard/(?:mapping-)?(.*?)\.txt$')
 
@@ -63,7 +64,7 @@ class ProjectDebugFileManager(BaseManager):
         ).values('file__checksum')
 
         for values in found:
-            missing.discard(values.values()[0])
+            missing.discard(list(values.values())[0])
 
         return sorted(missing)
 
@@ -127,7 +128,7 @@ class ProjectDebugFile(Model):
     data = JSONField(null=True)
     objects = ProjectDebugFileManager()
 
-    class Meta:
+    class Meta(object):
         index_together = (('project', 'debug_id'), ('project', 'code_id'))
         db_table = 'sentry_projectdsymfile'
         app_label = 'sentry'

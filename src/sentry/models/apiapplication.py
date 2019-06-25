@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import petname
 
 from django.db import models
@@ -59,7 +60,7 @@ class ApiApplication(Model):
 
     objects = BaseManager(cache_fields=('client_id', ))
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_apiapplication'
 

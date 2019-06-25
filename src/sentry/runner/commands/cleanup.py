@@ -7,6 +7,7 @@ sentry.runner.commands.cleanup
 """
 from __future__ import absolute_import, print_function
 
+from builtins import range
 import os
 from datetime import timedelta
 from uuid import uuid4
@@ -151,7 +152,7 @@ def cleanup(days, project, concurrency, silent, model, router, timed):
 
     pool = []
     task_queue = Queue(1000)
-    for _ in xrange(concurrency):
+    for _ in range(concurrency):
         p = Process(target=multiprocess_worker, args=(task_queue,))
         p.daemon = True
         p.start()

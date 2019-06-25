@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import six
 
 from django import forms
@@ -70,7 +71,7 @@ class UserReportForm(forms.ModelForm):
         )
     )
 
-    class Meta:
+    class Meta(object):
         model = UserReport
         fields = ('name', 'email', 'comments')
 

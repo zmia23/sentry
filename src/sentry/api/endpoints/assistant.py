@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import zip
 from copy import deepcopy
 
 from django.db import IntegrityError, transaction
@@ -19,7 +20,7 @@ VALID_STATUSES = frozenset(('viewed', 'dismissed'))
 class AssistantSerializer(serializers.Serializer):
     guide_id = serializers.IntegerField(required=True)
     status = serializers.ChoiceField(
-        choices=zip(VALID_STATUSES, VALID_STATUSES),
+        choices=list(zip(VALID_STATUSES, VALID_STATUSES)),
         required=True,
     )
     useful = serializers.BooleanField()
@@ -44,7 +45,7 @@ class AssistantEndpoint(Endpoint):
         seen_ids = set(AssistantActivity.objects.filter(
             user=request.user,
         ).values_list('guide_id', flat=True))
-        for k, v in guides.items():
+        for k, v in list(guides.items()):
             v['seen'] = v['id'] in seen_ids
         return Response(guides)
 

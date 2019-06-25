@@ -7,6 +7,7 @@ sentry.models.broadcast
 """
 from __future__ import absolute_import
 
+from builtins import object
 from datetime import timedelta
 from django.db import models
 from django.utils import timezone
@@ -34,7 +35,7 @@ class Broadcast(Model):
     date_added = models.DateTimeField(default=timezone.now)
     cta = models.CharField(max_length=256, null=True, blank=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_broadcast'
 
@@ -48,7 +49,7 @@ class BroadcastSeen(Model):
     user = FlexibleForeignKey('sentry.User')
     date_seen = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_broadcastseen'
         unique_together = (('broadcast', 'user'))

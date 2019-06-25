@@ -7,6 +7,7 @@ sentry.tagstore.v2.models.grouptagvalue
 """
 from __future__ import absolute_import
 
+from builtins import object
 import six
 
 from django.db import models, router, transaction, DataError, connections
@@ -38,7 +39,7 @@ class GroupTagValue(Model):
 
     objects = TagStoreManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'tagstore'
         unique_together = (('project_id', 'group_id', '_key', '_value'), )
         index_together = (('project_id', '_key', '_value', 'last_seen'), )

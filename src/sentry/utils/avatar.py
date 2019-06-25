@@ -9,7 +9,10 @@ Note: also see letterAvatar.jsx. Anything changed in this file (how colors are
 selected, the svg, etc) will also need to be changed there.
 """
 from __future__ import absolute_import
+from __future__ import division
 
+from builtins import map
+from past.utils import old_div
 import six
 
 from django.conf import settings
@@ -89,7 +92,7 @@ def get_letter_avatar(display_name, identifier, size=None, use_svg=True):
         )
     else:
         size_attrs = 'height:%spx;width:%spx;' % (size, size) if size else ''
-        font_size = 'font-size:%spx;' % (size / 2) if size else ''
+        font_size = 'font-size:%spx;' % (old_div(size, 2)) if size else ''
         line_height = 'line-height:%spx;' % size if size else ''
         return (
             u'<span class="html-avatar" '

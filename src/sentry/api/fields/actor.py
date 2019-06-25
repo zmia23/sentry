@@ -48,7 +48,7 @@ class Actor(namedtuple('Actor', 'id type')):
             actors_by_type[actor.type].append(actor)
 
         results = []
-        for type, actors in actors_by_type.items():
+        for type, actors in list(actors_by_type.items()):
             results.extend(list(type.objects.filter(
                 id__in=[a.id for a in actors]
             )))
@@ -58,11 +58,11 @@ class Actor(namedtuple('Actor', 'id type')):
     @classmethod
     def resolve_dict(cls, actor_dict):
         actors_by_type = defaultdict(list)
-        for actor in actor_dict.values():
+        for actor in list(actor_dict.values()):
             actors_by_type[actor.type].append(actor)
 
         resolved_actors = {}
-        for type, actors in actors_by_type.items():
+        for type, actors in list(actors_by_type.items()):
             resolved_actors[type] = {
                 actor.id: actor for actor in type.objects.filter(
                     id__in=[a.id for a in actors]
@@ -70,7 +70,7 @@ class Actor(namedtuple('Actor', 'id type')):
 
         return {
             key: resolved_actors[value.type][value.id]
-            for key, value in actor_dict.items()
+            for key, value in list(actor_dict.items())
         }
 
 

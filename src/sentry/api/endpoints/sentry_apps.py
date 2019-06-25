@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import next
 from rest_framework.response import Response
 
 from sentry.auth.superuser import is_active_superuser

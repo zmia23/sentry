@@ -7,6 +7,7 @@ sentry.utils.types
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import six
 
 from yaml.parser import ParserError

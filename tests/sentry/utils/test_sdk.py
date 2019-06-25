@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from sentry_sdk import Hub
 
 from django.conf import settings
@@ -28,7 +29,7 @@ class SentryInternalClientTest(TestCase):
         configure_sdk()
         Hub.current.bind_client(Hub.main.client)
 
-        class NotJSONSerializable():
+        class NotJSONSerializable(object):
             pass
 
         with self.tasks():

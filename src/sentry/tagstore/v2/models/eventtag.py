@@ -7,6 +7,7 @@ sentry.tagstore.v2.models.eventtag
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models, router, connections
 from django.utils import timezone
 
@@ -23,7 +24,7 @@ class EventTag(Model):
     value = FlexibleForeignKey('tagstore.TagValue', db_column='value_id')
     date_added = models.DateTimeField(default=timezone.now, db_index=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'tagstore'
         unique_together = (('project_id', 'event_id', 'key', 'value'), )
         index_together = (

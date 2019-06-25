@@ -7,7 +7,9 @@ sentry.nodestore.django.backend
 """
 
 from __future__ import absolute_import
+from __future__ import division
 
+from past.utils import old_div
 import math
 
 from django.utils import timezone
@@ -48,7 +50,7 @@ class DjangoNodeStorage(NodeStorage):
         from sentry.db.deletion import BulkDeleteQuery
 
         total_seconds = (timezone.now() - cutoff_timestamp).total_seconds()
-        days = math.floor(total_seconds / 86400)
+        days = math.floor(old_div(total_seconds, 86400))
 
         BulkDeleteQuery(
             model=Node,

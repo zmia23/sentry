@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import map
 from django.utils.functional import cached_property
 from parsimonious.exceptions import IncompleteParseError
 
@@ -43,7 +44,7 @@ class IssueSearchVisitor(SearchVisitor):
             'assigned': (SearchKey('unassigned'), SearchValue(False)),
             'unassigned': (SearchKey('unassigned'), SearchValue(True)),
         }
-        for status_key, status_value in STATUS_CHOICES.items():
+        for status_key, status_value in list(STATUS_CHOICES.items()):
             is_filter_translators[status_key] = (SearchKey('status'), SearchValue(status_value))
         return is_filter_translators
 
@@ -124,4 +125,4 @@ def convert_query_values(search_filters, projects, user, environments):
             search_filter = search_filter._replace(value=SearchValue(new_value))
         return search_filter
 
-    return map(convert_search_filter, search_filters)
+    return list(map(convert_search_filter, search_filters))

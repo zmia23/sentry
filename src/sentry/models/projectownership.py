@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import operator
 
 
@@ -28,7 +29,7 @@ class ProjectOwnership(Model):
     # An object to indicate ownership is implicitly everyone
     Everyone = object()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_projectownership'
 
@@ -57,7 +58,7 @@ class ProjectOwnership(Model):
             return cls.Everyone if ownership.fallthrough else [], None
 
         owners = {o for rule in rules for o in rule.owners}
-        return filter(None, resolve_actors(owners, project_id).values()), rules
+        return [_f for _f in list(resolve_actors(owners, project_id).values()) if _f], rules
 
     @classmethod
     def get_autoassign_owner(cls, project_id, data):
@@ -86,7 +87,7 @@ class ProjectOwnership(Model):
             if candidate > score:
                 score = candidate
                 owners = rule.owners
-        actors = filter(None, resolve_actors(owners, project_id).values())
+        actors = [_f for _f in list(resolve_actors(owners, project_id).values()) if _f]
 
         # Can happen if the ownership rule references a user/team that no longer
         # is assigned to the project or has been removed from the org.

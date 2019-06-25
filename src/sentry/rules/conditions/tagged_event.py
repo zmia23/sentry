@@ -8,6 +8,7 @@ sentry.rules.conditions.tagged_event
 
 from __future__ import absolute_import
 
+from builtins import object
 from collections import OrderedDict
 from django import forms
 
@@ -39,7 +40,7 @@ MATCH_CHOICES = OrderedDict(
 class TaggedEventForm(forms.Form):
     key = forms.CharField(widget=forms.TextInput())
     match = forms.ChoiceField(
-        MATCH_CHOICES.items(), widget=forms.Select()
+        list(MATCH_CHOICES.items()), widget=forms.Select()
     )
     value = forms.CharField(widget=forms.TextInput())
 
@@ -55,7 +56,7 @@ class TaggedEventCondition(EventCondition):
         },
         'match': {
             'type': 'choice',
-            'choices': MATCH_CHOICES.items()
+            'choices': list(MATCH_CHOICES.items())
         },
         'value': {
             'type': 'string',

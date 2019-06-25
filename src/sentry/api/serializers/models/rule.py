@@ -21,7 +21,7 @@ def _generate_rule_label(project, rule, data):
 class RuleSerializer(Serializer):
     def get_attrs(self, item_list, user, **kwargs):
         environments = Environment.objects.in_bulk(
-            filter(None, [i.environment_id for i in item_list]),
+            [_f for _f in [i.environment_id for i in item_list] if _f],
         )
         return {
             i: {
@@ -37,10 +37,10 @@ class RuleSerializer(Serializer):
             'id':
             six.text_type(obj.id) if obj.id else None,
             'conditions': [
-                dict(o.items() + [('name', _generate_rule_label(obj.project, obj, o))]) for o in obj.data.get('conditions', [])
+                dict(list(o.items()) + [('name', _generate_rule_label(obj.project, obj, o))]) for o in obj.data.get('conditions', [])
             ],
             'actions': [
-                dict(o.items() + [('name', _generate_rule_label(obj.project, obj, o))]) for o in obj.data.get('actions', [])
+                dict(list(o.items()) + [('name', _generate_rule_label(obj.project, obj, o))]) for o in obj.data.get('actions', [])
             ],
             'actionMatch':
             obj.data.get('action_match') or Rule.DEFAULT_ACTION_MATCH,

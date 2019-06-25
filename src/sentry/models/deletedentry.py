@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -23,5 +24,5 @@ class DeletedEntry(Model):
 
     reason = models.TextField(blank=True, null=True)
 
-    class Meta:
+    class Meta(object):
         abstract = True

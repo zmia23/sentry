@@ -52,7 +52,7 @@ _fixture_path = os.path.join(os.path.dirname(__file__), 'grouping_inputs')
 
 
 def load_configs():
-    configs = CONFIGURATIONS.keys()
+    configs = list(CONFIGURATIONS.keys())
 
     rv = []
     for filename in os.listdir(_fixture_path):

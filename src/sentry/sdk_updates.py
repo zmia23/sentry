@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import zip
+from builtins import object
 import logging
 from distutils.version import LooseVersion
 from django.conf import settings
@@ -282,7 +284,7 @@ def get_sdk_index():
 def get_sdk_versions():
     try:
         rv = settings.SDK_VERSIONS
-        rv.update((key, info['version']) for (key, info) in get_sdk_index().items())
+        rv.update((key, info['version']) for (key, info) in list(get_sdk_index().items()))
         return rv
     except Exception:
         logger.exception("sentry-release-registry.sdk-versions")
@@ -294,7 +296,7 @@ def get_sdk_urls():
         rv = dict(settings.SDK_URLS)
         rv.update(
             (key, info['main_docs_url']) for (
-                key, info) in get_sdk_index().items())
+                key, info) in list(get_sdk_index().items()))
         return rv
     except Exception:
         logger.exception("sentry-release-registry.sdk-urls")

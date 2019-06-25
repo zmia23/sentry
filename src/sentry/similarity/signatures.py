@@ -1,5 +1,8 @@
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import range
+from builtins import object
 import mmh3
 
 
@@ -9,15 +12,15 @@ class MinHashSignatureBuilder(object):
         self.rows = rows
 
     def __call__(self, features):
-        return map(
+        return list(map(
             lambda column: min(
-                map(
+                list(map(
                     lambda feature: mmh3.hash(
                         feature,
                         column,
                     ) % self.rows,
                     features,
-                ),
+                )),
             ),
-            range(self.columns),
-        )
+            list(range(self.columns)),
+        ))

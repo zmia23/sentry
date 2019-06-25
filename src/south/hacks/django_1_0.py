@@ -2,6 +2,7 @@
 Hacks for the Django 1.0/1.0.2 releases.
 """
 
+from builtins import object
 import django
 import six
 
@@ -31,7 +32,7 @@ class SkipFlushCommand(FlushCommand):
         return
 
 
-class Hacks:
+class Hacks(object):
     def set_installed_apps(self, apps):
         """
         Sets Django's INSTALLED_APPS setting to be effectively the list passed in.

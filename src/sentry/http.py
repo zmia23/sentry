@@ -251,7 +251,7 @@ def fetch_file(
                 logger.warning('source.disabled', extra=error)
             raise CannotFetch(error)
 
-        headers = {k.lower(): v for k, v in response.headers.items()}
+        headers = {k.lower(): v for k, v in list(response.headers.items())}
         encoding = response.encoding
 
         body = None

@@ -7,6 +7,7 @@ sentry.models.groupmeta
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -21,7 +22,7 @@ class EventMapping(Model):
     event_id = models.CharField(max_length=32)
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_eventmapping'
         unique_together = (('project_id', 'event_id'), )

@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import absolute_import
 
+from builtins import map
 import pytest
 from sentry.utils.db import is_postgres
 from sentry.testutils import TestCase

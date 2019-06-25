@@ -1,5 +1,7 @@
 from __future__ import absolute_import, print_function
 
+from builtins import zip
+from builtins import object
 import itertools
 from collections import defaultdict
 from datetime import timedelta
@@ -75,7 +77,7 @@ class GroupSerializerBase(Serializer):
             option.project_id: option.value
             for option in
             UserOption.objects.filter(
-                Q(project__in=projects.keys()) | Q(project__isnull=True),
+                Q(project__in=list(projects.keys())) | Q(project__isnull=True),
                 user=user,
                 key='workflow:notifications',
             )
@@ -90,12 +92,12 @@ class GroupSerializerBase(Serializer):
             GroupSubscription.objects.filter(
                 group__in=list(
                     itertools.chain.from_iterable(
-                        itertools.imap(
+                        map(
                             lambda project__groups: project__groups[1] if not options.get(
                                 project__groups[0].id,
                                 options.get(None)
                             ) == UserOptionValue.no_conversations else [],
-                            projects.items(),
+                            list(projects.items()),
                         ),
                     )
                 ),
@@ -109,7 +111,7 @@ class GroupSerializerBase(Serializer):
         global_default_workflow_option = options.get(None, UserOptionValue.participating_only)
 
         results = {}
-        for project, groups in projects.items():
+        for project, groups in list(projects.items()):
             project_default_workflow_option = options.get(
                 project.id, global_default_workflow_option)
             for group in groups:
@@ -430,7 +432,7 @@ class GroupSerializer(GroupSerializerBase):
                     'environment',
                     environment.name,
                 )
-                for item_id, value in environment_tagvalues.items():
+                for item_id, value in list(environment_tagvalues.items()):
                     first_seen[item_id] = value.first_seen
                     last_seen[item_id] = value.last_seen
                     times_seen[item_id] = value.times_seen
@@ -596,7 +598,7 @@ class GroupSerializerSnuba(GroupSerializerBase):
                 ).values('group_id').annotate(Min('first_seen'))
             }
 
-            for item_id, value in seen_data.items():
+            for item_id, value in list(seen_data.items()):
                 first_seen[item_id] = first_seen_data.get(item_id)
                 last_seen[item_id] = value['last_seen']
                 times_seen[item_id] = value['times_seen']

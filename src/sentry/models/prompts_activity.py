@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -27,7 +28,7 @@ class PromptsActivity(Model):
 
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_promptsactivity'
         unique_together = (('user', 'feature', 'organization_id', 'project_id'), )

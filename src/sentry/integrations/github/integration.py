@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import filter
 from django.utils.translation import ugettext_lazy as _
 
 from sentry import http, options
@@ -122,10 +123,10 @@ class GitHubIntegration(IntegrationInstallation, GitHubIssueBasic, RepositoryMix
             provider='github',
         )
 
-        return filter(
+        return list(filter(
             lambda repo: repo.name not in accessible_repo_names,
             existing_repos,
-        )
+        ))
 
     def reinstall(self):
         self.reinstall_repositories()

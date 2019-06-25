@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 __all__ = ['FeatureManager']
 
 from django.conf import settings
@@ -20,7 +21,7 @@ class FeatureManager(object):
         Get a mapping of feature name -> feature class, optionally specific to a
         particular feature type.
         """
-        return {k: v for k, v in self._registry.items() if v == feature_type}
+        return {k: v for k, v in list(self._registry.items()) if v == feature_type}
 
     def add(self, name, cls=Feature):
         """

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from rest_framework import serializers, status
 from rest_framework.response import Response
 
@@ -10,7 +11,7 @@ from sentry.models import ApiKey, AuditLogEntryEvent
 
 
 class ApiKeySerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = ApiKey
         fields = ('label', 'scope_list', 'allowed_origins')
 

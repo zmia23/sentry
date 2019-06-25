@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function
 
+from builtins import map
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -308,7 +309,7 @@ def tokenize_query(query):
                 break
         query_params[state].append(token)
 
-    result['query'] = map(format_query, query_params['query'])
+    result['query'] = list(map(format_query, query_params['query']))
     for tag in query_params['tags']:
         key, value = format_tag(tag)
         result[key].append(value)

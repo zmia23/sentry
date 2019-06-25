@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 
 from sentry.db.models import sane_repr, BoundedBigIntegerField
@@ -22,7 +23,7 @@ class DeletedTeam(DeletedEntry):
     organization_name = models.CharField(max_length=64, null=True)
     organization_slug = models.CharField(max_length=50, null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_deletedteam'
 

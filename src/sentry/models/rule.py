@@ -7,6 +7,7 @@ sentry.models.rule
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -45,7 +46,7 @@ class Rule(Model):
 
     objects = BaseManager(cache_fields=('pk', ))
 
-    class Meta:
+    class Meta(object):
         db_table = 'sentry_rule'
         app_label = 'sentry'
 

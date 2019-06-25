@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import zip
 import datetime
 
 import pytz
@@ -128,7 +129,7 @@ class DebugNewReleaseEmailView(View):
             text_template='sentry/emails/activity/release.txt',
             context={
                 'release': release,
-                'projects': zip(projects, release_links, [6, 1, 0]),
+                'projects': list(zip(projects, release_links, [6, 1, 0])),
                 'repos': repos,
                 'reason': GroupSubscriptionReason.descriptions[GroupSubscriptionReason.committed],
                 'project_count': len(projects),

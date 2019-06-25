@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.core.signals import request_finished
 
 from sentry.app import env

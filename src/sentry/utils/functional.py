@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import zip
 import six
 
 from django.utils.functional import empty
@@ -34,12 +35,12 @@ def apply_values(function, mapping):
     if not mapping:
         return {}
 
-    keys, values = zip(*mapping.items())
+    keys, values = list(zip(*list(mapping.items())))
     return dict(
-        zip(
+        list(zip(
             keys,
             function(values),
-        ),
+        )),
     )
 
 

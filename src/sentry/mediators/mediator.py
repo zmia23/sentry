@@ -1,5 +1,8 @@
 from __future__ import absolute_import
+from __future__ import division
 
+from builtins import object
+from past.utils import old_div
 import datetime
 import logging
 import six
@@ -269,4 +272,4 @@ class Mediator(object):
     def _milliseconds_since(self, start):
         now = datetime.datetime.now()
         elapsed = now - start
-        return (elapsed.seconds * 1000) + (elapsed.microseconds / 1000)
+        return (elapsed.seconds * 1000) + (old_div(elapsed.microseconds, 1000))

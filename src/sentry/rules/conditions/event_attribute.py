@@ -8,6 +8,7 @@ sentry.rules.conditions.tagged_event
 
 from __future__ import absolute_import
 
+from builtins import object
 import json
 import six
 
@@ -77,7 +78,7 @@ class EventAttributeForm(forms.Form):
         )
     )
     match = forms.ChoiceField(
-        MATCH_CHOICES.items()
+        list(MATCH_CHOICES.items())
     )
     value = forms.CharField(
         widget=forms.TextInput(), required=False
@@ -111,7 +112,7 @@ class EventAttributeCondition(EventCondition):
         },
         'match': {
             'type': 'choice',
-            'choices': MATCH_CHOICES.items()
+            'choices': list(MATCH_CHOICES.items())
         },
         'value': {
             'type': 'string',

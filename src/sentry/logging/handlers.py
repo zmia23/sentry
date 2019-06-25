@@ -6,6 +6,7 @@ sentry.logging.handlers
 """
 from __future__ import absolute_import
 
+from builtins import object
 import logging
 import re
 import six

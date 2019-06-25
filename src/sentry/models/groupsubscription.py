@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import range
+from builtins import object
 from django.conf import settings
 from django.db import IntegrityError, models, transaction
 from django.db.models import Q
@@ -165,22 +167,22 @@ class GroupSubscriptionManager(BaseManager):
             for subscription in
             GroupSubscription.objects.filter(
                 group=group,
-                user_id__in=users.keys(),
+                user_id__in=list(users.keys()),
             )
         }
 
-        for user_id, subscription in subscriptions.items():
+        for user_id, subscription in list(subscriptions.items()):
             if not subscription.is_active:
                 excluded_ids.add(user_id)
 
         options = get_user_options(
             'workflow:notifications',
-            users.keys(),
+            list(users.keys()),
             group.project,
             UserOptionValue.participating_only,
         )
 
-        for user_id, option in options.items():
+        for user_id, option in list(options.items()):
             if option == UserOptionValue.no_conversations:
                 excluded_ids.add(user_id)
             elif option == UserOptionValue.participating_only:
@@ -189,7 +191,7 @@ class GroupSubscriptionManager(BaseManager):
 
         results = {}
 
-        for user_id, user in users.items():
+        for user_id, user in list(users.items()):
             if user_id in excluded_ids:
                 continue
 
@@ -220,7 +222,7 @@ class GroupSubscription(Model):
 
     objects = GroupSubscriptionManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_groupsubscription'
         unique_together = (('group', 'user'), )

@@ -7,6 +7,12 @@ sentry.tsdb.redis
 """
 from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import next
+from builtins import map
+from builtins import object
 import itertools
 import logging
 import operator
@@ -152,7 +158,7 @@ class RedisTSDB(BaseTSDB):
         results = defaultdict(list)
         for environment_id in environment_ids:
             results[self.get_cluster(environment_id)].append(environment_id)
-        return results.items()
+        return list(results.items())
 
     def add_environment_parameter(self, key, environment_id):
         if environment_id is not None:
@@ -259,7 +265,7 @@ class RedisTSDB(BaseTSDB):
         self.validate_arguments([model], [environment_id])
 
         rollup, series = self.get_optimal_rollup_series(start, end, rollup)
-        series = map(to_datetime, series)
+        series = list(map(to_datetime, series))
 
         results = []
         cluster, _ = self.get_cluster(environment_id)
@@ -296,7 +302,7 @@ class RedisTSDB(BaseTSDB):
 
             with manager as client:
                 data = {}
-                for rollup, series in rollups.items():
+                for rollup, series in list(rollups.items()):
                     data[rollup] = {}
                     for timestamp in series:
                         results = data[rollup][timestamp] = defaultdict(list)
@@ -314,9 +320,9 @@ class RedisTSDB(BaseTSDB):
                                 client.hdel(source_hash_key, source_hash_field)
 
             with cluster.map() as client:
-                for rollup, series in data.items():
-                    for timestamp, results in series.items():
-                        for environment_id, promises in results.items():
+                for rollup, series in list(data.items()):
+                    for timestamp, results in list(series.items()):
+                        for environment_id, promises in list(results.items()):
                             total = sum([int(p.value) for p in promises if p.value])
                             if total:
                                 destination_hash_key, destination_hash_field = self.make_counter_key(
@@ -355,7 +361,7 @@ class RedisTSDB(BaseTSDB):
                 manager = SuppressionWrapper(manager)
 
             with manager as client:
-                for rollup, series in rollups.items():
+                for rollup, series in list(rollups.items()):
                     for timestamp in series:
                         for model in models:
                             for key in keys:
@@ -518,7 +524,7 @@ class RedisTSDB(BaseTSDB):
             client = cluster.get_local_client(host)
             with client.pipeline(transaction=False) as pipeline:
                 pipeline.execute_command(
-                    'PFMERGE', destination, *itertools.chain.from_iterable(map(expand_key, keys))
+                    'PFMERGE', destination, *itertools.chain.from_iterable(list(map(expand_key, keys)))
                 )
                 pipeline.get(destination)
                 pipeline.delete(destination)
@@ -538,9 +544,9 @@ class RedisTSDB(BaseTSDB):
             client = cluster.get_local_client(random.choice(values)[0])
             with client.pipeline(transaction=False) as pipeline:
                 pipeline.mset(aggregates)
-                pipeline.execute_command('PFMERGE', destination, *aggregates.keys())
+                pipeline.execute_command('PFMERGE', destination, *list(aggregates.keys()))
                 pipeline.execute_command('PFCOUNT', destination)
-                pipeline.delete(destination, *aggregates.keys())
+                pipeline.delete(destination, *list(aggregates.keys()))
                 return pipeline.execute()[2]
 
         # TODO: This could be optimized to skip the intermediate step for the
@@ -552,11 +558,11 @@ class RedisTSDB(BaseTSDB):
         return merge_aggregates(
             [
                 get_partition_aggregate(x)
-                for x in reduce(
+                for x in list(reduce(
                     map_key_to_host,
                     keys,
                     defaultdict(set),
-                ).items()
+                ).items())
             ]
         )
 
@@ -579,14 +585,14 @@ class RedisTSDB(BaseTSDB):
                 return u'{}{}:{}'.format(self.prefix, temporary_id, key)
 
             data = {}
-            for rollup, series in rollups.items():
+            for rollup, series in list(rollups.items()):
                 data[rollup] = {timestamp: {e: [] for e in environment_ids} for timestamp in series}
 
             with wrapper(cluster.fanout()) as client:
                 for source in sources:
                     c = client.target_key(source)
-                    for rollup, series in data.items():
-                        for timestamp, results in series.items():
+                    for rollup, series in list(data.items()):
+                        for timestamp, results in list(series.items()):
                             for environment_id in environment_ids:
                                 key = self.make_key(
                                     model,
@@ -603,9 +609,9 @@ class RedisTSDB(BaseTSDB):
 
                 temporary_key_sequence = itertools.count()
 
-                for rollup, series in data.items():
-                    for timestamp, results in series.items():
-                        for environment_id, promises in results.items():
+                for rollup, series in list(data.items()):
+                    for timestamp, results in list(series.items()):
+                        for environment_id, promises in list(results.items()):
                             values = {}
                             for promise in promises:
                                 if promise.value is None:
@@ -622,8 +628,8 @@ class RedisTSDB(BaseTSDB):
                                     environment_id,
                                 )
                                 c.mset(values)
-                                c.pfmerge(key, key, *values.keys())
-                                c.delete(*values.keys())
+                                c.pfmerge(key, key, *list(values.keys()))
+                                c.delete(*list(values.keys()))
                                 c.expireat(
                                     key,
                                     self.calculate_expiry(
@@ -649,7 +655,7 @@ class RedisTSDB(BaseTSDB):
                 manager = SuppressionWrapper(manager)
 
             with manager as client:
-                for rollup, series in rollups.items():
+                for rollup, series in list(rollups.items()):
                     for timestamp in series:
                         for model in models:
                             for key in keys:
@@ -667,10 +673,10 @@ class RedisTSDB(BaseTSDB):
 
     def make_frequency_table_keys(self, model, rollup, timestamp, key, environment_id):
         prefix = self.make_key(model, rollup, timestamp, key, environment_id)
-        return map(
+        return list(map(
             operator.methodcaller('format', prefix),
             ('{}:i', '{}:e'),
-        )
+        ))
 
     def record_frequency_multi(self, requests, timestamp=None, environment_id=None):
         self.validate_arguments([model for model, request in requests], [environment_id])
@@ -705,14 +711,14 @@ class RedisTSDB(BaseTSDB):
                             expirations[k] = expiry
 
                     arguments = ['INCR'] + list(self.DEFAULT_SKETCH_PARAMETERS)
-                    for member, score in items.items():
+                    for member, score in list(items.items()):
                         arguments.extend((score, member))
 
                     # Since we're essentially merging dictionaries, we need to
                     # append this to any value that already exists at the key.
                     cmds = commands.setdefault(key, [])
                     cmds.append((CountMinScript, keys, arguments))
-                    for k, t in expirations.items():
+                    for k, t in list(expirations.items()):
                         cmds.append(('EXPIREAT', k, t))
 
             try:
@@ -749,7 +755,7 @@ class RedisTSDB(BaseTSDB):
 
         results = {}
         cluster, _ = self.get_cluster(environment_id)
-        for key, responses in cluster.execute_commands(commands).items():
+        for key, responses in list(cluster.execute_commands(commands).items()):
             results[key] = [(member, float(score)) for member, score in responses[0].value]
 
         return results
@@ -782,8 +788,8 @@ class RedisTSDB(BaseTSDB):
 
         results = {}
         cluster, _ = self.get_cluster(environment_id)
-        for key, responses in cluster.execute_commands(commands).items():
-            results[key] = zip(series, map(unpack_response, responses))
+        for key, responses in list(cluster.execute_commands(commands).items()):
+            results[key] = list(zip(series, list(map(unpack_response, responses))))
 
         return results
 
@@ -799,13 +805,13 @@ class RedisTSDB(BaseTSDB):
         # as positional arguments to the Redis script and later associating the
         # results (which are returned in the same order that the arguments were
         # provided) with the original input values to compose the result.
-        for key, members in items.items():
+        for key, members in list(items.items()):
             items[key] = list(members)
 
         commands = {}
 
         arguments = ['ESTIMATE'] + list(self.DEFAULT_SKETCH_PARAMETERS)
-        for key, members in items.items():
+        for key, members in list(items.items()):
             ks = []
             for timestamp in series:
                 ks.extend(
@@ -821,12 +827,12 @@ class RedisTSDB(BaseTSDB):
         results = {}
 
         cluster, _ = self.get_cluster(environment_id)
-        for key, responses in cluster.execute_commands(commands).items():
+        for key, responses in list(cluster.execute_commands(commands).items()):
             members = items[key]
 
             chunk = results[key] = []
             for timestamp, scores in zip(series, responses[0].value):
-                chunk.append((timestamp, dict(zip(members, map(float, scores)))))
+                chunk.append((timestamp, dict(list(zip(members, list(map(float, scores)))))))
 
         return results
 
@@ -843,7 +849,7 @@ class RedisTSDB(BaseTSDB):
         ):
             response = responses[key] = {}
             for timestamp, results in series:
-                for member, value in results.items():
+                for member, value in list(results.items()):
                     response[member] = response.get(member, 0.0) + value
 
         return responses
@@ -859,13 +865,13 @@ class RedisTSDB(BaseTSDB):
             return
 
         rollups = []
-        for rollup, samples in self.rollups.items():
+        for rollup, samples in list(self.rollups.items()):
             _, series = self.get_optimal_rollup_series(
                 to_datetime(self.get_earliest_timestamp(rollup, timestamp=timestamp)),
                 end=None,
                 rollup=rollup,
             )
-            rollups.append((rollup, map(to_datetime, series), ))
+            rollups.append((rollup, list(map(to_datetime, series)), ))
 
         for (cluster, durable), environment_ids in self.get_cluster_groups(environment_ids):
             exports = defaultdict(list)
@@ -902,7 +908,7 @@ class RedisTSDB(BaseTSDB):
 
             imports = []
 
-            for source, results in responses.items():
+            for source, results in list(responses.items()):
                 results = iter(results)
                 for rollup, series in rollups:
                     for timestamp in series:
@@ -946,7 +952,7 @@ class RedisTSDB(BaseTSDB):
                 manager = SuppressionWrapper(manager)
 
             with manager as client:
-                for rollup, series in rollups.items():
+                for rollup, series in list(rollups.items()):
                     for timestamp in series:
                         for model in models:
                             for key in keys:

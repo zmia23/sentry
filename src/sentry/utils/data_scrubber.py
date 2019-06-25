@@ -7,6 +7,7 @@ sentry.utils.data_scrubber
 """
 from __future__ import absolute_import
 
+from builtins import object
 import re
 import six
 from six.moves.urllib.parse import urlsplit, urlunsplit
@@ -65,7 +66,7 @@ class SensitiveDataFilter(object):
 
     def __init__(self, fields=None, include_defaults=True, exclude_fields=()):
         if fields:
-            fields = tuple(f.lower() for f in filter(None, fields))
+            fields = tuple(f.lower() for f in [_f for _f in fields if _f])
         else:
             fields = ()
         if include_defaults:

@@ -10,6 +10,7 @@ web-server
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import logging
 import os.path
 import six

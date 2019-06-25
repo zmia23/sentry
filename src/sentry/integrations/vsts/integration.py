@@ -240,7 +240,7 @@ class VstsIntegration(IntegrationInstallation, RepositoryMixin, VstsIssueSync):
         if 'sync_status_forward' in data:
             project_ids_and_statuses = data.pop('sync_status_forward')
             if any(not mapping['on_unresolve'] or not mapping['on_resolve']
-                    for mapping in project_ids_and_statuses.values()):
+                    for mapping in list(project_ids_and_statuses.values())):
                 raise IntegrationError('Resolve and unresolve status are required.')
 
             data['sync_status_forward'] = bool(project_ids_and_statuses)
@@ -249,7 +249,7 @@ class VstsIntegration(IntegrationInstallation, RepositoryMixin, VstsIssueSync):
                 organization_integration_id=self.org_integration.id,
             ).delete()
 
-            for project_id, statuses in project_ids_and_statuses.items():
+            for project_id, statuses in list(project_ids_and_statuses.items()):
                 IntegrationExternalProject.objects.create(
                     organization_integration_id=self.org_integration.id,
                     external_id=project_id,

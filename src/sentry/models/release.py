@@ -7,6 +7,7 @@ sentry.models.release
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import logging
 import re
 import six
@@ -46,7 +47,7 @@ class ReleaseProject(Model):
     release = FlexibleForeignKey('sentry.Release')
     new_groups = BoundedPositiveIntegerField(null=True, default=0)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_release_project'
         unique_together = (('project', 'release'), )
@@ -86,7 +87,7 @@ class Release(Model):
     total_deploys = BoundedPositiveIntegerField(null=True, default=0)
     last_deploy_id = BoundedPositiveIntegerField(null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_release'
         unique_together = (('organization', 'version'), )

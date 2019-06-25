@@ -7,6 +7,8 @@ sentry.models.authenticator
 """
 from __future__ import absolute_import
 
+from builtins import range
+from builtins import object
 import os
 import hmac
 import time
@@ -611,7 +613,7 @@ class Authenticator(BaseModel):
     class AlreadyEnrolled(Exception):
         pass
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'auth_authenticator'
         verbose_name = _('authenticator')

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.conf import settings
 from django.http import HttpResponse
 from django.middleware.csrf import get_token as get_csrf_token

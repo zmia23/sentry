@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import logging
 import six
 
@@ -287,7 +288,7 @@ class BaseView(View, OrganizationMixin):
     def redirect(self, url, headers=None):
         res = HttpResponseRedirect(url)
         if headers:
-            for k, v in headers.items():
+            for k, v in list(headers.items()):
                 res[k] = v
         return res
 

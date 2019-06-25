@@ -1,5 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
+from builtins import range
+from builtins import object
 import re
 
 from django.utils.html import escape
@@ -8,7 +10,7 @@ import sqlparse
 from sqlparse import tokens as T
 
 
-class BoldKeywordFilter:
+class BoldKeywordFilter(object):
     """sqlparse filter to bold SQL keywords"""
 
     def process(self, stack, stream):

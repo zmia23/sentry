@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import str
 import jsonschema
 from rest_framework.response import Response
 

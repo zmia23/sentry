@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -18,7 +19,7 @@ class UserIP(Model):
     first_seen = models.DateTimeField(default=timezone.now)
     last_seen = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_userip'
         unique_together = (('user', 'ip_address'), )

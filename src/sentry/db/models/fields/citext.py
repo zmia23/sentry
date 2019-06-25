@@ -8,6 +8,7 @@ sentry.db.models.fields.citext
 
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import six
 
 from django.conf import settings

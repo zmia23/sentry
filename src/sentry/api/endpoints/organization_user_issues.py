@@ -44,7 +44,7 @@ class OrganizationUserIssuesEndpoint(OrganizationEndpoint, EnvironmentMixin):
         if tags:
             groups = sorted(
                 Group.objects.filter(
-                    id__in=tags.keys(),
+                    id__in=list(tags.keys()),
                 ).order_by('-last_seen')[:limit],
                 key=lambda x: tags[x.id].last_seen,
                 reverse=True,

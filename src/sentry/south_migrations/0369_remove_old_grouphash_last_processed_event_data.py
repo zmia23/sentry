@@ -18,7 +18,7 @@ class Migration(DataMigration):
         from sentry.utils import redis
 
         cluster = redis.clusters.get('default')
-        for host_id, host_info in cluster.hosts.items():
+        for host_id, host_info in list(cluster.hosts.items()):
             print('Cleaning obsolete data from {!r}...'.format(host_info))
             client = cluster.get_local_client(host_id)
             key_iterator = client.scan_iter(match='last-processed-event:*')

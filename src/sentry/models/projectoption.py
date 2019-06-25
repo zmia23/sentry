@@ -7,6 +7,7 @@ sentry.models.projectoption
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from celery.signals import task_postrun
 from django.core.signals import request_finished
 from django.db import models
@@ -126,7 +127,7 @@ class ProjectOption(Model):
 
     objects = ProjectOptionManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_projectoptions'
         unique_together = (('project', 'key', ), )

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import zip
 import six
 
 from collections import OrderedDict
@@ -40,7 +41,7 @@ NONSTANDARD_CRONTAB_SCHEDULES = {
 
 class CronJobValidator(serializers.Serializer):
     schedule_type = serializers.ChoiceField(
-        choices=zip(SCHEDULE_TYPES.keys(), SCHEDULE_TYPES.keys()),
+        choices=list(zip(list(SCHEDULE_TYPES.keys()), list(SCHEDULE_TYPES.keys()))),
     )
     schedule = serializers.WritableField()
     checkin_margin = serializers.IntegerField(required=False)
@@ -90,11 +91,11 @@ class MonitorValidator(serializers.Serializer):
     project = ProjectField()
     name = serializers.CharField()
     status = serializers.ChoiceField(
-        choices=zip(MONITOR_STATUSES.keys(), MONITOR_STATUSES.keys()),
+        choices=list(zip(list(MONITOR_STATUSES.keys()), list(MONITOR_STATUSES.keys()))),
         default='active',
     )
     type = serializers.ChoiceField(
-        choices=zip(MONITOR_TYPES.keys(), MONITOR_TYPES.keys())
+        choices=list(zip(list(MONITOR_TYPES.keys()), list(MONITOR_TYPES.keys())))
     )
 
     def get_default_fields(self):

@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from past.builtins import cmp
+from builtins import object
 import django
 import six
 
@@ -214,7 +216,7 @@ class BitHandler(object):
     __setitem__ = __setattr__
 
     def __iter__(self):
-        return self.iteritems()  # NOQA
+        return iter(self.items())  # NOQA
 
     def __sentry__(self):
         return repr(self)
@@ -246,7 +248,7 @@ class BitHandler(object):
         return iter(self._keys)
 
     def items(self):
-        return list(self.iteritems())  # NOQA
+        return list(self.items())  # NOQA
 
     def iteritems(self):
         for k in self._keys:

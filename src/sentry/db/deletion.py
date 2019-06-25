@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import zip
+from builtins import object
 import itertools
 from uuid import uuid4
 
@@ -170,7 +172,7 @@ class BulkDeleteQuery(object):
                                 [position],
                             ))
 
-                    conditions, parameters = zip(*where)
+                    conditions, parameters = list(zip(*where))
                     parameters = list(itertools.chain.from_iterable(parameters))
 
                     query = u"""

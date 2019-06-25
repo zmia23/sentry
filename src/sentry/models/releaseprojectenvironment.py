@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from datetime import timedelta
 from django.db import models
 from django.utils import timezone
@@ -19,7 +20,7 @@ class ReleaseProjectEnvironment(Model):
     last_seen = models.DateTimeField(default=timezone.now, db_index=True)
     last_deploy_id = BoundedPositiveIntegerField(null=True, db_index=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_releaseprojectenvironment'
         unique_together = (('project', 'release', 'environment'), )

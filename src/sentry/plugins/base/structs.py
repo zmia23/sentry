@@ -8,6 +8,7 @@ sentry.plugins.base.structs
 
 from __future__ import absolute_import, print_function
 
+from builtins import object
 __all__ = ('Annotation', 'Notification')
 
 import warnings

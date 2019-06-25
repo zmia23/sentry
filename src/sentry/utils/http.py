@@ -7,6 +7,7 @@ sentry.utils.http
 """
 from __future__ import absolute_import
 
+from builtins import filter
 import six
 
 from collections import namedtuple
@@ -43,7 +44,7 @@ def safe_urlencode(params, doseq=0):
     # Snippet originally from pysolr: https://github.com/toastdriven/pysolr
 
     if hasattr(params, "items"):
-        params = params.items()
+        params = list(params.items())
 
     new_params = list()
 
@@ -86,7 +87,7 @@ def get_origins(project=None):
 
     # lowercase and strip the trailing slash from all origin values
     # filter out empty values
-    return frozenset(filter(bool, map(lambda x: (x or '').lower().rstrip('/'), result)))
+    return frozenset(list(filter(bool, [(x or '').lower().rstrip('/') for x in result])))
 
 
 def parse_uri_match(value):

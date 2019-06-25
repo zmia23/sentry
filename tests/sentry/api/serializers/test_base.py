@@ -2,6 +2,7 @@
 
 from __future__ import absolute_import
 
+from builtins import object
 from sentry.api.serializers import serialize, Serializer
 from sentry.testutils import TestCase
 

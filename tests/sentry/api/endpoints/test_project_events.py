@@ -46,7 +46,7 @@ class ProjectEventsTest(APITestCase, SnubaTestCase):
 
         assert response.status_code == 200, response.content
         assert len(response.data) == 2
-        assert sorted(map(lambda x: x['id'], response.data)) == sorted(
+        assert sorted([x['id'] for x in response.data]) == sorted(
             [
                 six.text_type(event_1.event_id),
                 six.text_type(event_2.event_id),
@@ -88,7 +88,7 @@ class ProjectEventsTest(APITestCase, SnubaTestCase):
 
         assert response.status_code == 200, response.content
         assert len(response.data) == 1
-        assert sorted(map(lambda x: x['id'], response.data)) == sorted(
+        assert sorted([x['id'] for x in response.data]) == sorted(
             [
                 six.text_type(event_2.event_id),
             ]

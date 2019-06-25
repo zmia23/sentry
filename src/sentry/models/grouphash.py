@@ -7,6 +7,7 @@ sentry.models.grouphash
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_delete
@@ -19,7 +20,7 @@ from sentry.utils import redis
 class GroupHash(Model):
     __core__ = False
 
-    class State:
+    class State(object):
         UNLOCKED = None
         LOCKED_IN_MIGRATION = 1
 
@@ -34,7 +35,7 @@ class GroupHash(Model):
         null=True,
     )
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_grouphash'
         unique_together = (('project', 'hash'), )

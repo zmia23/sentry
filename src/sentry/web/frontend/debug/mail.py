@@ -1,5 +1,8 @@
 from __future__ import absolute_import, print_function
 
+from builtins import next
+from builtins import range
+from builtins import object
 import itertools
 import logging
 import six
@@ -91,7 +94,7 @@ def make_group_generator(random, project):
         last_seen = random.randint(first_seen, first_seen + (60 * 60 * 24 * 30))
 
         culprit = make_culprit(random)
-        level = random.choice(LOG_LEVELS.keys())
+        level = random.choice(list(LOG_LEVELS.keys()))
         message = make_message(random)
 
         group = Group(
@@ -159,7 +162,7 @@ class ActivityMailPreview(object):
     def get_context(self):
         context = self.email.get_base_context()
         context['reason'] = get_random(self.request
-                                       ).choice(GroupSubscriptionReason.descriptions.values())
+                                       ).choice(list(GroupSubscriptionReason.descriptions.values()))
         context.update(self.email.get_context())
         add_unsubscribe_link(context)
         return context
@@ -436,7 +439,7 @@ def report(request):
     )
 
     projects = []
-    for i in xrange(0, random.randint(1, 8)):
+    for i in range(0, random.randint(1, 8)):
         name = ' '.join(random.sample(loremipsum.words, random.randint(1, 4)))
         projects.append(
             Project(
@@ -501,12 +504,12 @@ def report(request):
             (
                 timestamp + (i * rollup),
                 (random.randint(0, daily_maximum), random.randint(0, daily_maximum))
-            ) for i in xrange(0, 7)
+            ) for i in range(0, 7)
         ]
 
         aggregates = [
             random.randint(0, daily_maximum * 7) if random.random() < 0.9 else None
-            for _ in xrange(0, 4)
+            for _ in range(0, 4)
         ]
 
         return reports.Report(

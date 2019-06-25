@@ -7,6 +7,7 @@ sentry.models.organizationonboardingtask
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models, IntegrityError, transaction
@@ -106,7 +107,7 @@ class OrganizationOnboardingTask(Model):
 
     objects = OrganizationOnboardingTaskManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_organizationonboardingtask'
         unique_together = (('organization', 'task'), )

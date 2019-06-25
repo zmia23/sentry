@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import six
 import uuid
 import hmac
@@ -58,7 +59,7 @@ REQUIRED_EVENT_PERMISSIONS = {
 # EVENT_EXPANSION above. This list is likely a subset of all valid ServiceHook
 # events.
 VALID_EVENTS = tuple(itertools.chain(
-    *EVENT_EXPANSION.values()
+    *list(EVENT_EXPANSION.values())
 ))
 
 
@@ -115,7 +116,7 @@ class SentryApp(ParanoidModel, HasApiScopes):
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_sentryapp'
 

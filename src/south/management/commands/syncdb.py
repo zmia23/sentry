@@ -104,7 +104,7 @@ class Command(NoArgsCommand):
             self.stdout.write("Syncing...\n")
 
         # This will allow the setting of the storage engine, for example.
-        for db in dbs.values():
+        for db in list(dbs.values()):
             db.connection_init()
 
         # In Django 1.7 we need to actually run migrations (Sentry specifically)
@@ -166,7 +166,7 @@ class Command(NoArgsCommand):
         else:
             old_installed, settings.INSTALLED_APPS = settings.INSTALLED_APPS, app_labels
             old_app_store, cache.app_store = cache.app_store, SortedDict([
-                (k, v) for (k, v) in cache.app_store.items()
+                (k, v) for (k, v) in list(cache.app_store.items())
                 if get_app_label(k) in app_labels
             ])
 

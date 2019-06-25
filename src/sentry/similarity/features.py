@@ -1,5 +1,8 @@
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import zip
+from builtins import object
 import functools
 import itertools
 import logging
@@ -15,16 +18,10 @@ def get_application_chunks(exception):
     better align similar logical application paths. This returns a sequence of
     application code "chunks": blocks of contiguously called application code.
     """
-    return map(
-        lambda in_app__frames: list(in_app__frames[1]),
-        itertools.ifilter(
-            lambda in_app__frames: in_app__frames[0],
-            itertools.groupby(
+    return [list(in_app__frames[1]) for in_app__frames in [in_app__frames for in_app__frames in itertools.groupby(
                 exception.stacktrace.frames,
                 key=lambda frame: frame.in_app,
-            )
-        )
-    )
+            ) if in_app__frames[0]]]
 
 
 class InterfaceDoesNotExist(KeyError):
@@ -76,7 +73,7 @@ class FeatureSet(object):
 
     def extract(self, event):
         results = {}
-        for label, strategy in self.features.items():
+        for label, strategy in list(self.features.items()):
             try:
                 results[label] = strategy.extract(event)
             except Exception as error:
@@ -102,7 +99,7 @@ class FeatureSet(object):
 
         items = []
         for event in events:
-            for label, features in self.extract(event).items():
+            for label, features in list(self.extract(event).items()):
                 if scope is None:
                     scope = self.__get_scope(event.project)
                 else:
@@ -118,7 +115,7 @@ class FeatureSet(object):
                     ) == key, 'all events must be associated with the same group'
 
                 try:
-                    features = map(self.encoder.dumps, features)
+                    features = list(map(self.encoder.dumps, features))
                 except Exception as error:
                     log = (
                         logger.debug if isinstance(error, self.expected_encoding_errors) else
@@ -153,7 +150,7 @@ class FeatureSet(object):
         labels = []
         items = []
         for event in events:
-            for label, features in self.extract(event).items():
+            for label, features in list(self.extract(event).items()):
                 if scope is None:
                     scope = self.__get_scope(event.project)
                 else:
@@ -162,7 +159,7 @@ class FeatureSet(object):
                     ) == scope, 'all events must be associated with the same project'
 
                 try:
-                    features = map(self.encoder.dumps, features)
+                    features = list(map(self.encoder.dumps, features))
                 except Exception as error:
                     log = (
                         logger.debug if isinstance(error, self.expected_encoding_errors) else
@@ -179,10 +176,10 @@ class FeatureSet(object):
                         items.append((self.aliases[label], thresholds.get(label, 0), features))
                         labels.append(label)
 
-        return map(
+        return list(map(
             lambda key__scores: (
                 int(key__scores[0]),
-                dict(zip(labels, key__scores[1])),
+                dict(list(zip(labels, key__scores[1]))),
             ),
             self.index.classify(
                 scope,
@@ -190,7 +187,7 @@ class FeatureSet(object):
                 limit=limit,
                 timestamp=int(to_timestamp(event.datetime)),
             ),
-        )
+        ))
 
     def compare(self, group, limit=None, thresholds=None):
         if thresholds is None:
@@ -200,10 +197,10 @@ class FeatureSet(object):
 
         items = [(self.aliases[label], thresholds.get(label, 0), ) for label in features]
 
-        return map(
+        return list(map(
             lambda key__scores: (
                 int(key__scores[0]),
-                dict(zip(features, key__scores[1])),
+                dict(list(zip(features, key__scores[1]))),
             ),
             self.index.compare(
                 self.__get_scope(group.project),
@@ -211,11 +208,11 @@ class FeatureSet(object):
                 items,
                 limit=limit,
             ),
-        )
+        ))
 
     def merge(self, destination, sources, allow_unsafe=False):
         def add_index_aliases_to_key(key):
-            return [(self.aliases[label], key) for label in self.features.keys()]
+            return [(self.aliases[label], key) for label in list(self.features.keys())]
 
         # Collect all of the sources by the scope that they are contained
         # within so that we can make the most efficient queries possible and
@@ -237,7 +234,7 @@ class FeatureSet(object):
         destination_scope = self.__get_scope(destination.project)
         destination_key = self.__get_key(destination)
 
-        for source_scope, sources in scopes.items():
+        for source_scope, sources in list(scopes.items()):
             items = []
             for source in sources:
                 items.extend(
@@ -267,11 +264,11 @@ class FeatureSet(object):
         key = self.__get_key(group)
         return self.index.delete(
             self.__get_scope(group.project),
-            [(self.aliases[label], key) for label in self.features.keys()],
+            [(self.aliases[label], key) for label in list(self.features.keys())],
         )
 
     def flush(self, project):
         return self.index.flush(
             self.__get_scope(project),
-            self.aliases.values(),
+            list(self.aliases.values()),
         )

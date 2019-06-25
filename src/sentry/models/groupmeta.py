@@ -7,6 +7,7 @@ sentry.models.groupmeta
 """
 from __future__ import absolute_import
 
+from builtins import object
 import threading
 
 from celery.signals import task_postrun
@@ -114,7 +115,7 @@ class GroupMeta(Model):
 
     objects = GroupMetaManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_groupmeta'
         unique_together = (('group', 'key'), )

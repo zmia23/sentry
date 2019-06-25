@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import os
 import zlib
 import json
@@ -201,11 +202,11 @@ def cli(output_path, output_format):
 def output_json(sections, scenarios, section_mapping):
     report('docs', 'Generating JSON documents')
 
-    for id, scenario in scenarios.items():
+    for id, scenario in list(scenarios.items()):
         dump_json('scenarios/%s.json' % id, scenario)
 
     section_listings = {}
-    for section, title in sections.items():
+    for section, title in list(sections.items()):
         entries = {}
         for endpoint in section_mapping.get(section, []):
             entries[endpoint['endpoint_name']] = endpoint['title']
@@ -221,7 +222,7 @@ def output_json(sections, scenarios, section_mapping):
 
 def output_markdown(sections, scenarios, section_mapping):
     report('docs', 'Generating markdown documents')
-    for section, title in sections.items():
+    for section, title in list(sections.items()):
         i = 0
         links = []
         for endpoint in section_mapping.get(section, []):
@@ -343,7 +344,7 @@ def format_headers(headers):
     return [
         u'{}: {}'.format(key, value)
         for key, value
-        in headers.items()
+        in list(headers.items())
     ]
 
 

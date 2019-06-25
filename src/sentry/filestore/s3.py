@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
 import os
 import posixpath
 import mimetypes
@@ -291,7 +293,7 @@ class S3Boto3Storage(Storage):
     def __init__(self, acl=None, bucket=None, **settings):
         # check if some of the settings we've provided as class attributes
         # need to be overwritten with values passed in here
-        for name, value in settings.items():
+        for name, value in list(settings.items()):
             if hasattr(self, name):
                 setattr(self, name, value)
 

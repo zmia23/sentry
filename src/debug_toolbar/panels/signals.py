@@ -66,7 +66,7 @@ class SignalsPanel(Panel):
 
     def process_response(self, request, response):
         signals = []
-        for name, signal in sorted(self.signals.items(), key=lambda x: x[0]):
+        for name, signal in sorted(list(self.signals.items()), key=lambda x: x[0]):
             if signal is None:
                 continue
             receivers = []

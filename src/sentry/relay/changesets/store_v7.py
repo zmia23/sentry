@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import str
 from django.core.urlresolvers import resolve, reverse
 from rest_framework.test import APIRequestFactory
 from rest_framework import serializers

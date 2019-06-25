@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import zip
 import collections
 import six
 
@@ -63,7 +64,7 @@ class SnubaTSDB(BaseTSDB):
             groupby.append(model_aggregate)
             model_aggregate = None
 
-        keys_map = dict(zip(model_columns, self.flatten_keys(keys)))
+        keys_map = dict(list(zip(model_columns, self.flatten_keys(keys))))
         keys_map = {k: v for k, v in six.iteritems(keys_map) if k is not None and v is not None}
         if environment_ids is not None:
             keys_map['environment'] = environment_ids
@@ -115,7 +116,7 @@ class SnubaTSDB(BaseTSDB):
                     result[k] = 0 if len(groups) == 1 else {}
 
             if subgroups:
-                for v in result.values():
+                for v in list(result.values()):
                     self.zerofill(v, subgroups, flat_keys)
 
     def trim(self, result, groups, keys):
@@ -127,7 +128,7 @@ class SnubaTSDB(BaseTSDB):
         if len(groups) > 0:
             group, subgroups = groups[0], groups[1:]
             if isinstance(result, dict):
-                for rk in result.keys():
+                for rk in list(result.keys()):
                     if group == 'time':  # Skip over time group
                         self.trim(result[rk], subgroups, keys)
                     elif rk in keys:
@@ -197,7 +198,7 @@ class SnubaTSDB(BaseTSDB):
         for k in result:
             result[k] = sorted([
                 (timestamp, {v: float(i + 1) for i, v in enumerate(reversed(topk or []))})
-                for (timestamp, topk) in result[k].items()
+                for (timestamp, topk) in list(result[k].items())
             ])
 
         return result
@@ -226,8 +227,8 @@ class SnubaTSDB(BaseTSDB):
         The output is a 2-tuple of ([level_1_keys], [all_level_2_keys])
         """
         if isinstance(items, collections.Mapping):
-            return (items.keys(), list(set.union(*(set(v)
-                                                   for v in items.values())) if items else []))
+            return (list(items.keys()), list(set.union(*(set(v)
+                                                   for v in list(items.values()))) if items else []))
         elif isinstance(items, (collections.Sequence, collections.Set)):
             return (items, None)
         else:

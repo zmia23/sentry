@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import next
+from builtins import range
 import pytest
 
 from sentry.utils.iterators import advance, chunked, shingle
@@ -7,11 +9,11 @@ from six.moves import xrange
 
 
 def test_chunked():
-    assert list(chunked(range(5), 5)) == [
+    assert list(chunked(list(range(5)), 5)) == [
         [0, 1, 2, 3, 4],
     ]
 
-    assert list(chunked(range(10), 4)) == [
+    assert list(chunked(list(range(10)), 4)) == [
         [0, 1, 2, 3],
         [4, 5, 6, 7],
         [8, 9],
@@ -19,7 +21,7 @@ def test_chunked():
 
 
 def test_advance():
-    i = iter(xrange(10))
+    i = iter(range(10))
 
     advance(5, i)  # [0, 1, 2, 3, 4]
     assert next(i) == 5

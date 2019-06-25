@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import filter
 import six
 import logging
 from itertools import chain
@@ -136,7 +137,7 @@ class ProjectAdminSerializer(ProjectMemberSerializer):
         return attrs
 
     def validate_allowedDomains(self, attrs, source):
-        attrs[source] = filter(bool, attrs[source])
+        attrs[source] = list(filter(bool, attrs[source]))
         if len(attrs[source]) == 0:
             raise serializers.ValidationError(
                 'Empty value will block all requests, use * to accept from all domains'

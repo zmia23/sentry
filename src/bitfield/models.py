@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import range
+from builtins import object
 from django.db.models.fields import BigIntegerField, Field
 
 from bitfield.forms import BitFormField
@@ -44,13 +46,13 @@ class BitFieldFlags(object):
             yield Bit(self._flags.index(flag))
 
     def items(self):
-        return list(self.iteritems())  # NOQA
+        return list(self.items())  # NOQA
 
     def keys(self):
-        return list(self.iterkeys())  # NOQA
+        return list(self.keys())  # NOQA
 
     def values(self):
-        return list(self.itervalues())  # NOQA
+        return list(self.values())  # NOQA
 
 
 class BitFieldCreator(object):
@@ -87,7 +89,7 @@ class BitField(BigIntegerField):
         if isinstance(flags, dict):
             # Get only integer keys in correct range
             valid_keys = (
-                k for k in flags.keys() if isinstance(k, int) and (0 <= k < MAX_FLAG_COUNT)
+                k for k in list(flags.keys()) if isinstance(k, int) and (0 <= k < MAX_FLAG_COUNT)
             )
             if not valid_keys:
                 raise ValueError('Wrong keys or empty dictionary')

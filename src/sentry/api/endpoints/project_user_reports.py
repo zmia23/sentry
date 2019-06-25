@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from datetime import timedelta
 from django.db import IntegrityError, transaction
 from django.utils import timezone
@@ -42,7 +43,7 @@ def create_user_feedback_scenario(runner):
 
 
 class UserReportSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = UserReport
         fields = ('name', 'email', 'comments', 'event_id')
 

@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from builtins import next
 import logging
 
 from django.views.decorators.csrf import csrf_exempt

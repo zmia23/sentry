@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from uuid import uuid4
 
 from sentry.utils.redis import clusters

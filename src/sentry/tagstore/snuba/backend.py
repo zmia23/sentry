@@ -41,7 +41,7 @@ tag_value_data_transformers = {
 
 
 def fix_tag_value_data(data):
-    for key, transformer in tag_value_data_transformers.items():
+    for key, transformer in list(tag_value_data_transformers.items()):
         if key in data:
             data[key] = transformer(data[key])
     return data
@@ -471,7 +471,7 @@ class SnubaTagStorage(TagStorage):
         if not result:
             return None
         else:
-            return result.keys()[0]
+            return list(result.keys())[0]
 
     def get_first_release(self, project_id, group_id):
         return self.__get_release(project_id, group_id, True)
@@ -521,7 +521,7 @@ class SnubaTagStorage(TagStorage):
             'project_id': project_ids,
         }
         conditions = [
-            ['tags[sentry:user]', 'IN', filter(None, [eu.tag_value for eu in event_users])],
+            ['tags[sentry:user]', 'IN', [_f for _f in [eu.tag_value for eu in event_users] if _f]],
         ]
         aggregations = [['max', SEEN_COLUMN, 'last_seen']]
 
@@ -536,7 +536,7 @@ class SnubaTagStorage(TagStorage):
             'project_id': [eu.project_id for eu in event_users]
         }
         conditions = [
-            ['tags[sentry:user]', 'IN', filter(None, [eu.tag_value for eu in event_users])]
+            ['tags[sentry:user]', 'IN', [_f for _f in [eu.tag_value for eu in event_users] if _f]]
         ]
         aggregations = [
             ['count()', '', 'times_seen'],
@@ -574,7 +574,7 @@ class SnubaTagStorage(TagStorage):
 
         result = snuba.query(start, end, ['issue'], None, filters, aggregations,
                              referrer='tagstore.get_groups_user_counts')
-        return defaultdict(int, {k: v for k, v in result.items() if v})
+        return defaultdict(int, {k: v for k, v in list(result.items()) if v})
 
     def get_tag_value_paginator(self, project_id, environment_id, key, query=None,
                                 order_by='-last_seen'):
@@ -728,7 +728,7 @@ class SnubaTagStorage(TagStorage):
             filters['environment'] = environment_ids
 
         conditions = []
-        for tag_name, tag_val in tags.items():
+        for tag_name, tag_val in list(tags.items()):
             operator = 'IN' if isinstance(tag_val, list) else '='
             conditions.append([u'tags[{}]'.format(tag_name), operator, tag_val])
 

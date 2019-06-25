@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import next
+from builtins import object
 from sentry.grouping.utils import hash_from_values
 
 
@@ -59,7 +61,7 @@ class GroupingComponent(object):
             for value in c.values:
                 if isinstance(value, GroupingComponent) and value.contributes:
                     _walk_components(value, stack)
-            parts = filter(None, stack)
+            parts = [_f for _f in stack if _f]
             items.append(parts)
             stack.pop()
 

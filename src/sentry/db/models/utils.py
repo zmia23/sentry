@@ -8,6 +8,8 @@ sentry.db.utils
 
 from __future__ import absolute_import
 
+from builtins import range
+from builtins import object
 import operator
 
 from django.db.models import F

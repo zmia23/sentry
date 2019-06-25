@@ -8,6 +8,7 @@ sentry.db.models
 
 from __future__ import absolute_import
 
+from builtins import object
 from copy import copy
 import logging
 import six
@@ -43,7 +44,7 @@ def sane_repr(*attrs):
 
 
 class BaseModel(models.Model):
-    class Meta:
+    class Meta(object):
         abstract = True
 
     objects = BaseManager()
@@ -127,7 +128,7 @@ class BaseModel(models.Model):
 class Model(BaseModel):
     id = BoundedBigAutoField(primary_key=True)
 
-    class Meta:
+    class Meta(object):
         abstract = True
 
     __repr__ = sane_repr('id')

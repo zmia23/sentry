@@ -7,6 +7,7 @@ sentry.utils.safe
 """
 from __future__ import absolute_import, print_function
 
+from builtins import filter
 import collections
 import logging
 import six

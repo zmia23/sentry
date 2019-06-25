@@ -7,6 +7,7 @@ sentry.tagstore.legacy.models.tagvalue
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -34,7 +35,7 @@ class TagValue(Model):
 
     objects = BaseManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_filtervalue'
         unique_together = (('project_id', 'key', 'value'), )

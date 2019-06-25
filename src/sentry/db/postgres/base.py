@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from six import string_types
 import psycopg2 as Database
 

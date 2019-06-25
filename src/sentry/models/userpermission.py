@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 
 from sentry.db.models import Model, FlexibleForeignKey, sane_repr
@@ -12,7 +13,7 @@ class UserPermission(Model):
     # permissions should be in the form of 'service-name.permission-name'
     permission = models.CharField(max_length=32)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_userpermission'
         unique_together = (('user', 'permission'), )

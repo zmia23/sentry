@@ -7,6 +7,7 @@ sentry.models.activity
 """
 from __future__ import absolute_import
 
+from builtins import object
 import six
 from django.conf import settings
 from django.db import models
@@ -79,7 +80,7 @@ class Activity(Model):
     datetime = models.DateTimeField(default=timezone.now)
     data = GzippedDictField(null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_activity'
 

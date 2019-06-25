@@ -7,6 +7,7 @@ sentry.models.groupshare
 """
 from __future__ import absolute_import
 
+from builtins import object
 from uuid import uuid4
 
 from django.conf import settings
@@ -35,7 +36,7 @@ class GroupShare(Model):
 
     objects = BaseManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_groupshare'
 

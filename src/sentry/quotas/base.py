@@ -6,7 +6,10 @@ sentry.quotas.base
 :license: BSD, see LICENSE for more details.
 """
 from __future__ import absolute_import
+from __future__ import division
 
+from past.utils import old_div
+from builtins import object
 import six
 
 from django.conf import settings
@@ -79,7 +82,7 @@ class Quota(Service):
     def translate_quota(self, quota, parent_quota):
         if six.text_type(quota).endswith('%'):
             pct = int(quota[:-1])
-            quota = int(parent_quota) * pct / 100
+            quota = old_div(int(parent_quota) * pct, 100)
         if not quota:
             return int(parent_quota or 0)
         return int(quota or 0)
@@ -139,7 +142,7 @@ class Quota(Service):
         # If there is only a single org, this one org should
         # be allowed to consume the entire quota.
         if settings.SENTRY_SINGLE_ORGANIZATION or account_limit:
-            if system_limit and (not account_limit or system_limit < account_limit / 60):
+            if system_limit and (not account_limit or system_limit < old_div(account_limit, 60)):
                 return (system_limit, 60)
             # an account limit is enforced, which is set as a fixed value and cannot
             # utilize percentage based limits

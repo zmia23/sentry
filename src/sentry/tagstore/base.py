@@ -8,6 +8,7 @@ sentry.tagstore.base
 
 from __future__ import absolute_import
 
+from builtins import object
 import re
 
 from sentry.constants import TAG_LABELS

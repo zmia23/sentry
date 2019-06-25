@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import object
 from collections import (Mapping, Set, Sequence)
 
 import six
@@ -7,7 +9,7 @@ import six
 
 class Encoder(object):
     try:
-        number_types = (int, long, float)  # noqa
+        number_types = (int, int, float)  # noqa
     except NameError:
         number_types = (int, float)
 
@@ -15,7 +17,7 @@ class Encoder(object):
         self.types = types if types is not None else {}
 
     def dumps(self, value):
-        for cls, function in self.types.items():
+        for cls, function in list(self.types.items()):
             if isinstance(value, cls):
                 value = function(value)
 
@@ -34,17 +36,17 @@ class Encoder(object):
             ))
         elif isinstance(value, Sequence):
             return '\x01'.join(
-                map(
+                list(map(
                     self.dumps,
                     value,
-                ),
+                )),
             )
         elif isinstance(value, Mapping):
             return '\x02'.join(
                 sorted('\x01'.join(map(
                     self.dumps,
                     item,
-                )) for item in value.items()),
+                )) for item in list(value.items())),
             )
         else:
             raise TypeError(u'Unsupported type: {}'.format(type(value)))

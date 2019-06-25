@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import map
 from rest_framework.exceptions import PermissionDenied
 
 from sentry.api.base import Endpoint

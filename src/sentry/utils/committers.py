@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import zip
+from builtins import next
 import operator
 import six
 
@@ -23,7 +25,7 @@ def tokenize_path(path):
         if sep in path:
             # Exclude empty path segments as some repository integrations
             # start their paths with `/` which we want to ignore.
-            return reversed(filter(lambda x: x != '', path.split(sep)))
+            return reversed([x for x in path.split(sep) if x != ''])
     else:
         return iter([path])
 
@@ -92,7 +94,7 @@ def _match_commits_path(commit_file_changes, path):
             #  we want a list of unique commits that tie for longest match
             matching_commits[file_change.commit.id] = (file_change.commit, score)
 
-    return matching_commits.values()
+    return list(matching_commits.values())
 
 
 def _get_commits_committer(commits, author_id):

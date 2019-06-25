@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import object
 import collections
 import six
 
@@ -27,7 +29,7 @@ class Meta(object):
         Enters into sub meta data at the specified path. This always returns a
         new ``Meta`` object, regardless whether the path already exists.
         """
-        return Meta(self._meta, path=self._path + map(six.text_type, path))
+        return Meta(self._meta, path=self._path + list(map(six.text_type, path)))
 
     @property
     def path(self):

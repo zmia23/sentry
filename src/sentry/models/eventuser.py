@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from collections import OrderedDict
 from functools import reduce
 from operator import or_
@@ -36,7 +37,7 @@ class EventUser(Model):
     ip_address = models.GenericIPAddressField(null=True)
     date_added = models.DateTimeField(default=timezone.now, db_index=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_eventuser'
         unique_together = (('project_id', 'ident'), ('project_id', 'hash'))
@@ -98,7 +99,7 @@ class EventUser(Model):
         """
         Iterate over key/value pairs for this EventUser in priority order.
         """
-        for key in KEYWORD_MAP.keys():
+        for key in list(KEYWORD_MAP.keys()):
             yield key, getattr(self, key)
 
     def get_label(self):

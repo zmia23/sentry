@@ -1,5 +1,8 @@
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import next
+from builtins import range
 import functools
 import hashlib
 import itertools
@@ -296,22 +299,22 @@ class UnmergeTestCase(TestCase):
         events = OrderedDict()
 
         for event in (create_message_event('This is message #%s.', i,
-                                           environment='production', release='version') for i in xrange(10)):
+                                           environment='production', release='version') for i in range(10)):
             events.setdefault(get_fingerprint(event), []).append(event)
 
         for event in (create_message_event('This is message #%s!', i,
-                                           environment='production', release='version') for i in xrange(10, 16)):
+                                           environment='production', release='version') for i in range(10, 16)):
             events.setdefault(get_fingerprint(event), []).append(event)
 
         event = create_message_event('This is message #%s!', 17, environment='', release=None)
         events.setdefault(get_fingerprint(event), []).append(event)
 
         assert len(events) == 2
-        assert sum(map(len, events.values())) == 17
+        assert sum(map(len, list(events.values()))) == 17
 
         # XXX: This is super contrived considering that it doesn't actually go
         # through the event pipeline, but them's the breaks, eh?
-        for fingerprint in events.keys():
+        for fingerprint in list(events.keys()):
             GroupHash.objects.create(
                 project=project,
                 group=source,
@@ -378,7 +381,7 @@ class UnmergeTestCase(TestCase):
                 source.project_id,
                 source.id,
                 None,
-                [events.keys()[1]],
+                [list(events.keys())[1]],
                 None,
                 batch_size=5,
             )
@@ -401,7 +404,7 @@ class UnmergeTestCase(TestCase):
         )
 
         mock_eventstream.start_unmerge.assert_called_once_with(
-            source.project_id, [events.keys()[1]], source.id, destination.id
+            source.project_id, [list(events.keys())[1]], source.id, destination.id
         )
 
         mock_eventstream.end_unmerge.assert_called_once_with(eventstream_state)
@@ -416,7 +419,7 @@ class UnmergeTestCase(TestCase):
 
         assert source_activity.data == {
             'destination_id': destination.id,
-            'fingerprints': [events.keys()[1]],
+            'fingerprints': [list(events.keys())[1]],
         }
 
         assert source.id != destination.id
@@ -427,13 +430,13 @@ class UnmergeTestCase(TestCase):
             type=Activity.UNMERGE_DESTINATION,
         ).data == {
             'source_id': source.id,
-            'fingerprints': [events.keys()[1]],
+            'fingerprints': [list(events.keys())[1]],
         }
 
-        source_event_event_ids = map(
+        source_event_event_ids = list(map(
             lambda event: event.event_id,
-            events.values()[0],
-        )
+            list(events.values())[0],
+        ))
 
         assert source.event_set.count() == 10
 
@@ -451,7 +454,7 @@ class UnmergeTestCase(TestCase):
 
         assert set(GroupHash.objects.filter(
             group_id=source.id,
-        ).values_list('hash', flat=True)) == set([events.keys()[0]])
+        ).values_list('hash', flat=True)) == set([list(events.keys())[0]])
 
         assert set(
             GroupRelease.objects.filter(
@@ -492,10 +495,10 @@ class UnmergeTestCase(TestCase):
             (u'sentry:release', u'version', 10, now + shift(0), now + shift(9), ),
         ])
 
-        destination_event_event_ids = map(
+        destination_event_event_ids = list(map(
             lambda event: event.event_id,
-            events.values()[1],
-        )
+            list(events.values())[1],
+        ))
 
         assert destination.event_set.count() == 7
 
@@ -515,7 +518,7 @@ class UnmergeTestCase(TestCase):
             GroupHash.objects.filter(
                 group_id=destination.id,
             ).values_list('hash', flat=True)
-        ) == set([events.keys()[1]])
+        ) == set([list(events.keys())[1]])
 
         assert set(
             GroupRelease.objects.filter(
@@ -605,7 +608,7 @@ class UnmergeTestCase(TestCase):
         def assert_series_contains(expected, actual, default=0):
             actual = dict(actual)
 
-            for key, value in expected.items():
+            for key, value in list(expected.items()):
                 assert actual.get(key, 0) == value
 
             for key in set(actual.keys()) - set(expected.keys()):
@@ -613,13 +616,13 @@ class UnmergeTestCase(TestCase):
 
         for series in [time_series, environment_time_series]:
             assert_series_contains(
-                get_expected_series_values(rollup_duration, events.values()[0]),
+                get_expected_series_values(rollup_duration, list(events.values())[0]),
                 series[source.id],
                 0,
             )
 
             assert_series_contains(
-                get_expected_series_values(rollup_duration, events.values()[1][:-1]),
+                get_expected_series_values(rollup_duration, list(events.values())[1][:-1]),
                 series[destination.id],
                 0,
             )
@@ -654,11 +657,11 @@ class UnmergeTestCase(TestCase):
             assert_series_contains(
                 {
                     timestamp: len(values)
-                    for timestamp, values in get_expected_series_values(
+                    for timestamp, values in list(get_expected_series_values(
                         rollup_duration,
-                        events.values()[0],
+                        list(events.values())[0],
                         collect_by_user_tag,
-                    ).items()
+                    ).items())
                 },
                 series[source.id],
             )
@@ -666,11 +669,11 @@ class UnmergeTestCase(TestCase):
             assert_series_contains(
                 {
                     timestamp: len(values)
-                    for timestamp, values in get_expected_series_values(
+                    for timestamp, values in list(get_expected_series_values(
                         rollup_duration,
-                        events.values()[1],
+                        list(events.values())[1],
                         collect_by_user_tag,
-                    ).items()
+                    ).items())
                 },
                 time_series[destination.id],
             )
@@ -702,7 +705,7 @@ class UnmergeTestCase(TestCase):
         assert_series_contains(
             get_expected_series_values(
                 rollup_duration,
-                events.values()[0],
+                list(events.values())[0],
                 functools.partial(
                     collect_by_release,
                     source,
@@ -715,7 +718,7 @@ class UnmergeTestCase(TestCase):
         assert_series_contains(
             get_expected_series_values(
                 rollup_duration,
-                events.values()[1],
+                list(events.values())[1],
                 functools.partial(
                     collect_by_release,
                     destination,
@@ -745,7 +748,7 @@ class UnmergeTestCase(TestCase):
         assert_series_contains(
             get_expected_series_values(
                 rollup_duration,
-                events.values()[0],
+                list(events.values())[0],
                 collect_by_environment,
             ),
             time_series[source.id],
@@ -755,7 +758,7 @@ class UnmergeTestCase(TestCase):
         assert_series_contains(
             get_expected_series_values(
                 rollup_duration,
-                events.values()[1],
+                list(events.values())[1],
                 collect_by_environment,
             ),
             time_series[destination.id],

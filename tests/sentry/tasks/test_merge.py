@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import range
 from collections import defaultdict
 from mock import patch
 
@@ -133,16 +134,16 @@ class MergeGroupTest(TestCase):
         output_group_tag_keys = defaultdict(int)  # [key] = values_seen
         output_group_tag_values = defaultdict(int)  # [(key, value)] = times_seen
 
-        for key, values in data.items():
+        for key, values in list(data.items()):
             output_group_tag_keys[key] = len(values)
 
-            for value, groups in values.items():
-                for group, count in groups.items():
+            for value, groups in list(values.items()):
+                for group, count in list(groups.items()):
                     input_group_tag_keys[(group, key)] += 1
                     input_group_tag_values[(group, key, value)] += count
                     output_group_tag_values[(key, value)] += count
 
-        for ((group, key), values_seen) in input_group_tag_keys.items():
+        for ((group, key), values_seen) in list(input_group_tag_keys.items()):
             tagstore.create_group_tag_key(
                 project_id=project.id,
                 group_id=group.id,
@@ -151,7 +152,7 @@ class MergeGroupTest(TestCase):
                 values_seen=values_seen,
             )
 
-        for ((group, key, value), times_seen) in input_group_tag_values.items():
+        for ((group, key, value), times_seen) in list(input_group_tag_values.items()):
             tagstore.create_group_tag_value(
                 project_id=project.id,
                 group_id=group.id,
@@ -176,11 +177,11 @@ class MergeGroupTest(TestCase):
                 group_id=other.id,
             )) == 0
 
-        for key, values_seen in output_group_tag_keys.items():
+        for key, values_seen in list(output_group_tag_keys.items()):
             assert tagstore.get_group_tag_key(
                 target.project_id, target.id, environment_id=self.environment.id, key=key).values_seen == values_seen
 
-        for (key, value), times_seen in output_group_tag_values.items():
+        for (key, value), times_seen in list(output_group_tag_values.items()):
             assert tagstore.get_group_tag_value(
                 project_id=target.project_id,
                 group_id=target.id,

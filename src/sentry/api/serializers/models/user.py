@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import filter
 import six
 
 from collections import defaultdict
@@ -25,7 +26,7 @@ from sentry.utils.avatar import get_gravatar_url
 def manytoone_to_dict(queryset, key, filter=None):
     result = defaultdict(list)
     for row in queryset:
-        if filter and not filter(row):
+        if filter and not list(filter(row)):
             continue
         result[getattr(row, key)].append(row)
     return result

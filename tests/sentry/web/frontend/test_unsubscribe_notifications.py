@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from sentry.incidents.models import IncidentSubscription
 from sentry.models import GroupSubscription
 from sentry.testutils import TestCase

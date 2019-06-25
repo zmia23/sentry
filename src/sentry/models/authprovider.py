@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from bitfield import BitField
 from django.db import models
 from django.utils import timezone
@@ -32,7 +33,7 @@ class AuthProvider(Model):
         default=0
     )
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_authprovider'
 

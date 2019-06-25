@@ -39,8 +39,8 @@ def freeze_apps(apps):
         model_classes[model_key(model)] = model
     # Check for any custom fields that failed to freeze.
     missing_fields = False
-    for key, fields in model_defs.items():
-        for field_name, value in fields.items():
+    for key, fields in list(model_defs.items()):
+        for field_name, value in list(fields.items()):
             if value is None:
                 missing_fields = True
                 model_class = model_classes[key]
@@ -77,7 +77,7 @@ def prep_for_freeze(model):
     """
     fields = modelsinspector.get_model_fields(model, m2m=True)
     # Remove useless attributes (like 'choices')
-    for name, field in fields.items():
+    for name, field in list(fields.items()):
         fields[name] = remove_useless_attributes(field)
     # See if there's a Meta
     fields['Meta'] = remove_useless_meta(modelsinspector.get_model_meta(model))

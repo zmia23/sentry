@@ -75,7 +75,7 @@ class Migration(DataMigration):
         # Copy remaining IDPs and Identities.
         num_new_idps = 0
         num_new_ids = 0
-        for (typ, ext_id), idps in grouped_idps.items():
+        for (typ, ext_id), idps in list(grouped_idps.items()):
             date_added = None
             for i in idps:
                 if i.date_added and (not date_added or i.date_added > date_added):
@@ -123,7 +123,7 @@ class Migration(DataMigration):
                             date_added=f.date_added,
                         )
                     )
-            for i in new_ids.values():
+            for i in list(new_ids.values()):
                 if not dry_run:
                     orm.Identity.objects.get_or_create(**i)
                 num_new_ids += 1

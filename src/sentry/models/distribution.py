@@ -7,6 +7,7 @@ sentry.models.distribution
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -22,7 +23,7 @@ class Distribution(Model):
     name = models.CharField(max_length=64)
     date_added = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_distribution'
         unique_together = (('release', 'name'), )

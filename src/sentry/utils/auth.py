@@ -7,6 +7,7 @@ sentry.utils.auth
 """
 from __future__ import absolute_import
 
+from builtins import map
 import six
 import logging
 
@@ -41,7 +42,7 @@ def parse_auth_header(header):
     if isinstance(header, bytes):
         header = header.decode('latin1')
     try:
-        return dict(map(_make_key_value, header.split(u' ', 1)[1].split(u',')))
+        return dict(list(map(_make_key_value, header.split(u' ', 1)[1].split(u','))))
     except Exception:
         return {}
 

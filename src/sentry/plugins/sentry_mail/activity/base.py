@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.core.urlresolvers import reverse
 from django.utils.html import escape, mark_safe
 from six.moves.urllib.parse import urlparse, urlunparse
@@ -245,7 +246,7 @@ class ActivityEmail(object):
         email_type = self.get_email_type()
         headers = self.get_headers()
 
-        for user, reason in participants.items():
+        for user, reason in list(participants.items()):
             if group:
                 context.update(
                     {

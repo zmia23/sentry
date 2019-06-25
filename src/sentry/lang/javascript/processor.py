@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import next
 __all__ = ['JavaScriptStacktraceProcessor']
 
 import logging
@@ -253,7 +254,7 @@ def fetch_release_file(filename, release, dist=None):
             logger.error('sourcemap.compress_read_failed', exc_info=sys.exc_info())
             result = None
         else:
-            headers = {k.lower(): v for k, v in releasefile.file.headers.items()}
+            headers = {k.lower(): v for k, v in list(releasefile.file.headers.items())}
             encoding = get_encoding_from_headers(headers)
             result = http.UrlResult(filename, headers, body, 200, encoding)
             cache.set(cache_key, (headers, z_body, 200, encoding), 3600)

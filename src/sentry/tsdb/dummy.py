@@ -87,7 +87,7 @@ class DummyTSDB(BaseTSDB):
         rollup, series = self.get_optimal_rollup_series(start, end, rollup)
 
         results = {}
-        for key, members in items.items():
+        for key, members in list(items.items()):
             result = results[key] = []
             for timestamp in series:
                 result.append((timestamp, {k: 0.0 for k in members}, ))
@@ -97,7 +97,7 @@ class DummyTSDB(BaseTSDB):
     def get_frequency_totals(self, model, items, start, end=None, rollup=None, environment_id=None):
         self.validate_arguments([model], [environment_id])
         results = {}
-        for key, members in items.items():
+        for key, members in list(items.items()):
             results[key] = {member: 0.0 for member in members}
         return results
 

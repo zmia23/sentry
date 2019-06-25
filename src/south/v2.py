@@ -3,6 +3,7 @@ API versioning file; we can tell what kind of migrations things are
 by what class they inherit from (if none, it's a v1).
 """
 
+from builtins import object
 from south.utils import ask_for_it_by_name
 
 

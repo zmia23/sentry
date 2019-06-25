@@ -19,7 +19,7 @@ class GroupHashesTest(APITestCase):
 
         assert response.status_code == 200, response.content
         assert len(response.data) == 2
-        assert sorted(map(lambda x: x['id'], response.data)) == sorted([
+        assert sorted([x['id'] for x in response.data]) == sorted([
             'a' * 32,
             'b' * 32,
         ])

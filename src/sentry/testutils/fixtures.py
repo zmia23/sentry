@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
+from builtins import object
 from sentry.models import Activity, OrganizationMember, OrganizationMemberTeam
 from sentry.incidents.models import IncidentActivityType
 

@@ -8,6 +8,7 @@ sentry.nodestore.django.models
 
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -25,5 +26,5 @@ class Node(BaseModel):
 
     __repr__ = sane_repr('timestamp')
 
-    class Meta:
+    class Meta(object):
         app_label = 'nodestore'

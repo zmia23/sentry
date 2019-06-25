@@ -25,7 +25,7 @@ def handle_project(plugin, project, stream):
     from sentry.utils.email import get_email_addresses
     user_ids = plugin.get_sendable_users(project)
     users = User.objects.in_bulk(user_ids)
-    for user_id, email in get_email_addresses(user_ids, project).items():
+    for user_id, email in list(get_email_addresses(user_ids, project).items()):
         stream.write(u'{}: {}\n'.format(users[user_id].username, email))
 
 

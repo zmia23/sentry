@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import map
 from copy import deepcopy
 from rest_framework.exceptions import PermissionDenied
 import six
@@ -42,7 +43,7 @@ class OrganizationEventsEndpointBase(OrganizationEndpoint):
         group_ids = request.GET.getlist('group')
         if group_ids:
             try:
-                group_ids = set(map(int, filter(None, group_ids)))
+                group_ids = set(map(int, [_f for _f in group_ids if _f]))
             except ValueError:
                 raise OrganizationEventsError('Invalid group parameter. Values must be numbers')
 

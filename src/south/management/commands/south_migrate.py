@@ -179,13 +179,13 @@ def diff_migrations(migration1, migration2):
     models2 = migration2.migration_class().models
 
     # find new models
-    for model in models2.keys():
-        if not model in models1.keys():
+    for model in list(models2.keys()):
+        if not model in list(models1.keys()):
             print('    added model %s' % model_name(models2, model))
 
     # find removed models
-    for model in models1.keys():
-        if not model in models2.keys():
+    for model in list(models1.keys()):
+        if not model in list(models2.keys()):
             print('    removed model %s' % model_name(models1, model))
 
     # compare models

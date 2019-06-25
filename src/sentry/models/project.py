@@ -7,6 +7,7 @@ sentry.models.project
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import logging
 import warnings
 from collections import defaultdict
@@ -43,7 +44,7 @@ class ProjectTeam(Model):
     project = FlexibleForeignKey('sentry.Project')
     team = FlexibleForeignKey('sentry.Team')
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_projectteam'
         unique_together = (('project', 'team'), )
@@ -120,7 +121,7 @@ class Project(Model, PendingDeletionMixin):
     ])
     platform = models.CharField(max_length=64, null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_project'
         unique_together = (('organization', 'slug'),)
@@ -362,7 +363,7 @@ class Project(Model, PendingDeletionMixin):
             ).values_list('id', 'name')
         )
 
-        for environment_id, rule_ids in rules_by_environment_id.items():
+        for environment_id, rule_ids in list(rules_by_environment_id.items()):
             Rule.objects.filter(id__in=rule_ids).update(
                 environment_id=Environment.get_or_create(
                     self,

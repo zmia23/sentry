@@ -67,7 +67,7 @@ class NodeData(collections.MutableMapping):
         # CanonicalKeyDict
         data.pop('data', None)
         data['_node_data_CANONICAL'] = isinstance(data['_node_data'], CANONICAL_TYPES)
-        data['_node_data'] = dict(data['_node_data'].items())
+        data['_node_data'] = dict(list(data['_node_data'].items()))
         return data
 
     def __setstate__(self, state):
@@ -157,7 +157,7 @@ class NodeData(collections.MutableMapping):
         # ensure that the data is converted into a plain old dict
         to_write = self._node_data
         if isinstance(to_write, CANONICAL_TYPES):
-            to_write = dict(to_write.items())
+            to_write = dict(list(to_write.items()))
 
         nodestore.set(self.id, to_write)
 

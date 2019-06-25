@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.db.models import DateTimeField, DO_NOTHING
 from django.db.models.signals import post_delete
 from django.utils import timezone
@@ -27,7 +28,7 @@ class GroupEnvironment(Model):
     )
     first_seen = DateTimeField(default=timezone.now, db_index=True, null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_groupenvironment'
         index_together = [

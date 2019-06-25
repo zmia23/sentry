@@ -6,6 +6,8 @@ blocks into the forwards() and backwards() methods, in the right place.
 
 from __future__ import print_function
 
+from builtins import input
+from builtins import object
 import sys
 
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
@@ -51,7 +53,7 @@ class Action(object):
     @classmethod
     def triples_to_defs(cls, fields):
         # Turn the (class, args, kwargs) format into a string
-        for field, triple in fields.items():
+        for field, triple in list(fields.items()):
             fields[field] = cls.triple_to_def(triple)
         return fields
 
@@ -61,7 +63,7 @@ class Action(object):
         return "self.gf(%r)(%s)" % (
             triple[0],  # Field full path
             ", ".join(triple[1] + ["%s=%s" % (kwd, val)
-                                   for kwd, val in triple[2].items()]),  # args and kwds
+                                   for kwd, val in list(triple[2].items())]),  # args and kwds
         )
 
 
@@ -96,7 +98,7 @@ class AddModel(Action):
         "Produces the code snippet that gets put into forwards()"
         field_defs = ",\n            ".join([
             "(%r, %s)" % (name, defn) for name, defn
-            in self.triples_to_defs(self.model_def).items()
+            in list(self.triples_to_defs(self.model_def).items())
         ]) + ","
 
         return self.FORWARDS_TEMPLATE % {
@@ -165,7 +167,7 @@ class _NullIssuesField(object):
         if self.issue_with_backward_migration:
             print(" ?  3. Disable the backwards migration by raising an exception; you can edit the migration to fix it later")
         while True:
-            choice = raw_input(" ? Please select a choice: ")
+            choice = input(" ? Please select a choice: ")
             if choice == "1":
                 sys.exit(1)
             elif choice == "2":
@@ -184,7 +186,7 @@ class _NullIssuesField(object):
         print(" ? Please enter Python code for your one-off default value.")
         print(" ? The datetime module is available, so you can do e.g. datetime.date.today()")
         while True:
-            code = raw_input(" >>> ")
+            code = input(" >>> ")
             if not code:
                 print(" ! Please enter some code, or 'exit' (with no quotes) to exit.")
             elif code == "exit":

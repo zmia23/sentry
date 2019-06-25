@@ -54,7 +54,7 @@ _RENAMED_CONFIG = {
     'ROOT_TAG_ATTRS': 'ROOT_TAG_EXTRA_ATTRS',
     'HIDDEN_STACKTRACE_MODULES': 'HIDE_IN_STACKTRACES'
 }
-for old_name, new_name in _RENAMED_CONFIG.items():
+for old_name, new_name in list(_RENAMED_CONFIG.items()):
     if old_name in USER_CONFIG:
         warnings.warn(
             "%r was renamed to %r. Update your DEBUG_TOOLBAR_CONFIG "

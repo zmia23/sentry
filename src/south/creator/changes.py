@@ -5,6 +5,7 @@ commandline, or by using autodetection, etc.
 
 from __future__ import print_function
 
+from builtins import object
 from django.db import models
 from django.contrib.contenttypes.generic import GenericRelation
 from django.utils.datastructures import SortedDict
@@ -30,7 +31,7 @@ class BaseChanges(object):
         real_fields = SortedDict()
         meta = SortedDict()
         m2m_fields = SortedDict()
-        for name, triple in model_def.items():
+        for name, triple in list(model_def.items()):
             if name == "Meta":
                 meta = triple
             elif isinstance(model._meta.get_field_by_name(name)[0], models.ManyToManyField):
@@ -360,8 +361,8 @@ class AutoChanges(BaseChanges):
 
         # Copy the positional and keyword arguments so we can compare them and pop off things
         old_pos, new_pos = old_pos[:], new_pos[:]
-        old_kwd = dict(old_kwd.items())
-        new_kwd = dict(new_kwd.items())
+        old_kwd = dict(list(old_kwd.items()))
+        new_kwd = dict(list(new_kwd.items()))
 
         # Remove comparison of the existence of 'unique', that's done elsewhere.
         # TODO: Make this work for custom fields where unique= means something else?
@@ -504,7 +505,7 @@ class InitialChanges(BaseChanges):
                             })
 
             # Finally, see if there's some M2M action
-            for name, triple in m2m_fields.items():
+            for name, triple in list(m2m_fields.items()):
                 field = model._meta.get_field_by_name(name)[0]
                 # But only if it's not through=foo (#120)
                 if field.rel.through:

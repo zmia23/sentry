@@ -17,7 +17,7 @@ class BidirectionalMapping(MutableMapping):
 
     def __init__(self, data):
         self.__data = data
-        self.__inverse = {v: k for k, v in self.__data.items()}
+        self.__inverse = {v: k for k, v in list(self.__data.items())}
         if len(self.__data) != len(self.__inverse):
             raise ValueError('duplicate value provided')
 

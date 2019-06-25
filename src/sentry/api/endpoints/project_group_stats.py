@@ -38,4 +38,4 @@ class ProjectGroupStatsEndpoint(ProjectEndpoint, EnvironmentMixin, StatsMixin):
             )
         )
 
-        return Response({six.text_type(k): v for k, v in data.items()})
+        return Response({six.text_type(k): v for k, v in list(data.items())})

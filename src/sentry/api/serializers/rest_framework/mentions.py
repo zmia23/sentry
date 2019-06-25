@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from rest_framework import serializers
 
 from sentry.api.fields.actor import Actor

@@ -7,6 +7,7 @@ sentry.runner
 """
 from __future__ import absolute_import, print_function
 
+from builtins import map
 import os
 import click
 import sys
@@ -52,8 +53,7 @@ def cli(ctx, config):
 
 # TODO(mattrobenolt): Autodiscover commands?
 list(
-    map(
-        lambda cmd: cli.add_command(import_string(cmd)), (
+    [cli.add_command(import_string(cmd)) for cmd in (
             'sentry.runner.commands.backup.export', 'sentry.runner.commands.backup.import_',
             'sentry.runner.commands.cleanup.cleanup', 'sentry.runner.commands.config.config',
             'sentry.runner.commands.consumer.consumer', 'sentry.runner.commands.createuser.createuser',
@@ -66,8 +66,7 @@ list(
             'sentry.runner.commands.upgrade.upgrade',
             'sentry.runner.commands.permissions.permissions',
             'sentry.runner.commands.devservices.devservices',
-        )
-    )
+        )]
 )
 
 

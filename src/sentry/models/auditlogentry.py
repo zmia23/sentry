@@ -6,6 +6,9 @@ sentry.models.auditlogentry
 :license: BSD, see LICENSE for more details.
 """
 from __future__ import absolute_import, print_function
+from __future__ import division
+from past.utils import old_div
+from builtins import object
 import six
 
 from django.db import models
@@ -177,7 +180,7 @@ class AuditLogEntry(Model):
     data = GzippedDictField()
     datetime = models.DateTimeField(default=timezone.now)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_auditlogentry'
 
@@ -243,7 +246,7 @@ class AuditLogEntry(Model):
             return 'created the organization'
         elif self.event == AuditLogEntryEvent.ORG_EDIT:
             return 'edited the organization setting: ' + (', '.join(u'{} {}'.format(k, v)
-                                                                    for k, v in self.data.items()))
+                                                                    for k, v in list(self.data.items())))
         elif self.event == AuditLogEntryEvent.ORG_REMOVE:
             return 'removed the organization'
         elif self.event == AuditLogEntryEvent.ORG_RESTORE:
@@ -296,7 +299,7 @@ class AuditLogEntry(Model):
             return 'disabled sso (%s)' % (self.data['provider'], )
         elif self.event == AuditLogEntryEvent.SSO_EDIT:
             return 'edited sso settings: ' + (', '.join(u'{} {}'.format(k, v)
-                                                        for k, v in self.data.items()))
+                                                        for k, v in list(self.data.items())))
         elif self.event == AuditLogEntryEvent.SSO_IDENTITY_LINK:
             return 'linked their account to a new identity'
 
@@ -317,7 +320,7 @@ class AuditLogEntry(Model):
         elif self.event == AuditLogEntryEvent.SET_ONDEMAND:
             if self.data['ondemand'] == -1:
                 return 'changed on-demand spend to unlimited'
-            return 'changed on-demand max spend to $%d' % (self.data['ondemand'] / 100, )
+            return 'changed on-demand max spend to $%d' % (old_div(self.data['ondemand'], 100), )
         elif self.event == AuditLogEntryEvent.TRIAL_STARTED:
             return 'started trial'
         elif self.event == AuditLogEntryEvent.PLAN_CHANGED:

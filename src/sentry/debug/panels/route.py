@@ -45,7 +45,7 @@ class RoutePanel(Panel):
         result = []
         for arg in args:
             result.append(arg)
-        for pair in kwargs.items():
+        for pair in list(kwargs.items()):
             result.append(u'%s=%s' % tuple(pair))
         return u', '.join(result)
 

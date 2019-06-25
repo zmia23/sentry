@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.utils.encoding import force_text
 from django import forms
 from django.db import models
@@ -11,14 +12,14 @@ from sentry.testutils import TestCase
 class JSONFieldTestModel(models.Model):
     json = JSONField("test", null=True, blank=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
 
 
 class JSONFieldWithDefaultTestModel(models.Model):
     json = JSONField(default={"sukasuka": "YAAAAAZ"})
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
 
 
@@ -26,14 +27,14 @@ class BlankJSONFieldTestModel(models.Model):
     null_json = JSONField(null=True)
     blank_json = JSONField(blank=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
 
 
 class CallableDefaultModel(models.Model):
     json = JSONField(default=lambda: {'x': 2})
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
 
 

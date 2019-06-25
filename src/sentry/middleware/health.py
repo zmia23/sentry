@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import filter
+from builtins import object
 import itertools
 import six
 
@@ -24,14 +26,14 @@ class HealthCheck(object):
         from sentry.utils import json
 
         threshold = Problem.threshold(Problem.SEVERITY_CRITICAL)
-        results = {check: filter(threshold, problems) for check, problems in check_all().items()}
-        problems = list(itertools.chain.from_iterable(results.values()))
+        results = {check: list(filter(threshold, problems)) for check, problems in list(check_all().items())}
+        problems = list(itertools.chain.from_iterable(list(results.values())))
 
         return HttpResponse(
             json.dumps(
                 {
                     'problems': [six.text_type(p) for p in problems],
-                    'healthy': {type(check).__name__: not p for check, p in results.items()},
+                    'healthy': {type(check).__name__: not p for check, p in list(results.items())},
                 }
             ),
             content_type='application/json',

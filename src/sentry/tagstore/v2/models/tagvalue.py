@@ -7,6 +7,7 @@ sentry.tagstore.v2.models.tagvalue
 """
 from __future__ import absolute_import, print_function
 
+from builtins import object
 import six
 
 from django.db import models, router, connections
@@ -42,7 +43,7 @@ class TagValue(Model):
 
     objects = TagStoreManager()
 
-    class Meta:
+    class Meta(object):
         app_label = 'tagstore'
         unique_together = (('project_id', '_key', 'value'), )
         index_together = (('project_id', '_key', 'last_seen'), )
@@ -123,8 +124,8 @@ class TagValue(Model):
 
         # First attempt to hit from cache, which in theory is the hot case
         cache_key_to_key = {cls.get_cache_key(project_id, tk.id, v): (tk, v) for tk, v in tags}
-        cache_key_to_models = cache.get_many(cache_key_to_key.keys())
-        for model in cache_key_to_models.values():
+        cache_key_to_models = cache.get_many(list(cache_key_to_key.keys()))
+        for model in list(cache_key_to_models.values()):
             key_to_model[tags_by_key_id[model._key_id]] = model
             remaining_keys.remove(tags_by_key_id[model._key_id])
 

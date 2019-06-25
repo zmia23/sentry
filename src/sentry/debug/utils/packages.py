@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import map
 import six
 import sys
 
@@ -50,7 +51,7 @@ def get_package_version(module_name, app):
 
 def get_all_package_versions():
     packages = {}
-    for module_name, app in sys.modules.items():
+    for module_name, app in list(sys.modules.items()):
         # ignore items that look like submodules
         if '.' in module_name:
             continue

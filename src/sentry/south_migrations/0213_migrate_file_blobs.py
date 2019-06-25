@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 import six
 
 from collections import defaultdict
@@ -68,7 +70,7 @@ class Migration(DataMigration):
 
         print(
             "Saved %.2fGB (on %.2fGB) with removal of %d duplicate files" %
-            (saved / 1024 / 1024 / 1024.0, total / 1024 / 1024 / 1024.0, count, )
+            (old_div(saved, 1024 / 1024 / 1024.0), old_div(total, 1024 / 1024 / 1024.0), count, )
         )
 
     def backwards(self, orm):

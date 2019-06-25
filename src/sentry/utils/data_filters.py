@@ -7,6 +7,7 @@ sentry.utils.data_filters.py
 """
 from __future__ import absolute_import
 
+from builtins import object
 import fnmatch
 import ipaddress
 import six

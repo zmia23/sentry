@@ -16,7 +16,7 @@ backends = []
 if settings.SENTRY_TAGSTORE == 'sentry.utils.services.ServiceDelegator':
     backends = [
         backend['path'] for backend in
-        settings.SENTRY_TAGSTORE_OPTIONS.get('backends', {}).values()
+        list(settings.SENTRY_TAGSTORE_OPTIONS.get('backends', {}).values())
     ]
 elif settings.SENTRY_TAGSTORE.startswith('sentry.tagstore.multi'):
     backends = [
@@ -37,7 +37,7 @@ prefix_map = {
 }
 
 for i, backend in enumerate(backends):
-    for prefix, path in prefix_map.items():
+    for prefix, path in list(prefix_map.items()):
         if backend.startswith(prefix):
             models = __import__(path, globals(), locals(), ['models'], level=0).models
             if i == 0:
@@ -50,7 +50,7 @@ for i, backend in enumerate(backends):
                     predicate = lambda name: name in models.__all__
                 else:
                     predicate = lambda name: not name.startswith('_')
-                locals().update({k: v for k, v in vars(models).items() if predicate(k)})
+                locals().update({k: v for k, v in list(vars(models).items()) if predicate(k)})
             break
     else:
         raise ImproperlyConfigured("Found unknown tagstore backend '%s'" % backend)

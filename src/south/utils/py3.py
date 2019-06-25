@@ -2,6 +2,9 @@
 Python 2 + 3 compatibility functions. This is a very small subset of six.
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from past.builtins import basestring
 import sys
 
 PY3 = sys.version_info[0] == 3
@@ -16,11 +19,11 @@ if PY3:
 
 else:
     string_types = basestring,
-    text_type = unicode
+    text_type = str
     raw_input = raw_input
 
-    import cStringIO
-    StringIO = cStringIO.StringIO
+    import io
+    StringIO = io.StringIO
 
 
 def with_metaclass(meta, base=object):

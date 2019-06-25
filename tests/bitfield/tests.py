@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import range
 import pickle
 import six
 
@@ -327,7 +328,7 @@ class BitFieldSerializationTest(TestCase):
         bf.flags.FLAG_3 = 0
         data = pickle.dumps(bf)
         inst = pickle.loads(data)
-        self.assertTrue('FLAG_3' in inst.flags.keys())
+        self.assertTrue('FLAG_3' in list(inst.flags.keys()))
 
 
 class BitFormFieldTest(TestCase):

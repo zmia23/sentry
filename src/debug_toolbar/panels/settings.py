@@ -22,6 +22,6 @@ class SettingsPanel(Panel):
     def process_response(self, request, response):
         self.record_stats(
             {
-                'settings': OrderedDict(sorted(get_safe_settings().items(), key=lambda s: s[0])),
+                'settings': OrderedDict(sorted(list(get_safe_settings().items()), key=lambda s: s[0])),
             }
         )

@@ -81,7 +81,7 @@ def _generate_culprit(event):
     # releases.  Platform was added back to data in december 2018.
     data = event.data
     if data.get('platform') is None:
-        data = dict(data.items())
+        data = dict(list(data.items()))
         data['platform'] = event.platform
     return generate_culprit(data)
 
@@ -125,25 +125,25 @@ def get_group_creation_attributes(caches, events):
     return reduce(
         lambda data, event: merge_mappings([
             data,
-            {name: f(caches, data, event) for name, f in backfill_fields.items()},
+            {name: f(caches, data, event) for name, f in list(backfill_fields.items())},
         ]),
         events,
-        {name: f(latest_event) for name, f in initial_fields.items()},
+        {name: f(latest_event) for name, f in list(initial_fields.items())},
     )
 
 
 def get_group_backfill_attributes(caches, group, events):
     return {
         k: v for k, v in
-        reduce(
+        list(reduce(
             lambda data, event: merge_mappings([
                 data,
-                {name: f(caches, data, event) for name, f in backfill_fields.items()},
+                {name: f(caches, data, event) for name, f in list(backfill_fields.items())},
             ]),
             events,
             {name: getattr(group, name)
              for name in set(initial_fields.keys()) | set(backfill_fields.keys())},
-        ).items()
+        ).items())
         if k in backfill_fields
     }
 
@@ -305,7 +305,7 @@ def collect_group_environment_data(events):
 
 
 def repair_group_environment_data(caches, project, events):
-    for (group_id, env_name), first_release in collect_group_environment_data(events).items():
+    for (group_id, env_name), first_release in list(collect_group_environment_data(events).items()):
         fields = {}
         if first_release:
             fields['first_release'] = caches['Release'](
@@ -340,12 +340,12 @@ def collect_tag_data(events):
 
 
 def repair_tag_data(caches, project, events):
-    for (group_id, env_name), keys in collect_tag_data(events).items():
+    for (group_id, env_name), keys in list(collect_tag_data(events).items()):
         environment = caches['Environment'](
             project.organization_id,
             env_name,
         )
-        for key, values in keys.items():
+        for key, values in list(keys.items()):
             tagstore.get_or_create_group_tag_key(
                 project_id=project.id,
                 group_id=group_id,
@@ -356,7 +356,7 @@ def repair_tag_data(caches, project, events):
             # XXX: `{first,last}_seen` columns don't totally replicate the
             # ingestion logic (but actually represent a more accurate value.)
             # See GH-5289 for more details.
-            for value, (times_seen, first_seen, last_seen) in values.items():
+            for value, (times_seen, first_seen, last_seen) in list(values.items()):
                 _, created = tagstore.get_or_create_group_tag_value(
                     project_id=project.id,
                     group_id=group_id,
@@ -412,7 +412,7 @@ def collect_release_data(caches, project, events):
 
 
 def repair_group_release_data(caches, project, events):
-    attributes = collect_release_data(caches, project, events).items()
+    attributes = list(collect_release_data(caches, project, events).items())
     for (group_id, environment, release_id), (first_seen, last_seen) in attributes:
         instance, created = GroupRelease.objects.get_or_create(
             project_id=project.id,
@@ -498,19 +498,19 @@ def collect_tsdb_data(caches, project, events):
 def repair_tsdb_data(caches, project, events):
     counters, sets, frequencies = collect_tsdb_data(caches, project, events)
 
-    for timestamp, data in counters.items():
-        for model, keys in data.items():
-            for (key, environment_id), value in keys.items():
+    for timestamp, data in list(counters.items()):
+        for model, keys in list(data.items()):
+            for (key, environment_id), value in list(keys.items()):
                 tsdb.incr(model, key, timestamp, value, environment_id=environment_id)
 
-    for timestamp, data in sets.items():
-        for model, keys in data.items():
-            for (key, environment_id), values in keys.items():
+    for timestamp, data in list(sets.items()):
+        for model, keys in list(data.items()):
+            for (key, environment_id), values in list(keys.items()):
                 # TODO: This should use `record_multi` rather than `record`.
                 tsdb.record(model, key, values, timestamp, environment_id=environment_id)
 
-    for timestamp, data in frequencies.items():
-        tsdb.record_frequency_multi(data.items(), timestamp)
+    for timestamp, data in list(frequencies.items()):
+        tsdb.record_frequency_multi(list(data.items()), timestamp)
 
 
 def repair_denormalizations(caches, project, events):

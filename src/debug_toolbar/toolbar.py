@@ -4,6 +4,8 @@ The main DebugToolbar class that loads and renders the Toolbar.
 
 from __future__ import absolute_import, unicode_literals
 
+from builtins import range
+from builtins import object
 import uuid
 
 import django
@@ -42,7 +44,7 @@ class DebugToolbar(object):
         """
         Get a list of panels enabled for the current request.
         """
-        return [panel for panel in self._panels.values() if panel.enabled]
+        return [panel for panel in list(self._panels.values()) if panel.enabled]
 
     def get_panel_by_id(self, panel_id):
         """

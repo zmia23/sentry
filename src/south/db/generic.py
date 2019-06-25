@@ -1,5 +1,9 @@
 from __future__ import print_function
 
+from builtins import zip
+from builtins import map
+from builtins import hex
+from builtins import object
 import re
 import sys
 
@@ -538,7 +542,7 @@ class DatabaseOperations(object):
 
         # Actually change the column (step 1 -- Nullity may need to be fixed)
         if self.allows_combined_alters:
-            sqls, values = zip(*sqls)
+            sqls, values = list(zip(*sqls))
             self.execute(
                 "ALTER TABLE %s %s;" % (self.quote_name(table_name), ", ".join(sqls)),
                 flatten(values),
@@ -604,7 +608,7 @@ class DatabaseOperations(object):
             raise DryRunError("Cannot get constraints for columns.")
 
         if columns is not None:
-            columns = set(map(lambda s: s.lower(), columns))
+            columns = set([s.lower() for s in columns])
 
         db_name = self._get_setting('NAME')
 
@@ -615,7 +619,7 @@ class DatabaseOperations(object):
                     cnames.setdefault(cname, set())
                     cnames[cname].add(col.lower())
 
-        for cname, cols in cnames.items():
+        for cname, cols in list(cnames.items()):
             if cols == columns or columns is None:
                 yield cname
 
@@ -1065,7 +1069,7 @@ class DatabaseOperations(object):
             except KeyError:
                 signals[app_label] = list(model_names)
         # Send only one signal per app.
-        for (app_label, model_names) in signals.items():
+        for (app_label, model_names) in list(signals.items()):
             self.really_send_create_signal(app_label, list(set(model_names)),
                                            verbosity=verbosity,
                                            interactive=interactive)

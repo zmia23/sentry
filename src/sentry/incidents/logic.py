@@ -1,5 +1,7 @@
 from __future__ import absolute_import
+from __future__ import division
 
+from past.utils import old_div
 from datetime import timedelta
 
 import six
@@ -287,7 +289,7 @@ def get_incident_event_stats(incident, start=None, end=None, data_points=50):
     period, otherwise uses the incident start/current_end.
     """
     kwargs = build_incident_query_params(incident, start=start, end=end)
-    rollup = max(int(incident.duration.total_seconds() / data_points), 1)
+    rollup = max(int(old_div(incident.duration.total_seconds(), data_points)), 1)
     return SnubaTSResult(
         raw_query(
             aggregations=[

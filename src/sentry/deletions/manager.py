@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from collections import defaultdict
 
 __all__ = ['DeletionTaskManager']

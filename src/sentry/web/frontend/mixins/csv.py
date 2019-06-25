@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import object
 import csv
 import six
 
@@ -15,7 +17,7 @@ if six.PY3:
 else:
 
     def encode_row(row):
-        return map(force_bytes, row)
+        return list(map(force_bytes, row))
 
 
 # csv.writer doesn't provide a non-file interface

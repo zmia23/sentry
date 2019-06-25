@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.utils import timezone
@@ -32,7 +33,7 @@ class Repository(Model, PendingDeletionMixin):
     date_added = models.DateTimeField(default=timezone.now)
     integration_id = BoundedPositiveIntegerField(db_index=True, null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_repository'
         unique_together = (

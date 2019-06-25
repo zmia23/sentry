@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
+from builtins import object
 import dateutil.parser
 import hashlib
 import hmac
@@ -68,7 +69,7 @@ class Webhook(object):
             }
 
             repos = Repository.objects.filter(
-                organization_id__in=orgs.keys(),
+                organization_id__in=list(orgs.keys()),
                 provider='integrations:%s' % self.provider,
                 external_id=six.text_type(event['repository']['id']),
             )

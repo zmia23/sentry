@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 import functools
 import logging
 import six
@@ -218,7 +219,7 @@ class Endpoint(APIView):
             [
                 self.build_cursor_link(
                     request, 'previous', cursor_result.prev),
-                self.build_cursor_link(request, 'next', cursor_result.next),
+                self.build_cursor_link(request, 'next', cursor_result.__next__),
             ]
         )
 

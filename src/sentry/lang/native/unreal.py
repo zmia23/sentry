@@ -1,4 +1,6 @@
 from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
 from symbolic import Unreal4Crash
 from sentry.lang.native.minidump import MINIDUMP_ATTACHMENT_TYPE
 from sentry.models import UserReport

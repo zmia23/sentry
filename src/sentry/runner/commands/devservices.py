@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import map
 import os
 import click
 from six import text_type
@@ -28,7 +29,7 @@ def ensure_interface(ports):
     # If there is no interface specified, make sure the
     # default interface is 127.0.0.1
     rv = {}
-    for k, v in ports.items():
+    for k, v in list(ports.items()):
         if not isinstance(v, tuple):
             v = ('127.0.0.1', v)
         rv[k] = v
@@ -104,7 +105,7 @@ def up(project, exclude):
     get_or_create(client, 'network', project)
 
     containers = {}
-    for name, options in settings.SENTRY_DEVSERVICES.items():
+    for name, options in list(settings.SENTRY_DEVSERVICES.items()):
         if name in exclude:
             continue
         options = options.copy()
@@ -118,7 +119,7 @@ def up(project, exclude):
         containers[name] = options
 
     pulled = set()
-    for name, options in containers.items():
+    for name, options in list(containers.items()):
         # HACK(mattrobenolt): special handle snuba backend becuase it needs to
         # handle different values based on the eventstream backend
         # For snuba, we can't run the full suite of devserver, but can only
@@ -127,13 +128,13 @@ def up(project, exclude):
             options['environment'].pop('DEFAULT_BROKERS', None)
             options['command'] = ['devserver', '--no-workers']
 
-        for key, value in options['environment'].items():
+        for key, value in list(options['environment'].items()):
             options['environment'][key] = value.format(containers=containers)
         if options.pop('pull', False) and options['image'] not in pulled:
             click.secho("> Pulling image '%s'" % options['image'], err=True, fg='green')
             client.images.pull(options['image'])
             pulled.add(options['image'])
-        for mount in options.get('volumes', {}).keys():
+        for mount in list(options.get('volumes', {}).keys()):
             if '/' not in mount:
                 get_or_create(client, 'volume', project + '_' + mount)
                 options['volumes'][project + '_' + mount] = options['volumes'].pop(mount)
@@ -146,7 +147,7 @@ def up(project, exclude):
             container.remove()
         listening = ''
         if options['ports']:
-            listening = ' (listening: %s)' % ', '.join(map(text_type, options['ports'].values()))
+            listening = ' (listening: %s)' % ', '.join(map(text_type, list(options['ports'].values())))
         click.secho("> Creating '%s' container%s" %
                     (options['name'], listening), err=True, fg='yellow')
         client.containers.run(**options)

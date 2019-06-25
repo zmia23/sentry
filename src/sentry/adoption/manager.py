@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from collections import defaultdict, namedtuple
 
 FEATURE_LOCATION = {'language', 'integration', 'code', 'web', 'admin', 'api'}

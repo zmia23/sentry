@@ -7,6 +7,7 @@ sentry.runner.commands.devserver
 """
 from __future__ import absolute_import, print_function
 
+from builtins import next
 import click
 import six
 from six.moves.urllib.parse import urlparse

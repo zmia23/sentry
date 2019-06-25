@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from datetime import timedelta
 
 from django.db import models
@@ -42,7 +43,7 @@ class GroupSnooze(Model):
 
     objects = BaseManager(cache_fields=('group', ))
 
-    class Meta:
+    class Meta(object):
         db_table = 'sentry_groupsnooze'
         app_label = 'sentry'
 

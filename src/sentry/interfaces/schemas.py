@@ -387,7 +387,7 @@ EVENT_SCHEMA = {
                 },
                 {
                     'type': 'string',
-                    'enum': LOG_LEVELS_MAP.keys(),
+                    'enum': list(LOG_LEVELS_MAP.keys()),
                 },
             ],
         },
@@ -777,7 +777,7 @@ def validate_and_default_interface(data, interface, name=None, meta=None,
 
     # Strip Nones so we don't have to take null into account for all schemas.
     if strip_nones and isinstance(data, dict):
-        for k in data.keys():
+        for k in list(data.keys()):
             if data[k] is None:
                 del data[k]
 

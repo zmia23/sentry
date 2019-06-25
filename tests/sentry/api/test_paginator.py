@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import range
 from datetime import timedelta
 from django.utils import timezone
 from unittest import TestCase as SimpleTestCase
@@ -88,30 +89,30 @@ class OffsetPaginatorTest(TestCase):
         result1 = paginator.get_result(limit=1, cursor=None)
         assert len(result1) == 1, result1
         assert result1[0] == res1
-        assert result1.next
+        assert result1.__next__
         assert not result1.prev
 
-        result2 = paginator.get_result(limit=1, cursor=result1.next)
+        result2 = paginator.get_result(limit=1, cursor=result1.__next__)
         assert len(result2) == 1, (result2, list(result2))
         assert result2[0] == res2
-        assert result2.next
+        assert result2.__next__
         assert result2.prev
 
-        result3 = paginator.get_result(limit=1, cursor=result2.next)
+        result3 = paginator.get_result(limit=1, cursor=result2.__next__)
         assert len(result3) == 1, result3
         assert result3[0] == res3
-        assert not result3.next
+        assert not result3.__next__
         assert result3.prev
 
-        result4 = paginator.get_result(limit=1, cursor=result3.next)
+        result4 = paginator.get_result(limit=1, cursor=result3.__next__)
         assert len(result4) == 0, result4
-        assert not result4.next
+        assert not result4.__next__
         assert result4.prev
 
         result5 = paginator.get_result(limit=1, cursor=result4.prev)
         assert len(result5) == 1, result5
         assert result5[0] == res3
-        assert not result5.next
+        assert not result5.__next__
         assert result5.prev
 
     def test_order_by_multiple(self):
@@ -125,7 +126,7 @@ class OffsetPaginatorTest(TestCase):
         result = paginator.get_result(limit=1, cursor=None)
         assert len(result) == 1, result
         assert result[0] == res1
-        assert result.next
+        assert result.__next__
         assert not result.prev
 
         res3.update(is_active=False)
@@ -134,13 +135,13 @@ class OffsetPaginatorTest(TestCase):
         result = paginator.get_result(limit=1, cursor=None)
         assert len(result) == 1, result
         assert result[0] == res3
-        assert result.next
+        assert result.__next__
         assert not result.prev
 
-        result = paginator.get_result(limit=1, cursor=result.next)
+        result = paginator.get_result(limit=1, cursor=result.__next__)
         assert len(result) == 1, (result, list(result))
         assert result[0] == res1
-        assert result.next
+        assert result.__next__
         assert result.prev
 
     def test_max_offset(self):
@@ -179,26 +180,26 @@ class DateTimePaginatorTest(TestCase):
         assert len(result1) == 2, result1
         assert result1[0] == res1
         assert result1[1] == res2
-        assert result1.next
+        assert result1.__next__
         assert not result1.prev
 
-        result2 = paginator.get_result(limit=2, cursor=result1.next)
+        result2 = paginator.get_result(limit=2, cursor=result1.__next__)
         assert len(result2) == 2, result2
         assert result2[0] == res3
         assert result2[1] == res4
-        assert not result2.next
+        assert not result2.__next__
         assert result2.prev
 
         result3 = paginator.get_result(limit=1, cursor=result2.prev)
         assert len(result3) == 1, result3
         assert result3[0] == res2
-        assert result3.next
+        assert result3.__next__
         assert result3.prev
 
         result4 = paginator.get_result(limit=1, cursor=result3.prev)
         assert len(result4) == 1, result4
         assert result4[0] == res1
-        assert result4.next
+        assert result4.__next__
         assert not result4.prev
 
     def test_descending(self):
@@ -214,20 +215,20 @@ class DateTimePaginatorTest(TestCase):
         result1 = paginator.get_result(limit=1, cursor=None)
         assert len(result1) == 1, result1
         assert result1[0] == res3
-        assert result1.next
+        assert result1.__next__
         assert not result1.prev
 
-        result2 = paginator.get_result(limit=2, cursor=result1.next)
+        result2 = paginator.get_result(limit=2, cursor=result1.__next__)
         assert len(result2) == 2, result2
         assert result2[0] == res2
         assert result2[1] == res1
-        assert not result2.next
+        assert not result2.__next__
         assert result2.prev
 
         result3 = paginator.get_result(limit=2, cursor=result2.prev)
         assert len(result3) == 1, result3
         assert result3[0] == res3
-        assert result3.next
+        assert result3.__next__
         assert not result3.prev
 
     def test_prev_descending_with_new(self):
@@ -255,7 +256,7 @@ class DateTimePaginatorTest(TestCase):
         result3 = paginator.get_result(limit=10, cursor=result2.prev)
         assert len(result3) == 0, result3
 
-        result4 = paginator.get_result(limit=10, cursor=result1.next)
+        result4 = paginator.get_result(limit=10, cursor=result1.__next__)
         assert len(result4) == 0, result4
 
     def test_rounding_offset(self):
@@ -275,7 +276,7 @@ class DateTimePaginatorTest(TestCase):
         assert result1[1] == res2
         assert result1[2] == res3
 
-        result2 = paginator.get_result(limit=10, cursor=result1.next)
+        result2 = paginator.get_result(limit=10, cursor=result1.__next__)
         assert len(result2) == 1, result2
         assert result2[0] == res4
 
@@ -396,13 +397,13 @@ class SequencePaginatorTestCase(SimpleTestCase):
         result = paginator.get_result(5)
         assert list(result) == []
         assert result.prev == Cursor(0, 0, True, False)
-        assert result.next == Cursor(0, 0, False, False)
+        assert result.__next__ == Cursor(0, 0, False, False)
 
         paginator = SequencePaginator([], reverse=True)
         result = paginator.get_result(5)
         assert list(result) == []
         assert result.prev == Cursor(0, 0, True, False)
-        assert result.next == Cursor(0, 0, False, False)
+        assert result.__next__ == Cursor(0, 0, False, False)
 
     def test_ascending_simple(self):
         paginator = SequencePaginator([(i, i) for i in range(10)], reverse=False)
@@ -410,22 +411,22 @@ class SequencePaginatorTestCase(SimpleTestCase):
         result = paginator.get_result(5)
         assert list(result) == [0, 1, 2, 3, 4]
         assert result.prev == Cursor(0, 0, True, False)
-        assert result.next == Cursor(5, 0, False, True)
+        assert result.__next__ == Cursor(5, 0, False, True)
 
-        result = paginator.get_result(5, result.next)
+        result = paginator.get_result(5, result.__next__)
         assert list(result) == [5, 6, 7, 8, 9]
         assert result.prev == Cursor(5, 0, True, True)
-        assert result.next == Cursor(9, 1, False, False)
+        assert result.__next__ == Cursor(9, 1, False, False)
 
         result = paginator.get_result(5, result.prev)
         assert list(result) == [0, 1, 2, 3, 4]
         assert result.prev == Cursor(0, 0, True, False)
-        assert result.next == Cursor(5, 0, False, True)
+        assert result.__next__ == Cursor(5, 0, False, True)
 
         result = paginator.get_result(5, Cursor(100, 0, False))
         assert list(result) == []
         assert result.prev == Cursor(9, 1, True, True)
-        assert result.next == Cursor(9, 1, False, False)
+        assert result.__next__ == Cursor(9, 1, False, False)
 
     def test_descending_simple(self):
         paginator = SequencePaginator([(i, i) for i in range(10)], reverse=True)
@@ -433,22 +434,22 @@ class SequencePaginatorTestCase(SimpleTestCase):
         result = paginator.get_result(5)
         assert list(result) == [9, 8, 7, 6, 5]
         assert result.prev == Cursor(9, 0, True, False)
-        assert result.next == Cursor(4, 0, False, True)
+        assert result.__next__ == Cursor(4, 0, False, True)
 
-        result = paginator.get_result(5, result.next)
+        result = paginator.get_result(5, result.__next__)
         assert list(result) == [4, 3, 2, 1, 0]
         assert result.prev == Cursor(4, 0, True, True)
-        assert result.next == Cursor(0, 1, False, False)
+        assert result.__next__ == Cursor(0, 1, False, False)
 
         result = paginator.get_result(5, result.prev)
         assert list(result) == [9, 8, 7, 6, 5]
         assert result.prev == Cursor(9, 0, True, False)
-        assert result.next == Cursor(4, 0, False, True)
+        assert result.__next__ == Cursor(4, 0, False, True)
 
         result = paginator.get_result(5, Cursor(-10, 0, False))
         assert list(result) == []
         assert result.prev == Cursor(0, 1, True, True)
-        assert result.next == Cursor(0, 1, False, False)
+        assert result.__next__ == Cursor(0, 1, False, False)
 
     def test_ascending_repeated_scores(self):
         paginator = SequencePaginator([(1, i) for i in range(10)], reverse=False)
@@ -456,22 +457,22 @@ class SequencePaginatorTestCase(SimpleTestCase):
         result = paginator.get_result(5)
         assert list(result) == [0, 1, 2, 3, 4]
         assert result.prev == Cursor(1, 0, True, False)
-        assert result.next == Cursor(1, 5, False, True)
+        assert result.__next__ == Cursor(1, 5, False, True)
 
-        result = paginator.get_result(5, result.next)
+        result = paginator.get_result(5, result.__next__)
         assert list(result) == [5, 6, 7, 8, 9]
         assert result.prev == Cursor(1, 5, True, True)
-        assert result.next == Cursor(1, 10, False, False)
+        assert result.__next__ == Cursor(1, 10, False, False)
 
         result = paginator.get_result(5, result.prev)
         assert list(result) == [0, 1, 2, 3, 4]
         assert result.prev == Cursor(1, 0, True, False)
-        assert result.next == Cursor(1, 5, False, True)
+        assert result.__next__ == Cursor(1, 5, False, True)
 
         result = paginator.get_result(5, Cursor(100, 0, False))
         assert list(result) == []
         assert result.prev == Cursor(1, 10, True, True)
-        assert result.next == Cursor(1, 10, False, False)
+        assert result.__next__ == Cursor(1, 10, False, False)
 
     def test_descending_repeated_scores(self):
         paginator = SequencePaginator([(1, i) for i in range(10)], reverse=True)
@@ -479,22 +480,22 @@ class SequencePaginatorTestCase(SimpleTestCase):
         result = paginator.get_result(5)
         assert list(result) == [9, 8, 7, 6, 5]
         assert result.prev == Cursor(1, 0, True, False)
-        assert result.next == Cursor(1, 5, False, True)
+        assert result.__next__ == Cursor(1, 5, False, True)
 
-        result = paginator.get_result(5, result.next)
+        result = paginator.get_result(5, result.__next__)
         assert list(result) == [4, 3, 2, 1, 0]
         assert result.prev == Cursor(1, 5, True, True)
-        assert result.next == Cursor(1, 10, False, False)
+        assert result.__next__ == Cursor(1, 10, False, False)
 
         result = paginator.get_result(5, result.prev)
         assert list(result) == [9, 8, 7, 6, 5]
         assert result.prev == Cursor(1, 0, True, False)
-        assert result.next == Cursor(1, 5, False, True)
+        assert result.__next__ == Cursor(1, 5, False, True)
 
         result = paginator.get_result(5, Cursor(-10, 0, False))
         assert list(result) == []
         assert result.prev == Cursor(1, 10, True, True)
-        assert result.next == Cursor(1, 10, False, False)
+        assert result.__next__ == Cursor(1, 10, False, False)
 
     def test_hits(self):
         n = 10
@@ -513,10 +514,10 @@ class GenericOffsetPaginatorTest(TestCase):
 
         assert list(result) == [0, 1, 2, 3, 4]
         assert result.prev == Cursor(0, 0, True, False)
-        assert result.next == Cursor(0, 5, False, True)
+        assert result.__next__ == Cursor(0, 5, False, True)
 
-        result2 = paginator.get_result(5, result.next)
+        result2 = paginator.get_result(5, result.__next__)
 
         assert list(result2) == [5]
         assert result2.prev == Cursor(0, 0, True, True)
-        assert result2.next == Cursor(0, 10, False, False)
+        assert result2.__next__ == Cursor(0, 10, False, False)

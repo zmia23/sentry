@@ -7,6 +7,7 @@ sentry.runner.initializer
 """
 from __future__ import absolute_import, print_function
 
+from builtins import map
 import click
 import os
 import six
@@ -408,7 +409,7 @@ def show_big_error(message):
         lines = message.strip().splitlines()
     else:
         lines = message
-    maxline = max(map(len, lines))
+    maxline = max(list(map(len, lines)))
     click.echo('', err=True)
     click.secho('!!!%s!!!' % ('!' * min(maxline, 80), ), err=True, fg='red')
     click.secho('!! %s !!' % ''.center(maxline), err=True, fg='red')

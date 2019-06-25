@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from builtins import range
+from builtins import object
 import os
 import re
 import json
@@ -558,7 +560,7 @@ class Runner(object):
                 headers['Content-Type'] = 'application/json'
             elif format == 'multipart':
                 files = {}
-                for key, value in data.items():
+                for key, value in list(data.items()):
                     if hasattr(value, 'read') or isinstance(value, tuple):
                         files[key] = value
                         del data[key]

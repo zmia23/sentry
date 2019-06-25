@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import map
 import click
 import pytz
 import six
@@ -95,7 +96,7 @@ def organizations(metrics, since, until):
 
     stderr.write(
         u'Dumping {} from {} to {}...\n'.format(
-            ', '.join(metrics.keys()),
+            ', '.join(list(metrics.keys())),
             since,
             until,
         ),
@@ -107,12 +108,12 @@ def organizations(metrics, since, until):
         instances = OrderedDict((instance.pk, instance) for instance in chunk)
 
         results = {}
-        for metric in metrics.values():
-            results[metric] = tsdb.get_range(metric, instances.keys(), since, until)
+        for metric in list(metrics.values()):
+            results[metric] = tsdb.get_range(metric, list(instances.keys()), since, until)
 
         for key, instance in six.iteritems(instances):
             values = []
-            for metric in metrics.values():
+            for metric in list(metrics.values()):
                 values.append(aggregate(results[metric][key]))
 
             stdout.write(

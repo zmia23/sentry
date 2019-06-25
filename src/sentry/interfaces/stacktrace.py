@@ -7,7 +7,9 @@ sentry.interfaces.stacktrace
 """
 
 from __future__ import absolute_import
+from __future__ import division
 
+from past.utils import old_div
 __all__ = ('Stacktrace', )
 
 import six
@@ -138,7 +140,7 @@ def slim_frame_data(frames, frame_allowance=settings.SENTRY_MAX_STACKTRACE_FRAME
     app_count = len(app_frames)
     system_allowance = max(frame_allowance - app_count, 0)
     if system_allowance:
-        half_max = system_allowance / 2
+        half_max = old_div(system_allowance, 2)
         # prioritize trimming system frames
         for frame in system_frames[half_max:-half_max]:
             frame.vars = None
@@ -157,7 +159,7 @@ def slim_frame_data(frames, frame_allowance=settings.SENTRY_MAX_STACKTRACE_FRAME
         return
 
     app_allowance = app_count - remaining
-    half_max = app_allowance / 2
+    half_max = old_div(app_allowance, 2)
 
     for frame in app_frames[half_max:-half_max]:
         frame.vars = None

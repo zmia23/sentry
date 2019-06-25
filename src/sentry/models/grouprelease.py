@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from datetime import timedelta
 from django.db import IntegrityError, models, transaction
 from django.utils import timezone
@@ -19,7 +20,7 @@ class GroupRelease(Model):
     first_seen = models.DateTimeField(default=timezone.now)
     last_seen = models.DateTimeField(default=timezone.now, db_index=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_grouprelease'
         unique_together = (('group_id', 'release_id', 'environment'), )

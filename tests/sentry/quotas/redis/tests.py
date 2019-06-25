@@ -2,6 +2,8 @@
 
 from __future__ import absolute_import
 
+from builtins import map
+from builtins import range
 import mock
 import six
 import time
@@ -162,7 +164,7 @@ class RedisQuotaTest(TestCase):
         self.get_organization_quota.return_value = (300, 60)
 
         n = 10
-        for _ in xrange(n):
+        for _ in range(n):
             self.quota.is_rate_limited(self.project, timestamp=timestamp)
 
         quotas = self.quota.get_quotas(self.project)
@@ -225,7 +227,7 @@ class RedisQuotaTest(TestCase):
         self.get_organization_quota.return_value = (300, 60)
 
         n = 10
-        for _ in xrange(n):
+        for _ in range(n):
             self.quota.is_rate_limited(self.project, timestamp=timestamp)
 
         self.quota.refund(self.project, timestamp=timestamp)

@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
 from sentry.interfaces.base import Interface, prune_empty_keys
 from sentry.interfaces.stacktrace import Stacktrace
 from sentry.utils.safe import trim

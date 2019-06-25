@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import filter
 import logging
 
 from celery.task import current
@@ -182,10 +183,10 @@ def _process_resource_change(action, sender, instance_id, retryer=None, *args, *
             ).organization_id
         )
 
-    installations = filter(
+    installations = list(filter(
         lambda i: event in i.sentry_app.events,
         org.sentry_app_installations.select_related('sentry_app'),
-    )
+    ))
 
     for installation in installations:
         data = {}

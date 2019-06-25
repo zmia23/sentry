@@ -1,5 +1,7 @@
 from __future__ import absolute_import
+from __future__ import division
 
+from past.utils import old_div
 import six
 
 from time import time
@@ -28,7 +30,7 @@ class RedisRateLimiter(RateLimiter):
             window = self.window
 
         key_hex = md5_text(key).hexdigest()
-        bucket = int(time() / window)
+        bucket = int(old_div(time(), window))
 
         if project:
             key = 'rl:%s:%s:%s' % (key_hex, project.id, bucket)

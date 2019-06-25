@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 
+from builtins import object
 from collections import OrderedDict
 import logging
 import six

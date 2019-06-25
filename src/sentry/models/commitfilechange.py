@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 
 from sentry.db.models import (BoundedPositiveIntegerField, FlexibleForeignKey, Model, sane_repr)
@@ -17,7 +18,7 @@ class CommitFileChange(Model):
         max_length=1, choices=(('A', 'Added'), ('D', 'Deleted'), ('M', 'Modified'), )
     )
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_commitfilechange'
         unique_together = (('commit', 'filename'), )

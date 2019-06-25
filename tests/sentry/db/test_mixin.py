@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from mock import patch
 
 from sentry.models import OrganizationOption, Repository
@@ -16,7 +17,7 @@ class RenamePendingDeleteTest(TestCase):
             external_id='external_id',
         )
 
-        class MockUuid4:
+        class MockUuid4(object):
             hex = '1234567'
 
         self.mock_uuid4 = MockUuid4

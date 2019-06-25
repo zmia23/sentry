@@ -1,9 +1,11 @@
 from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
 import six
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle  # NOQA
 

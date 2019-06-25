@@ -8,6 +8,8 @@ sentry.testutils.cases
 
 from __future__ import absolute_import
 
+from builtins import zip
+from builtins import range
 __all__ = (
     'TestCase', 'TransactionTestCase', 'APITestCase', 'TwoFactorAPITestCase', 'AuthProviderTestCase', 'RuleTestCase',
     'PermissionTestCase', 'PluginTestCase', 'CliTestCase', 'AcceptanceTestCase',
@@ -418,7 +420,7 @@ class _AssertQueriesContext(CaptureQueriesContext):
             pprint.pprint("====================== Table writes ======================")
             pprint.pprint(parsed_queries)
 
-        for table, num in parsed_queries.items():
+        for table, num in list(parsed_queries.items()):
             expected = self.queries.get(table, 0)
             if expected == 0:
                 import pprint
@@ -432,7 +434,7 @@ class _AssertQueriesContext(CaptureQueriesContext):
                     )
                 )
 
-        for table, num in self.queries.items():
+        for table, num in list(self.queries.items()):
             executed = parsed_queries.get(table, None)
             self.test_case.assertFalse(
                 executed is None, "no query against %s emitted, add debug=True to see all the queries" % (

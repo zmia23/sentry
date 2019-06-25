@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
+from past.utils import old_div
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
@@ -34,7 +36,7 @@ class Migration(DataMigration):
         queryset = ProjectKey.objects.filter(rate_limit_window__isnull=False)
         for key in RangeQuerySetWrapperWithProgressBar(queryset):
             ProjectKey.objects.filter(pk=key.pk).update(
-                rate_limit_window=key.rate_limit_window / 60)
+                rate_limit_window=old_div(key.rate_limit_window, 60))
 
     models = {
         'sentry.activity': {

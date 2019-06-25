@@ -7,6 +7,7 @@ sentry.models.userreport
 """
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models
 from django.utils import timezone
 
@@ -26,7 +27,7 @@ class UserReport(Model):
     comments = models.TextField()
     date_added = models.DateTimeField(default=timezone.now, db_index=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_userreport'
         index_together = (('project', 'event_id'), ('project', 'date_added'))

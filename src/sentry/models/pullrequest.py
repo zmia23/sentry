@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from builtins import object
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
@@ -28,7 +29,7 @@ class PullRequest(Model):
     author = FlexibleForeignKey('sentry.CommitAuthor', null=True)
     merge_commit_sha = models.CharField(max_length=64, null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_pull_request'
         index_together = (('repository_id', 'date_added'), ('organization_id', 'merge_commit_sha'))
@@ -66,7 +67,7 @@ class PullRequestCommit(Model):
     pull_request = FlexibleForeignKey('sentry.PullRequest')
     commit = FlexibleForeignKey('sentry.Commit')
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_pullrequest_commit'
         unique_together = (('pull_request', 'commit'), )

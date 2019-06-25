@@ -35,7 +35,7 @@ class UserAgentPlugin(TagPlugin):
         headers = http.headers
         # XXX: transitional support for workers
         if isinstance(headers, dict):
-            headers = headers.items()
+            headers = list(headers.items())
 
         output = []
         for key, value in headers:

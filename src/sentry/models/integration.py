@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from builtins import object
 from django.db import models, IntegrityError
 from django.utils import timezone
 
@@ -20,7 +21,7 @@ class IntegrationExternalProject(Model):
     resolved_status = models.CharField(max_length=64)
     unresolved_status = models.CharField(max_length=64)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_integrationexternalproject'
         unique_together = (('organization_integration_id', 'external_id'),)
@@ -40,7 +41,7 @@ class OrganizationIntegration(Model):
         choices=ObjectStatus.as_choices(),
     )
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_organizationintegration'
         unique_together = (('organization', 'integration'),)
@@ -55,7 +56,7 @@ class ProjectIntegration(Model):
     integration = FlexibleForeignKey('sentry.Integration')
     config = EncryptedJsonField(default=dict)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_projectintegration'
         unique_together = (('project', 'integration'),)
@@ -84,7 +85,7 @@ class Integration(Model):
     )
     date_added = models.DateTimeField(default=timezone.now, null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'sentry'
         db_table = 'sentry_integration'
         unique_together = (('provider', 'external_id'),)
