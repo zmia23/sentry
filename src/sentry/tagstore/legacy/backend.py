@@ -27,6 +27,7 @@ from sentry.utils import db
 from . import models
 from sentry.tagstore.types import TagKey, TagValue, GroupTagKey, GroupTagValue
 from sentry.tasks.post_process import index_event_tags
+from functools import reduce
 
 
 transformers = {

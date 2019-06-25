@@ -35,7 +35,7 @@ def safe_execute(func, *args, **kwargs):
         if _passthrough_errors and isinstance(e, _passthrough_errors):
             raise
         if hasattr(func, 'im_class'):
-            cls = func.im_class
+            cls = func.__self__.__class__
         else:
             cls = func.__class__
 

@@ -24,6 +24,7 @@ from sentry.utils.dates import floor_to_utc_day, to_datetime, to_timestamp
 from sentry.utils.email import MessageBuilder
 from sentry.utils.math import mean
 from six.moves import reduce
+from functools import reduce
 
 date_format = functools.partial(
     dateformat.format,
