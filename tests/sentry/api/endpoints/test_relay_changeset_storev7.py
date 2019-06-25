@@ -20,7 +20,7 @@ class RelayChangeSetStoreV7Test(APITestCase):
 
         self.public_key = self.key_pair[1]
         self.private_key = self.key_pair[0]
-        self.relay_id = six.binary_type(uuid4())
+        self.relay_id = six.binary_type(six.text_type(uuid4()).encode('ascii'))
 
         self.relay = Relay.objects.create(
             relay_id=self.relay_id,

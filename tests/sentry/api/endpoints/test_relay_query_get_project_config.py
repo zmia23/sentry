@@ -21,7 +21,7 @@ class RelayQueryGetProjectConfigTest(APITestCase):
 
         self.public_key = self.key_pair[1]
         self.private_key = self.key_pair[0]
-        self.relay_id = six.binary_type(uuid4())
+        self.relay_id = six.binary_type(six.text_type(uuid4()).encode('ascii'))
 
         self.relay = Relay.objects.create(
             relay_id=self.relay_id,
@@ -36,7 +36,7 @@ class RelayQueryGetProjectConfigTest(APITestCase):
         )
 
     def test_get_project_config(self):
-        query_id = six.binary_type(uuid4())
+        query_id = six.binary_type(six.text_type(uuid4()).encode('ascii'))
 
         data = {
             'changesets': [],
@@ -69,7 +69,7 @@ class RelayQueryGetProjectConfigTest(APITestCase):
         assert query_result.get('disabled') is False
 
     def test_get_project_config_missing_project_id(self):
-        query_id = six.binary_type(uuid4())
+        query_id = six.binary_type(six.text_type(uuid4()).encode('ascii'))
 
         data = {
             'changesets': [],
@@ -97,7 +97,7 @@ class RelayQueryGetProjectConfigTest(APITestCase):
         assert result.get('queryResults').get(query_id).get('status') == 'error'
 
     def test_invalid_query(self):
-        query_id = six.binary_type(uuid4())
+        query_id = six.binary_type(six.text_type(uuid4()).encode('ascii'))
 
         data = {
             'changesets': [],
@@ -128,7 +128,7 @@ class RelayQueryGetProjectConfigTest(APITestCase):
         assert query_result == 'unknown query'
 
     def test_project_does_not_exist(self):
-        query_id = six.binary_type(uuid4())
+        query_id = six.binary_type(six.text_type(uuid4()).encode('ascii'))
 
         data = {
             'changesets': [],
