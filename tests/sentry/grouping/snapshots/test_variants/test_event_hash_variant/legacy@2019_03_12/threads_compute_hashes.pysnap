@@ -11,9 +11,9 @@ app:
         stacktrace*
           frame* (frame considered in-app because no frame is in-app)
             filename*
-              u'foo/baz.c'
+              'foo/baz.c'
             function*
-              u'main'
+              'main'
             lineno (function takes precedence)
               1
 --------------------------------------------------------------------------
@@ -25,8 +25,8 @@ system:
         stacktrace*
           frame*
             filename*
-              u'foo/baz.c'
+              'foo/baz.c'
             function*
-              u'main'
+              'main'
             lineno (function takes precedence)
               1

@@ -11,70 +11,70 @@ app:
         stacktrace
           frame (non app frame)
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function (ignored unknown function name)
           frame (non app frame)
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'testMethod'
+              'testMethod'
           frame (non app frame)
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'aha'
+              'aha'
           frame (non app frame)
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'eval'
+              'eval'
           frame (non app frame)
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'test'
+              'test'
           frame (non app frame)
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function (ignored unknown function name)
-              u'test/<'
+              'test/<'
           frame (non app frame)
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'callback'
+              'callback'
           frame (non app frame)
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'callAnotherThing'
+              'callAnotherThing'
           frame (non app frame)
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'aha'
+              'aha'
         type*
-          u'Error'
+          'Error'
         value*
-          u'bad'
+          'bad'
 --------------------------------------------------------------------------
 system:
   hash: 'b2602ad455472dede8e4c340d8a7eaba'
@@ -84,67 +84,67 @@ system:
         stacktrace*
           frame*
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function (ignored unknown function name)
           frame*
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'testMethod'
+              'testMethod'
           frame*
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'aha'
+              'aha'
           frame (ignored low quality javascript frame)
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'eval'
+              'eval'
           frame*
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'test'
+              'test'
           frame*
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function (ignored unknown function name)
-              u'test/<'
+              'test/<'
           frame*
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'callback'
+              'callback'
           frame*
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'callAnotherThing'
+              'callAnotherThing'
           frame*
             module*
-              u'test'
+              'test'
             filename (ignored because frame points to a URL)
-              u'test.html'
+              'test.html'
             function*
-              u'aha'
+              'aha'
         type*
-          u'Error'
+          'Error'
         value (ignored because stacktrace takes precedence)
-          u'bad'
+          'bad'

@@ -10,9 +10,9 @@ app:
       stacktrace
         frame (non app frame)
           module*
-            u'foo/bar/baz'
+            'foo/bar/baz'
           filename (ignored because frame points to a URL)
-            u'foo.py'
+            'foo.py'
 --------------------------------------------------------------------------
 system:
   hash: 'a7a536723f7289f3ab7cbb444b7058ac'
@@ -21,6 +21,6 @@ system:
       stacktrace*
         frame*
           module*
-            u'foo/bar/baz'
+            'foo/bar/baz'
           filename (ignored because frame points to a URL)
-            u'foo.py'
+            'foo.py'

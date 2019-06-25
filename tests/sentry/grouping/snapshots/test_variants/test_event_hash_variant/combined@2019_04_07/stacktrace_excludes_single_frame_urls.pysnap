@@ -10,9 +10,9 @@ app:
       stacktrace (ignored single frame stack)
         frame (non app frame)
           module*
-            u'<unknown module>'
+            '<unknown module>'
           filename (module takes precedence)
-            u'/bar/'
+            '/bar/'
           context-line (discarded because from URL origin)
           lineno*
             107
@@ -27,9 +27,9 @@ system:
       stacktrace (ignored single frame stack)
         frame*
           module*
-            u'<unknown module>'
+            '<unknown module>'
           filename (module takes precedence)
-            u'/bar/'
+            '/bar/'
           context-line (discarded because from URL origin)
           lineno*
             107

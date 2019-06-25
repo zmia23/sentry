@@ -11,26 +11,26 @@ app:
         stacktrace*
           frame* (frame considered in-app because no frame is in-app)
             module*
-              u'app/components/modals/createTeamModal'
+              'app/components/modals/createTeamModal'
             filename (module takes precedence)
-              u'./app/components/modals/createTeamModal.jsx'
+              './app/components/modals/createTeamModal.jsx'
             context-line*
-              u'        onError(err);'
+              '        onError(err);'
             lineno (line number is used only if module or filename are available)
               27
           frame* (frame considered in-app because no frame is in-app)
             module*
-              u'app/views/settings/components/forms/form'
+              'app/views/settings/components/forms/form'
             filename (module takes precedence)
-              u'./app/views/settings/components/forms/form.jsx'
+              './app/views/settings/components/forms/form.jsx'
             context-line*
-              u'    this.model.submitError(error);'
+              '    this.model.submitError(error);'
             function (function name is used only if module or filename are available)
-              u'onError'
+              'onError'
             lineno (line number is used only if module or filename are available)
               125
         type*
-          u'TypeError'
+          'TypeError'
         value (stacktrace and type take precedence)
           u"Cannot read property 'submitError' of null"
 --------------------------------------------------------------------------
@@ -42,25 +42,25 @@ system:
         stacktrace*
           frame*
             module*
-              u'app/components/modals/createTeamModal'
+              'app/components/modals/createTeamModal'
             filename (module takes precedence)
-              u'./app/components/modals/createTeamModal.jsx'
+              './app/components/modals/createTeamModal.jsx'
             context-line*
-              u'        onError(err);'
+              '        onError(err);'
             lineno (line number is used only if module or filename are available)
               27
           frame*
             module*
-              u'app/views/settings/components/forms/form'
+              'app/views/settings/components/forms/form'
             filename (module takes precedence)
-              u'./app/views/settings/components/forms/form.jsx'
+              './app/views/settings/components/forms/form.jsx'
             context-line*
-              u'    this.model.submitError(error);'
+              '    this.model.submitError(error);'
             function (function name is used only if module or filename are available)
-              u'onError'
+              'onError'
             lineno (line number is used only if module or filename are available)
               125
         type*
-          u'TypeError'
+          'TypeError'
         value (stacktrace and type take precedence)
           u"Cannot read property 'submitError' of null"

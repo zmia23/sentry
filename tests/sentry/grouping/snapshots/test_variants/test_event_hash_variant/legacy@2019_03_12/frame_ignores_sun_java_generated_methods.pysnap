@@ -12,12 +12,12 @@ app:
           module* (removed reflection marker)
             'sun.reflect.GeneratedMethodAccessor'
           function*
-            u'invoke'
+            'invoke'
         frame* (frame considered in-app because no frame is in-app)
           module* (removed reflection marker)
             'jdk.internal.reflect.GeneratedMethodAccessor'
           function*
-            u'invoke'
+            'invoke'
 --------------------------------------------------------------------------
 system:
   hash: '9bc326575875422d0d4ced3c35d9f916'
@@ -28,9 +28,9 @@ system:
           module* (removed reflection marker)
             'sun.reflect.GeneratedMethodAccessor'
           function*
-            u'invoke'
+            'invoke'
         frame*
           module* (removed reflection marker)
             'jdk.internal.reflect.GeneratedMethodAccessor'
           function*
-            u'invoke'
+            'invoke'

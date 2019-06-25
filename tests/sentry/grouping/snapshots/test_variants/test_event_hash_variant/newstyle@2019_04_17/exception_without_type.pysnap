@@ -9,7 +9,7 @@ app:
     app (exception of system takes precedence)
       exception (ignored because hash matches system variant)
         value*
-          u'hello world'
+          'hello world'
 --------------------------------------------------------------------------
 system:
   hash: '5eb63bbbe01eeed093cb22bb8f5acdc3'
@@ -17,4 +17,4 @@ system:
     system*
       exception*
         value*
-          u'hello world'
+          'hello world'

@@ -9,7 +9,7 @@ default:
     default*
       csp*
         salt* (a static salt)
-          u'script-src'
+          'script-src'
         violation (not a local script violation)
         uri*
           "'self'"

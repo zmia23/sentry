@@ -10,9 +10,9 @@ app:
       stacktrace
         frame (non app frame)
           module*
-            u'<unknown module>'
+            '<unknown module>'
           filename (ignored because frame points to a URL)
-            u''
+            ''
 --------------------------------------------------------------------------
 system:
   hash: 'cd2a9fd0cdaa8cd55ed22b101fc65882'
@@ -21,6 +21,6 @@ system:
       stacktrace*
         frame*
           module*
-            u'<unknown module>'
+            '<unknown module>'
           filename (ignored because frame points to a URL)
-            u''
+            ''

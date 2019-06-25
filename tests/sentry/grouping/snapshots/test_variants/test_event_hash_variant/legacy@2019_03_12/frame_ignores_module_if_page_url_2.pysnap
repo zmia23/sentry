@@ -13,9 +13,9 @@ app:
             salt* (normalized generated module name)
               '<module>'
           filename (module takes precedence)
-            u'foo.py'
+            'foo.py'
           function*
-            u'a'
+            'a'
 --------------------------------------------------------------------------
 system:
   hash: '37a2dbfebce02591474d46b7485e9923'
@@ -27,6 +27,6 @@ system:
             salt* (normalized generated module name)
               '<module>'
           filename (module takes precedence)
-            u'foo.py'
+            'foo.py'
           function*
-            u'a'
+            'a'

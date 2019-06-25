@@ -9,9 +9,9 @@ app:
     app (exception of system takes precedence)
       exception (ignored because hash matches system variant)
         type*
-          u'Error'
+          'Error'
         value* (stripped common values)
-          u'<date>: <email> logged in (error <int>) time spent <float> --- correlation id <uuid>, checksum <sha1> (md5 <md5>); payload timestamp <date> (submitted from <ip> via <ip> via <ip>)'
+          '<date>: <email> logged in (error <int>) time spent <float> --- correlation id <uuid>, checksum <sha1> (md5 <md5>); payload timestamp <date> (submitted from <ip> via <ip> via <ip>)'
 --------------------------------------------------------------------------
 system:
   hash: '0bbe78766de9b3b64a5cc115018bec46'
@@ -19,6 +19,6 @@ system:
     system*
       exception*
         type*
-          u'Error'
+          'Error'
         value* (stripped common values)
-          u'<date>: <email> logged in (error <int>) time spent <float> --- correlation id <uuid>, checksum <sha1> (md5 <md5>); payload timestamp <date> (submitted from <ip> via <ip> via <ip>)'
+          '<date>: <email> logged in (error <int>) time spent <float> --- correlation id <uuid>, checksum <sha1> (md5 <md5>); payload timestamp <date> (submitted from <ip> via <ip> via <ip>)'

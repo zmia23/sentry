@@ -10,62 +10,62 @@ app:
       stacktrace (less than 10% of frames are in-app)
         frame*
           filename*
-            u'foo.py'
+            'foo.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
 --------------------------------------------------------------------------
@@ -76,61 +76,61 @@ system:
       stacktrace*
         frame*
           filename*
-            u'foo.py'
+            'foo.py'
           lineno*
             1
         frame*
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (ignored due to recursion)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (ignored due to recursion)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (ignored due to recursion)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (ignored due to recursion)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (ignored due to recursion)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (ignored due to recursion)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (ignored due to recursion)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (ignored due to recursion)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (ignored due to recursion)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
         frame (ignored due to recursion)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
