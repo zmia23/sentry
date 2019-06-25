@@ -23,7 +23,7 @@ class SentryAppTest(TestCase):
             webhook_url='http://example.com',
         )
 
-    def test_slug(self):
+    def testn(self):
         self.sentry_app.save()
         assert self.sentry_app.slug == 'nulldb'
 
@@ -32,7 +32,7 @@ class SentryAppTest(TestCase):
         self.sentry_app.save()
 
         assert self.sentry_app.slug == u'nulldb-{}'.format(
-            hashlib.sha1(self.org.slug).hexdigest()[0:6]
+            hashlib.sha1(self.org.slug.encode('utf-8')).hexdigest()[0:6]
         )
 
     def test_internal_slug_on_update(self):
@@ -41,7 +41,7 @@ class SentryAppTest(TestCase):
         self.sentry_app.save()
 
         assert self.sentry_app.slug == u'nulldb-{}'.format(
-            hashlib.sha1(self.org.slug).hexdigest()[0:6]
+            hashlib.sha1(self.org.slug.encode('utf-8')).hexdigest()[0:6]
         )
 
     def test_paranoid(self):
