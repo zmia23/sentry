@@ -4,9 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'react-emotion';
 
 import Count from 'app/components/count';
-import {Panel, PanelBody, PanelHeader, PanelItem} from 'app/components/panels';
-import Pills from 'app/components/pills';
-import Pill from 'app/components/pill';
+import {Panel, PanelBody, PanelItem} from 'app/components/panels';
 import ToolbarHeader from 'app/components/toolbarHeader';
 import {t} from 'app/locale';
 import SentryTypes from 'app/sentryTypes';
@@ -21,6 +19,7 @@ class EventStackExchange extends React.Component {
   constructor(...args) {
     super(...args);
     this.state = {
+      loading: true,
       questions: [],
     };
 
@@ -32,16 +31,12 @@ class EventStackExchange extends React.Component {
   }
 
   fetchData() {
-    this.props.api.request('/stackexchange/search/', {
+    this.props.api.request(`/stackexchange/search/?title=${this.props.event.title}`, {
       success: data => {
-        console.log(data.items);
         this.setState({
+          loading: false,
           questions: data.items,
         });
-      },
-      error: err => {
-        console.log('oh crap its broken');
-        console.log(err);
       },
     });
   }
@@ -81,11 +76,7 @@ class EventStackExchange extends React.Component {
           </div>
           <StyledTags>
             {question.tags.map(tag => (
-              <a
-                style={{cursor: 'default'}}
-                className="btn btn-default btn-sm"
-                key={tag}
-              >
+              <a style={{cursor: 'default'}} className="btn btn-default btn-sm" key={tag}>
                 {tag}
               </a>
             ))}
