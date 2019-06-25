@@ -11,48 +11,48 @@ app:
         stacktrace*
           frame*
             function*
-              u'_main'
+              '_main'
           frame (non app frame)
             function*
-              u'std::rt::lang_start'
+              'std::rt::lang_start'
           frame (non app frame)
             function*
-              u'std::rt::lang_start_internal'
+              'std::rt::lang_start_internal'
           frame*
             function*
-              u'___rust_maybe_catch_panic'
+              '___rust_maybe_catch_panic'
           frame (non app frame)
             function*
-              u'std::panicking::try::do_call'
+              'std::panicking::try::do_call'
           frame (non app frame)
             function*
-              u'std::rt::lang_start::{{closure}}'
+              'std::rt::lang_start::{{closure}}'
           frame*
             function*
-              u'log_demo::main'
+              'log_demo::main'
           frame*
             function*
-              u'log::__private_api_log'
+              'log::__private_api_log'
           frame (non app frame)
             function*
-              u'<sentry::integrations::log::Logger as log::Log>::log'
+              '<sentry::integrations::log::Logger as log::Log>::log'
           frame (non app frame)
             function*
-              u'sentry::hub::Hub::with_active'
+              'sentry::hub::Hub::with_active'
           frame (non app frame)
             function*
-              u'sentry::hub::Hub::with'
+              'sentry::hub::Hub::with'
           frame (non app frame)
             function*
-              u'sentry::hub::Hub::with_active::{{closure}}'
+              'sentry::hub::Hub::with_active::{{closure}}'
           frame (non app frame)
             function (ignored unknown function)
-              u'<unknown>'
+              '<unknown>'
           frame (non app frame)
             function (ignored unknown function)
-              u'<redacted>'
+              '<redacted>'
         type (ignored because exception is synthetic)
-          u'log_demo'
+          'log_demo'
 --------------------------------------------------------------------------
 system:
   hash: '06f8f02638bc75df5a5c88712055ee5f'
@@ -62,45 +62,45 @@ system:
         stacktrace*
           frame*
             function*
-              u'_main'
+              '_main'
           frame*
             function*
-              u'std::rt::lang_start'
+              'std::rt::lang_start'
           frame*
             function*
-              u'std::rt::lang_start_internal'
+              'std::rt::lang_start_internal'
           frame*
             function*
-              u'___rust_maybe_catch_panic'
+              '___rust_maybe_catch_panic'
           frame*
             function*
-              u'std::panicking::try::do_call'
+              'std::panicking::try::do_call'
           frame*
             function*
-              u'std::rt::lang_start::{{closure}}'
+              'std::rt::lang_start::{{closure}}'
           frame*
             function*
-              u'log_demo::main'
+              'log_demo::main'
           frame*
             function*
-              u'log::__private_api_log'
+              'log::__private_api_log'
           frame*
             function*
-              u'<sentry::integrations::log::Logger as log::Log>::log'
+              '<sentry::integrations::log::Logger as log::Log>::log'
           frame*
             function*
-              u'sentry::hub::Hub::with_active'
+              'sentry::hub::Hub::with_active'
           frame*
             function*
-              u'sentry::hub::Hub::with'
+              'sentry::hub::Hub::with'
           frame*
             function*
-              u'sentry::hub::Hub::with_active::{{closure}}'
+              'sentry::hub::Hub::with_active::{{closure}}'
           frame
             function (ignored unknown function)
-              u'<unknown>'
+              '<unknown>'
           frame
             function (ignored unknown function)
-              u'<redacted>'
+              '<redacted>'
         type (ignored because exception is synthetic)
-          u'log_demo'
+          'log_demo'

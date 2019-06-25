@@ -9,6 +9,6 @@ default:
     default*
       template*
         filename*
-          u'foo.html'
+          'foo.html'
         context-line*
-          u'hello world'
+          'hello world'

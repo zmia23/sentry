@@ -8,4 +8,4 @@ default:
   component:
     default*
       message*
-        u'Hello there %s!'
+        'Hello there %s!'

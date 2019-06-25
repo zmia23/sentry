@@ -8,4 +8,4 @@ default:
   component:
     default*
       message*
-        u'event'
+        'event'

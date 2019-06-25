@@ -10,12 +10,12 @@ app:
       stacktrace*
         frame*
           filename*
-            u'foo.py'
+            'foo.py'
           lineno*
             1
         frame (non app frame)
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1
 --------------------------------------------------------------------------
@@ -26,11 +26,11 @@ system:
       stacktrace*
         frame*
           filename*
-            u'foo.py'
+            'foo.py'
           lineno*
             1
         frame*
           filename*
-            u'bar.py'
+            'bar.py'
           lineno*
             1

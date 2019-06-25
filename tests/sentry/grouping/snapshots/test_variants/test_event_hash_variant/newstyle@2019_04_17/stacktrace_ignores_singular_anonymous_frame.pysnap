@@ -10,17 +10,17 @@ app:
       stacktrace
         frame (non app frame)
           filename (anonymous filename discarded)
-            u'<anonymous>'
+            '<anonymous>'
         frame (non app frame)
           filename (ignored because frame points to a URL)
-            u'dojo.js'
+            'dojo.js'
           function*
-            u'c'
+            'c'
         frame (non app frame)
           filename (ignored because frame points to a URL)
-            u'dojo.js'
+            'dojo.js'
           function*
-            u'Object._createDocumentViewModel'
+            'Object._createDocumentViewModel'
 --------------------------------------------------------------------------
 system:
   hash: 'e61225523929cf925f6ac3b1f7f26d85'
@@ -29,14 +29,14 @@ system:
       stacktrace*
         frame
           filename (anonymous filename discarded)
-            u'<anonymous>'
+            '<anonymous>'
         frame*
           filename (ignored because frame points to a URL)
-            u'dojo.js'
+            'dojo.js'
           function*
-            u'c'
+            'c'
         frame*
           filename (ignored because frame points to a URL)
-            u'dojo.js'
+            'dojo.js'
           function*
-            u'Object._createDocumentViewModel'
+            'Object._createDocumentViewModel'

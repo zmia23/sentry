@@ -10,9 +10,9 @@ app:
       stacktrace
         frame (non app frame)
           module*
-            u'foo'
+            'foo'
           filename (module takes precedence)
-            u'foo.py'
+            'foo.py'
 --------------------------------------------------------------------------
 system:
   hash: 'acbd18db4cc2f85cedef654fccc4a4d8'
@@ -21,6 +21,6 @@ system:
       stacktrace*
         frame*
           module*
-            u'foo'
+            'foo'
           filename (module takes precedence)
-            u'foo.py'
+            'foo.py'

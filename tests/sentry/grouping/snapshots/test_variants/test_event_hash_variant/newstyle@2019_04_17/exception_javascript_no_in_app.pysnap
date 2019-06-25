@@ -11,18 +11,18 @@ app:
         stacktrace
           frame (non app frame)
             module*
-              u'app/components/modals/createTeamModal'
+              'app/components/modals/createTeamModal'
             filename (module takes precedence)
-              u'createteammodal.jsx'
+              'createteammodal.jsx'
           frame (non app frame)
             module*
-              u'app/views/settings/components/forms/form'
+              'app/views/settings/components/forms/form'
             filename (module takes precedence)
-              u'form.jsx'
+              'form.jsx'
             function*
-              u'onError'
+              'onError'
         type*
-          u'TypeError'
+          'TypeError'
         value*
           u"Cannot read property 'submitError' of null"
 --------------------------------------------------------------------------
@@ -34,17 +34,17 @@ system:
         stacktrace*
           frame*
             module*
-              u'app/components/modals/createTeamModal'
+              'app/components/modals/createTeamModal'
             filename (module takes precedence)
-              u'createteammodal.jsx'
+              'createteammodal.jsx'
           frame*
             module*
-              u'app/views/settings/components/forms/form'
+              'app/views/settings/components/forms/form'
             filename (module takes precedence)
-              u'form.jsx'
+              'form.jsx'
             function*
-              u'onError'
+              'onError'
         type*
-          u'TypeError'
+          'TypeError'
         value (ignored because stacktrace takes precedence)
           u"Cannot read property 'submitError' of null"

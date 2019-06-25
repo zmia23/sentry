@@ -13,7 +13,7 @@ app:
             salt* (normalized generated module name)
               '<module>'
           function*
-            u'call'
+            'call'
 --------------------------------------------------------------------------
 system:
   hash: '5fd1358271b3a3dba3287e135029688d'
@@ -25,4 +25,4 @@ system:
             salt* (normalized generated module name)
               '<module>'
           function*
-            u'call'
+            'call'

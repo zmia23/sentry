@@ -11,4 +11,4 @@ default:
         salt* (a static salt)
           'hpkp'
         hostname*
-          u'example.com'
+          'example.com'

@@ -10,18 +10,18 @@ app:
       stacktrace
         frame (non app frame)
           filename (anonymous filename discarded)
-            u'<anonymous>'
+            '<anonymous>'
           function (ignored unknown function name)
         frame (non app frame)
           filename*
-            u'dojo.js'
+            'dojo.js'
           function*
-            u'c'
+            'c'
         frame (non app frame)
           filename*
-            u'dojo.js'
+            'dojo.js'
           function* (trimmed javascript function)
-            u'_createDocumentViewModel'
+            '_createDocumentViewModel'
 --------------------------------------------------------------------------
 system:
   hash: 'c5da56c71b31f34c5880d734cbc8f5bb'
@@ -30,15 +30,15 @@ system:
       stacktrace*
         frame (ignored low quality javascript frame)
           filename (anonymous filename discarded)
-            u'<anonymous>'
+            '<anonymous>'
           function (ignored unknown function name)
         frame*
           filename*
-            u'dojo.js'
+            'dojo.js'
           function*
-            u'c'
+            'c'
         frame*
           filename*
-            u'dojo.js'
+            'dojo.js'
           function* (trimmed javascript function)
-            u'_createDocumentViewModel'
+            '_createDocumentViewModel'

@@ -11,182 +11,182 @@ app:
         stacktrace
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'M'
+              'M'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'S/<'
+              'S/<'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'i'
+              'i'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'b'
+              'b'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'n'
+              'n'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'g/</t[e]'
+              'g/</t[e]'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'_invoke</<'
+              '_invoke</<'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'W'
+              'W'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/app'
+              'sentry/dist/app'
             filename (ignored because frame points to a URL)
-              u'app.js'
+              'app.js'
             function (ignored unknown function name)
-              u'e/<'
+              'e/<'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/app'
+              'sentry/dist/app'
             filename (ignored because frame points to a URL)
-              u'app.js'
+              'app.js'
             function (ignored unknown function name)
-              u'e/</a</<'
+              'e/</a</<'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'exports/<'
+              'exports/<'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'L'
+              'L'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'exports/</<'
+              'exports/</<'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'c'
+              'c'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'n'
+              'n'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'g/</t[e]'
+              'g/</t[e]'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'_invoke</<'
+              '_invoke</<'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'W'
+              'W'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/app'
+              'sentry/dist/app'
             filename (ignored because frame points to a URL)
-              u'app.js'
+              'app.js'
             function (ignored unknown function name)
-              u'e/<'
+              'e/<'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/app'
+              'sentry/dist/app'
             filename (ignored because frame points to a URL)
-              u'app.js'
+              'app.js'
             function*
-              u'componentPromise'
+              'componentPromise'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/app'
+              'sentry/dist/app'
             filename (ignored because frame points to a URL)
-              u'app.js'
+              'app.js'
             function* (trimmed javascript function)
-              u'e'
+              'e'
             context-line (discarded because line too long)
           frame (non app frame)
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'wrapTimeFunction/<'
+              'wrapTimeFunction/<'
             context-line (discarded because line too long)
         type*
-          u'NS_ERROR_NOT_INITIALIZED'
+          'NS_ERROR_NOT_INITIALIZED'
 --------------------------------------------------------------------------
 system:
   hash: 'dcfcd48a02c100bbe4023cbc783054f0'
@@ -196,179 +196,179 @@ system:
         stacktrace*
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'M'
+              'M'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'S/<'
+              'S/<'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'i'
+              'i'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'b'
+              'b'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'n'
+              'n'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'g/</t[e]'
+              'g/</t[e]'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'_invoke</<'
+              '_invoke</<'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'W'
+              'W'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/app'
+              'sentry/dist/app'
             filename (ignored because frame points to a URL)
-              u'app.js'
+              'app.js'
             function (ignored unknown function name)
-              u'e/<'
+              'e/<'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/app'
+              'sentry/dist/app'
             filename (ignored because frame points to a URL)
-              u'app.js'
+              'app.js'
             function (ignored unknown function name)
-              u'e/</a</<'
+              'e/</a</<'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'exports/<'
+              'exports/<'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'L'
+              'L'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'exports/</<'
+              'exports/</<'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'c'
+              'c'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'n'
+              'n'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'g/</t[e]'
+              'g/</t[e]'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'_invoke</<'
+              '_invoke</<'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function*
-              u'W'
+              'W'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/app'
+              'sentry/dist/app'
             filename (ignored because frame points to a URL)
-              u'app.js'
+              'app.js'
             function (ignored unknown function name)
-              u'e/<'
+              'e/<'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/app'
+              'sentry/dist/app'
             filename (ignored because frame points to a URL)
-              u'app.js'
+              'app.js'
             function*
-              u'componentPromise'
+              'componentPromise'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/app'
+              'sentry/dist/app'
             filename (ignored because frame points to a URL)
-              u'app.js'
+              'app.js'
             function* (trimmed javascript function)
-              u'e'
+              'e'
             context-line (discarded because line too long)
           frame*
             module*
-              u'sentry/dist/vendor'
+              'sentry/dist/vendor'
             filename (ignored because frame points to a URL)
-              u'vendor.js'
+              'vendor.js'
             function (ignored unknown function name)
-              u'wrapTimeFunction/<'
+              'wrapTimeFunction/<'
             context-line (discarded because line too long)
         type*
-          u'NS_ERROR_NOT_INITIALIZED'
+          'NS_ERROR_NOT_INITIALIZED'

@@ -10,9 +10,9 @@ app:
       stacktrace (ignored because hash matches system variant)
         frame* (frame considered in-app because no frame is in-app)
           module*
-            u'libfoo'
+            'libfoo'
           function*
-            u'main'
+            'main'
 --------------------------------------------------------------------------
 system:
   hash: 'a972f399399f5566f39b14a7afdd24ff'
@@ -21,6 +21,6 @@ system:
       stacktrace*
         frame*
           module*
-            u'libfoo'
+            'libfoo'
           function*
-            u'main'
+            'main'

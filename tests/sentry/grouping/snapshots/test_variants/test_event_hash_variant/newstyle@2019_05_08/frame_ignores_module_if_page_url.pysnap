@@ -10,9 +10,9 @@ app:
       stacktrace
         frame (non app frame)
           module*
-            u'foo/bar/baz'
+            'foo/bar/baz'
           filename (ignored because frame points to a URL)
-            u'foo.py'
+            'foo.py'
           function (ignored unknown function name)
 --------------------------------------------------------------------------
 system:
@@ -22,7 +22,7 @@ system:
       stacktrace*
         frame*
           module*
-            u'foo/bar/baz'
+            'foo/bar/baz'
           filename (ignored because frame points to a URL)
-            u'foo.py'
+            'foo.py'
           function (ignored unknown function name)

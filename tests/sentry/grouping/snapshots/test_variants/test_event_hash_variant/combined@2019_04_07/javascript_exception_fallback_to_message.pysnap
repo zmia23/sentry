@@ -9,9 +9,9 @@ app:
     app (exception of system takes precedence)
       exception (ignored because hash matches system variant)
         type*
-          u'Error'
+          'Error'
         value*
-          u'Loading chunk 158 failed.\n(timeout: https://s1.sentry-cdn.com/_static/34f8a6d11b9f52ebb4e5fd949650088f/sentry/dist/passwordStrength.js)'
+          'Loading chunk 158 failed.\n(timeout: https://s1.sentry-cdn.com/_static/34f8a6d11b9f52ebb4e5fd949650088f/sentry/dist/passwordStrength.js)'
 --------------------------------------------------------------------------
 system:
   hash: 'ad1efff799d4f9435077701aee66dde0'
@@ -19,6 +19,6 @@ system:
     system*
       exception*
         type*
-          u'Error'
+          'Error'
         value*
-          u'Loading chunk 158 failed.\n(timeout: https://s1.sentry-cdn.com/_static/34f8a6d11b9f52ebb4e5fd949650088f/sentry/dist/passwordStrength.js)'
+          'Loading chunk 158 failed.\n(timeout: https://s1.sentry-cdn.com/_static/34f8a6d11b9f52ebb4e5fd949650088f/sentry/dist/passwordStrength.js)'

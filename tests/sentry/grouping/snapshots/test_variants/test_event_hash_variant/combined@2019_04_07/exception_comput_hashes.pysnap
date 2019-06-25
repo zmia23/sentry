@@ -9,9 +9,9 @@ app:
     app (exception of system takes precedence)
       exception (ignored because hash matches system variant)
         type*
-          u'ValueError'
+          'ValueError'
         value*
-          u'hello world'
+          'hello world'
 --------------------------------------------------------------------------
 system:
   hash: 'b23ee1963904c2ca87b145febf94b66c'
@@ -19,6 +19,6 @@ system:
     system*
       exception*
         type*
-          u'ValueError'
+          'ValueError'
         value*
-          u'hello world'
+          'hello world'
