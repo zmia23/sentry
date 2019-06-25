@@ -103,7 +103,7 @@ app:
             filename (module takes precedence)
               'sentry_plugins/heroku/plugin.py'
             context-line*
-              u"        email = request.POST['user']"
+              "        email = request.POST['user']"
             function (function name is used only if module or filename are available)
               'handle'
             lineno (line number is used only if module or filename are available)
@@ -224,7 +224,7 @@ system:
             filename (module takes precedence)
               'sentry_plugins/heroku/plugin.py'
             context-line*
-              u"        email = request.POST['user']"
+              "        email = request.POST['user']"
             function (function name is used only if module or filename are available)
               'handle'
             lineno (line number is used only if module or filename are available)

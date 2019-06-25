@@ -162,7 +162,7 @@ app:
         type*
           'TypeError'
         value (ignored because stacktrace takes precedence)
-          u"undefined is not a function (evaluating '({}).invalidFunction()')"
+          "undefined is not a function (evaluating '({}).invalidFunction()')"
 --------------------------------------------------------------------------
 system:
   hash: '53f5eee7a48d6754dcc87aee2be66195'
@@ -323,4 +323,4 @@ system:
         type*
           'TypeError'
         value (ignored because stacktrace takes precedence)
-          u"undefined is not a function (evaluating '({}).invalidFunction()')"
+          "undefined is not a function (evaluating '({}).invalidFunction()')"

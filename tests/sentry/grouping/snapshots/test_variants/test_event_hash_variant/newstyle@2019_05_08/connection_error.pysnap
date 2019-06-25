@@ -71,7 +71,7 @@ app:
             function*
               'evalsha'
             context-line*
-              u"return self.execute_command('EVALSHA', sha, numkeys, *keys_and_args)"
+              "return self.execute_command('EVALSHA', sha, numkeys, *keys_and_args)"
           frame (non app frame)
             module*
               'redis.client'
@@ -111,7 +111,7 @@ app:
         type*
           'ConnectionError'
         value (ignored because stacktrace takes precedence)
-          u"Error while reading from socket: ('Connection closed by server.',)"
+          "Error while reading from socket: ('Connection closed by server.',)"
 --------------------------------------------------------------------------
 default:
   hash: None
@@ -188,7 +188,7 @@ system:
             function*
               'evalsha'
             context-line*
-              u"return self.execute_command('EVALSHA', sha, numkeys, *keys_and_args)"
+              "return self.execute_command('EVALSHA', sha, numkeys, *keys_and_args)"
           frame*
             module*
               'redis.client'
@@ -228,4 +228,4 @@ system:
         type*
           'ConnectionError'
         value (ignored because stacktrace takes precedence)
-          u"Error while reading from socket: ('Connection closed by server.',)"
+          "Error while reading from socket: ('Connection closed by server.',)"

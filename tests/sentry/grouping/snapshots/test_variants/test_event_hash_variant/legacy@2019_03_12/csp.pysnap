@@ -14,4 +14,4 @@ default:
         uri*
           'YYY'
       message (csp takes precedence)
-        u"Blocked 'script' from 'YYY'"
+        "Blocked 'script' from 'YYY'"

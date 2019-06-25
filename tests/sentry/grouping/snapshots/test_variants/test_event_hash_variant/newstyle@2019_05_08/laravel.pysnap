@@ -13,7 +13,7 @@ app:
             filename*
               'server.php'
             context-line*
-              u"require_once __DIR__.'/public/index.php';"
+              "require_once __DIR__.'/public/index.php';"
           frame*
             filename*
               'index.php'
@@ -349,14 +349,14 @@ app:
             function*
               'Illuminate\\Routing\\Route::runCallable'
             context-line*
-              u"$this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])"
+              "$this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])"
           frame*
             filename*
               'web.php'
             function*
               'Illuminate\\Routing\\RouteFileRegistrar::{closure}'
             context-line*
-              u"throw new Exception('LARAVEL TEST');"
+              "throw new Exception('LARAVEL TEST');"
         type*
           'Exception'
         value (ignored because stacktrace takes precedence)
@@ -372,7 +372,7 @@ system:
             filename*
               'server.php'
             context-line*
-              u"require_once __DIR__.'/public/index.php';"
+              "require_once __DIR__.'/public/index.php';"
           frame*
             filename*
               'index.php'
@@ -708,14 +708,14 @@ system:
             function*
               'Illuminate\\Routing\\Route::runCallable'
             context-line*
-              u"$this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])"
+              "$this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])"
           frame*
             filename*
               'web.php'
             function*
               'Illuminate\\Routing\\RouteFileRegistrar::{closure}'
             context-line*
-              u"throw new Exception('LARAVEL TEST');"
+              "throw new Exception('LARAVEL TEST');"
         type*
           'Exception'
         value (ignored because stacktrace takes precedence)

@@ -81,7 +81,7 @@ app:
             filename (module takes precedence)
               'redis/client.py'
             context-line*
-              u"        return self.execute_command('EVALSHA', sha, numkeys, *keys_and_args)"
+              "        return self.execute_command('EVALSHA', sha, numkeys, *keys_and_args)"
             function (function name is used only if module or filename are available)
               'evalsha'
             lineno (line number is used only if module or filename are available)
@@ -133,7 +133,7 @@ app:
         type*
           'ConnectionError'
         value (stacktrace and type take precedence)
-          u"Error while reading from socket: ('Connection closed by server.',)"
+          "Error while reading from socket: ('Connection closed by server.',)"
 --------------------------------------------------------------------------
 default:
   hash: None
@@ -220,7 +220,7 @@ system:
             filename (module takes precedence)
               'redis/client.py'
             context-line*
-              u"        return self.execute_command('EVALSHA', sha, numkeys, *keys_and_args)"
+              "        return self.execute_command('EVALSHA', sha, numkeys, *keys_and_args)"
             function (function name is used only if module or filename are available)
               'evalsha'
             lineno (line number is used only if module or filename are available)
@@ -272,4 +272,4 @@ system:
         type*
           'ConnectionError'
         value (stacktrace and type take precedence)
-          u"Error while reading from socket: ('Connection closed by server.',)"
+          "Error while reading from socket: ('Connection closed by server.',)"
