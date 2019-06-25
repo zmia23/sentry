@@ -200,7 +200,7 @@ class FeatureSet(object):
 
         items = [(self.aliases[label], thresholds.get(label, 0), ) for label in features]
 
-        return map(
+        return list(map(
             lambda key__scores: (
                 int(key__scores[0]),
                 dict(zip(features, key__scores[1])),
@@ -211,7 +211,7 @@ class FeatureSet(object):
                 items,
                 limit=limit,
             ),
-        )
+        ))
 
     def merge(self, destination, sources, allow_unsafe=False):
         def add_index_aliases_to_key(key):
