@@ -36,7 +36,7 @@ class Cursor(object):
         )
 
     def __bool__(self):
-        return self.has_results
+        return bool(self.has_results)
 
     @classmethod
     def from_string(cls, value):
