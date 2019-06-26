@@ -15,7 +15,7 @@ from django.db.models import Q
 
 from collections import defaultdict
 from six.moves import reduce
-from functools import reduce
+from functools32 import reduce
 
 PATH_SEPERATORS = frozenset(['/', '\\'])
 

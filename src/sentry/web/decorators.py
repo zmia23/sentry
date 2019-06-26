@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from functools import wraps
+from functools32 import wraps
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages

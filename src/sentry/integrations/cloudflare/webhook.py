@@ -5,7 +5,7 @@ import logging
 import six
 
 from django.utils.crypto import constant_time_compare
-from functools import wraps
+from functools32 import wraps
 from hashlib import sha256
 from rest_framework.response import Response
 

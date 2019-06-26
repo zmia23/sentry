@@ -8,7 +8,7 @@ sentry.web.frontend.accounts
 from __future__ import absolute_import
 
 import logging
-from functools import partial, update_wrapper
+from functools32 import partial, update_wrapper
 
 import six
 

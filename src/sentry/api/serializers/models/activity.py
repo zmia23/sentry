@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from builtins import zip
-import functools
+import functools32
 import six
 
 from sentry.api.serializers import Serializer, register, serialize
@@ -48,7 +48,7 @@ class ActivitySerializer(Serializer):
             pull_requests = {}
 
         groups = apply_values(
-            functools.partial(serialize, user=user),
+            functools32.partial(serialize, user=user),
             Group.objects.in_bulk(
                 set(
                     i.data['source_id'] for i in item_list if i.type == Activity.UNMERGE_DESTINATION

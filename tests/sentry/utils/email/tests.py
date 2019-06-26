@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from future import standard_library
 standard_library.install_aliases()
-import functools
+import functools32
 
 import pytest
 from django.core import mail
@@ -295,7 +295,7 @@ class MessageBuilderTest(TestCase):
         assert out.bcc == ['bar@example.com']
 
     def test_generates_list_ids_for_registered_types(self):
-        build_message = functools.partial(
+        build_message = functools32.partial(
             MessageBuilder,
             subject='Test',
             body='hello world',

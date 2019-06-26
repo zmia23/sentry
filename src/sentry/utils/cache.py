@@ -8,7 +8,7 @@ sentry.utils.cache
 from __future__ import absolute_import, print_function
 
 from builtins import object
-import functools
+import functools32
 
 from django.core.cache import cache
 
@@ -79,4 +79,4 @@ class cached_for_request(memoize):
         return data[key]
 
     def __get__(self, obj, type=None):
-        return functools.partial(self.__call__, obj)
+        return functools32.partial(self.__call__, obj)

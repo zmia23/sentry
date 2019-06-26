@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from datetime import timedelta
-import functools
+import functools32
 import logging
 from uuid import uuid4
 
@@ -231,7 +231,7 @@ class GroupDetailsEndpoint(GroupEndpoint, EnvironmentMixin):
         if last_release:
             last_release = self._get_release_info(request, group, last_release)
 
-        get_range = functools.partial(tsdb.get_range,
+        get_range = functools32.partial(tsdb.get_range,
                                       environment_ids=environment_ids)
 
         tags = tagstore.get_group_tag_keys(

@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from builtins import range
 from builtins import object
 from collections import OrderedDict
-from functools import partial
+from functools32 import partial
 import pytest
 import unittest
 

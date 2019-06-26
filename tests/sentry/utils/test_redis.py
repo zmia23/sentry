@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-import functools
+import functools32
 import logging
 import mock
 import pytest
@@ -14,7 +14,7 @@ from sentry.utils.redis import (
 # Silence connection warnings
 logger.setLevel(logging.ERROR)
 
-make_manager = functools.partial(
+make_manager = functools32.partial(
     ClusterManager,
     {
         'redis.clusters': {

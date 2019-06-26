@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from builtins import object
-import functools
+import functools32
 import logging
 import six
 import time
@@ -278,7 +278,7 @@ class EnvironmentMixin(object):
         environment was provided and exists, or the environment was not
         provided.)
         """
-        return functools.partial(
+        return functools32.partial(
             self._get_environment_from_request,
             request,
             organization_id,

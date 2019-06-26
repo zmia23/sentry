@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from builtins import map
 from builtins import next
 from builtins import range
-import functools
+import functools32
 import hashlib
 import itertools
 import logging
@@ -706,7 +706,7 @@ class UnmergeTestCase(TestCase):
             get_expected_series_values(
                 rollup_duration,
                 list(events.values())[0],
-                functools.partial(
+                functools32.partial(
                     collect_by_release,
                     source,
                 ),
@@ -719,7 +719,7 @@ class UnmergeTestCase(TestCase):
             get_expected_series_values(
                 rollup_duration,
                 list(events.values())[1],
-                functools.partial(
+                functools32.partial(
                     collect_by_release,
                     destination,
                 ),

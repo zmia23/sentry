@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from builtins import filter
 from builtins import map
-import functools
+import functools32
 
 from rest_framework.response import Response
 
@@ -22,7 +22,7 @@ class GroupSimilarIssuesEndpoint(GroupEndpoint):
         results = [group_id__scores for group_id__scores in features.compare(group, limit=limit) if group_id__scores[0] != group.id]
 
         serialized_groups = apply_values(
-            functools.partial(serialize, user=request.user),
+            functools32.partial(serialize, user=request.user),
             Group.objects.in_bulk([group_id for group_id, scores in results])
         )
 

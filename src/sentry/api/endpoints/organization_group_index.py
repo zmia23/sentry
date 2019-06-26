@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
 from builtins import map
-import functools
+import functools32
 import six
 
 from django.conf import settings
@@ -95,7 +95,7 @@ class OrganizationGroupIndexEndpoint(OrganizationEventsEndpointBase):
 
         environments = self.get_environments(request, organization)
 
-        serializer = functools.partial(
+        serializer = functools32.partial(
             StreamGroupSerializerSnuba,
             environment_ids=[env.id for env in environments],
             stats_period=stats_period,
@@ -265,7 +265,7 @@ class OrganizationGroupIndexEndpoint(OrganizationEventsEndpointBase):
                 'detail': 'You do not have the multi project stream feature enabled'
             }, status=400)
 
-        search_fn = functools.partial(
+        search_fn = functools32.partial(
             self._search, request, organization, projects,
             self.get_environments(request, organization),
         )
@@ -303,7 +303,7 @@ class OrganizationGroupIndexEndpoint(OrganizationEventsEndpointBase):
                 'detail': 'You do not have the multi project stream feature enabled'
             }, status=400)
 
-        search_fn = functools.partial(
+        search_fn = functools32.partial(
             self._search, request, organization, projects,
             self.get_environments(request, organization),
         )

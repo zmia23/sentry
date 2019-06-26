@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from builtins import map
 from builtins import zip
 from builtins import object
-import functools
+import functools32
 import itertools
 import logging
 
@@ -79,7 +79,7 @@ class FeatureSet(object):
             except Exception as error:
                 log = (
                     logger.debug if isinstance(error, self.expected_extraction_errors) else
-                    functools.partial(logger.warning, exc_info=True)
+                    functools32.partial(logger.warning, exc_info=True)
                 )
                 log(
                     'Could not extract features from %r for %r due to error: %r',
@@ -119,7 +119,7 @@ class FeatureSet(object):
                 except Exception as error:
                     log = (
                         logger.debug if isinstance(error, self.expected_encoding_errors) else
-                        functools.partial(logger.warning, exc_info=True)
+                        functools32.partial(logger.warning, exc_info=True)
                     )
                     log(
                         'Could not encode features from %r for %r due to error: %r',
@@ -163,7 +163,7 @@ class FeatureSet(object):
                 except Exception as error:
                     log = (
                         logger.debug if isinstance(error, self.expected_encoding_errors) else
-                        functools.partial(logger.warning, exc_info=True)
+                        functools32.partial(logger.warning, exc_info=True)
                     )
                     log(
                         'Could not encode features from %r for %r due to error: %r',

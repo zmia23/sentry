@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from builtins import filter
 from builtins import object
-import functools
+import functools32
 import logging
 import time
 from datetime import timedelta
@@ -235,10 +235,10 @@ class SnubaSearchBackend(SearchBackend):
                 ),
             ),
             'assigned_to': QCallbackCondition(
-                functools.partial(assigned_to_filter, projects=projects),
+                functools32.partial(assigned_to_filter, projects=projects),
             ),
             'unassigned': QCallbackCondition(
-                functools.partial(unassigned_filter, projects=projects),
+                functools32.partial(unassigned_filter, projects=projects),
             ),
             'subscribed_by': QCallbackCondition(
                 lambda user: Q(

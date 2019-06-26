@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import six
 import sys
 
-from functools import wraps
+from functools32 import wraps
 
 from .exceptions import TransactionAborted
 from .helpers import can_reconnect

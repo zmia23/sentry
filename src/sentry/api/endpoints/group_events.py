@@ -6,7 +6,7 @@ from datetime import timedelta
 from django.db.models import Q
 from django.utils import timezone
 from rest_framework.response import Response
-from functools import partial
+from functools32 import partial
 
 
 from sentry import features, options, quotas, tagstore

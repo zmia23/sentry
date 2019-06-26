@@ -7,7 +7,7 @@ from __future__ import print_function
 import os.path
 import re
 import sys
-from functools import reduce
+from functools32 import reduce
 from optparse import make_option
 
 from django.core.management.base import BaseCommand

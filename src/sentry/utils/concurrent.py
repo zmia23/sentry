@@ -111,7 +111,7 @@ class Executor(object):
 
     NOTE: This is *not* compatible with the ``concurrent.futures.Executor``
     API! Rather than ``submit`` accepting the function arguments, the function
-    must already have the argument values bound (via ``functools.partial`` or
+    must already have the argument values bound (via ``functools32.partial`` or
     similar), and ``submit`` passes all additional arguments to ``queue.put``
     to allow controlling whether or not queue insertion should be blocking.
     """

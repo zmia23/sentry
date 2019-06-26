@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import sys
-import functools
+import functools32
 
 from sentry.utils.strings import (
     is_valid_dot_atom, soft_break, soft_hyphenate,
@@ -44,7 +44,7 @@ def test_soft_break():
 
 
 def test_soft_break_and_hyphenate():
-    hyphenate = functools.partial(soft_hyphenate, length=6)
+    hyphenate = functools32.partial(soft_hyphenate, length=6)
     assert soft_break('com.reallyreallyreally.long.path', 6, hyphenate) == \
         ZWSP.join(['com.', SHY.join(['really'] * 3) + '.', 'long.', 'path'])
 

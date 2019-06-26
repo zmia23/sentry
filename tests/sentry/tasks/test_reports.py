@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from builtins import chr
 from builtins import range
-import functools
+import functools32
 from datetime import datetime, timedelta
 
 import mock
@@ -304,13 +304,13 @@ class ReportTestCase(TestCase):
         user = self.user
         organization = self.organization
 
-        set_option_value = functools.partial(
+        set_option_value = functools32.partial(
             UserOption.objects.set_value,
             user,
             DISABLED_ORGANIZATIONS_USER_OPTION_KEY,
         )
 
-        deliver_report = functools.partial(
+        deliver_report = functools32.partial(
             deliver_organization_user_report,
             0,
             60 * 60 * 24 * 7,
@@ -328,7 +328,7 @@ class ReportTestCase(TestCase):
         user = self.user
         organization = self.organization
 
-        set_option_value = functools.partial(
+        set_option_value = functools32.partial(
             UserOption.objects.set_value,
             user,
             DISABLED_ORGANIZATIONS_USER_OPTION_KEY,

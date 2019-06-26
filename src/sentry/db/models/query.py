@@ -18,7 +18,7 @@ from django.db.models.signals import post_save
 from six.moves import reduce
 
 from .utils import resolve_combined_expression
-from functools import reduce
+from functools32 import reduce
 
 __all__ = ('update', 'create_or_update')
 

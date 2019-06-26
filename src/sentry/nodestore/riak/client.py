@@ -11,7 +11,7 @@ from __future__ import absolute_import
 from builtins import map
 from builtins import range
 from builtins import object
-import functools
+import functools32
 import six
 import sys
 import socket
@@ -151,7 +151,7 @@ class RiakClient(object):
                     {
                         'headers': headers
                     },  # kwargs
-                    functools.partial(
+                    functools32.partial(
                         callback,
                         key,
                         event,
