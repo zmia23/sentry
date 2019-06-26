@@ -219,7 +219,8 @@ class Endpoint(APIView):
             [
                 self.build_cursor_link(
                     request, 'previous', cursor_result.prev),
-                self.build_cursor_link(request, 'next', cursor_result.__next__),
+                # XXX(python3): AttributeError: 'CursorResult' object has no attribute '__next__'
+                self.build_cursor_link(request, 'next', cursor_result.next),
             ]
         )
 
