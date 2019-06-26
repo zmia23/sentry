@@ -558,6 +558,7 @@ def _load_configs():
     base = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'enhancement-configs')
     for fn in os.listdir(base):
         if fn.endswith('.txt'):
+            from io import open
             with open(os.path.join(base, fn), encoding='utf-8') as f:
                 # We cannot use `:` in filenames on Windows but we already have ids with
                 # `:` in their names hence this trickery.
