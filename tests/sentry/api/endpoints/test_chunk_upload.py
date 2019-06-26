@@ -77,8 +77,8 @@ class ChunkUploadTest(APITestCase):
         assert response.status_code == 403, response.content
 
     def test_upload(self):
-        string1 = '1 this is my testString'
-        string2 = '2 this is my testString'
+        string1 = '1 this is my testString'.encode('ascii')
+        string2 = '2 this is my testString'.encode('ascii')
 
         checksum1 = sha1(string1).hexdigest()
         checksum2 = sha1(string2).hexdigest()
@@ -108,7 +108,7 @@ class ChunkUploadTest(APITestCase):
 
         # Exactly the limit
         for x in range(0, MAX_CHUNKS_PER_REQUEST + 1):
-            content = "x"
+            content = "x".encode('ascii')
             files.append(SimpleUploadedFile(sha1(content).hexdigest(), content))
 
         response = self.client.post(
@@ -128,6 +128,7 @@ class ChunkUploadTest(APITestCase):
         # Exactly the limit
         for x in range(0, MAX_CHUNKS_PER_REQUEST):
             content = "x" * (old_div(MAX_REQUEST_SIZE, MAX_CHUNKS_PER_REQUEST))
+            content = content.encode('ascii')
             files.append(SimpleUploadedFile(sha1(content).hexdigest(), content))
 
         response = self.client.post(
@@ -142,7 +143,8 @@ class ChunkUploadTest(APITestCase):
         assert response.status_code == 200, response.content
 
         # We overflow the request here
-        files.append(SimpleUploadedFile(sha1('content').hexdigest(), 'content'))
+        content = 'content'.encode('ascii')
+        files.append(SimpleUploadedFile(sha1(content).hexdigest(), content))
         response = self.client.post(
             self.url,
             data={
@@ -156,6 +158,7 @@ class ChunkUploadTest(APITestCase):
     def test_too_large_chunk(self):
         files = []
         content = "x" * (CHUNK_UPLOAD_BLOB_SIZE + 1)
+        content = content.encode('ascii')
         files.append(SimpleUploadedFile(sha1(content).hexdigest(), content))
 
         response = self.client.post(
@@ -172,6 +175,7 @@ class ChunkUploadTest(APITestCase):
     def test_checksum_missmatch(self):
         files = []
         content = "x" * (CHUNK_UPLOAD_BLOB_SIZE + 1)
+        content = content.encode('ascii')
         files.append(SimpleUploadedFile('wrong checksum', content))
 
         response = self.client.post(
