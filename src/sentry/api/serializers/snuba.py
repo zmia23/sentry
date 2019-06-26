@@ -5,7 +5,7 @@ from builtins import object
 from past.utils import old_div
 import six
 import itertools
-from functools32 import reduce, partial
+from functools import reduce, partial
 from operator import or_
 
 from django.db.models import Q

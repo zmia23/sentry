@@ -8,7 +8,7 @@ sentry.interfaces.schemas
 
 from __future__ import absolute_import
 
-from functools32 import lru_cache
+from functools import lru_cache
 from itertools import groupby
 import jsonschema
 import six

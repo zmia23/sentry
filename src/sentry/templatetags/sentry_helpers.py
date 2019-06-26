@@ -10,7 +10,7 @@ from __future__ import division
 
 from builtins import range
 from past.utils import old_div
-import functools32
+import functools
 import os.path
 from collections import namedtuple
 from datetime import timedelta
@@ -324,7 +324,7 @@ def soft_break(value, length):
     return _soft_break(
         value,
         length,
-        functools32.partial(soft_hyphenate, length=max(length // 10, 10)),
+        functools.partial(soft_hyphenate, length=max(length // 10, 10)),
     )
 
 

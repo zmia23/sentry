@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from builtins import next
 import re
 import six
-from functools32 import partial
+from functools import partial
 from copy import deepcopy
 
 from rest_framework import serializers

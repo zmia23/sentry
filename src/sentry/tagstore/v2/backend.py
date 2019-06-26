@@ -29,7 +29,7 @@ from sentry.utils import db
 from . import models
 from sentry.tagstore.types import TagKey, TagValue, GroupTagKey, GroupTagValue
 from sentry.tasks.post_process import index_event_tags
-from functools32 import reduce
+from functools import reduce
 
 
 logger = logging.getLogger('sentry.tagstore.v2')

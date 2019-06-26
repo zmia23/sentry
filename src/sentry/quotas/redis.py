@@ -10,7 +10,7 @@ from __future__ import absolute_import
 from builtins import zip
 from builtins import map
 from builtins import object
-import functools32
+import functools
 import six
 
 from time import time
@@ -123,7 +123,7 @@ class RedisQuota(Quota):
 
         with self.cluster.fanout() as client:
             results = list(map(
-                functools32.partial(
+                functools.partial(
                     get_usage_for_quota,
                     client.target_key(
                         six.text_type(organization_id),

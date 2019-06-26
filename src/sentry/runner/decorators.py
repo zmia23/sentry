@@ -23,7 +23,7 @@ class CaseInsensitiveChoice(Choice):
 def configuration(f):
     "Load and configure Sentry."
     import click
-    from functools32 import update_wrapper
+    from functools import update_wrapper
 
     @click.pass_context
     def inner(ctx, *args, **kwargs):
@@ -45,7 +45,7 @@ def log_options(default=None):
         Must be used before configuration.
         """
         import click
-        from functools32 import update_wrapper
+        from functools import update_wrapper
         from sentry.logging import LoggingFormat
         formats = [LoggingFormat.HUMAN, LoggingFormat.MACHINE]
 

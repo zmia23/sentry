@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from builtins import object
-import functools32
+import functools
 import inspect
 import itertools
 import logging
@@ -378,7 +378,7 @@ class ServiceDelegator(Service):
                         exc_info=True)
                 else:
                     results[i] = executor.submit(
-                        functools32.partial(
+                        functools.partial(
                             call_backend_method,
                             context.copy(),
                             backend,
@@ -393,7 +393,7 @@ class ServiceDelegator(Service):
             # since we already ensured that the primary backend exists.)
             backend, executor = self.__backends[selected_backend_names[0]]
             results[0] = executor.submit(
-                functools32.partial(
+                functools.partial(
                     call_backend_method,
                     context.copy(),
                     backend,

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from builtins import next
 from builtins import range
-import functools32
+import functools
 import itertools
 
 from sentry.models import (
@@ -191,7 +191,7 @@ class GetParticipantsTest(TestCase):
                 key='workflow:notifications',
             ).delete()
 
-        get_participants = functools32.partial(
+        get_participants = functools.partial(
             GroupSubscription.objects.get_participants,
             group,
         )
@@ -317,7 +317,7 @@ class GetParticipantsTest(TestCase):
                 key='workflow:notifications',
             ).delete()
 
-        get_participants = functools32.partial(
+        get_participants = functools.partial(
             GroupSubscription.objects.get_participants,
             group,
         )

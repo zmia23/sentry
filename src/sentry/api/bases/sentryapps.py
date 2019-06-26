@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from django.http import Http404
-from functools32 import wraps
+from functools import wraps
 
 from sentry.utils.sdk import configure_scope
 from sentry.api.authentication import ClientIdSecretAuthentication

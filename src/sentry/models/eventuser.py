@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from builtins import object
 from collections import OrderedDict
-from functools32 import reduce
+from functools import reduce
 from operator import or_
 
 from django.db import models

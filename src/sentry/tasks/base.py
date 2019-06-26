@@ -11,7 +11,7 @@ import resource
 
 from celery.task import current
 from contextlib import contextmanager
-from functools32 import wraps
+from functools import wraps
 
 from sentry.celery import app
 from sentry.utils import metrics

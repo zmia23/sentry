@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from functools32 import wraps
+from functools import wraps
 
 from sentry.api.exceptions import SudoRequired
 from sentry.models import ApiKey, ApiToken

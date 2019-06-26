@@ -19,7 +19,7 @@ import tempfile
 import time
 
 from email.utils import parseaddr
-from functools32 import partial
+from functools import partial
 from operator import attrgetter
 from random import randrange
 

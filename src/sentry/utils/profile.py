@@ -5,7 +5,7 @@ import time
 
 from cProfile import Profile
 from pstats import Stats
-from functools32 import update_wrapper
+from functools import update_wrapper
 
 
 def profile_call(_func, *args, **kwargs):

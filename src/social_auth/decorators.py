@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from functools32 import wraps
+from functools import wraps
 
 from django.core.urlresolvers import reverse
 

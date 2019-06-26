@@ -11,7 +11,7 @@ from django.utils import timezone
 from sentry.db.models import Model, sane_repr
 from sentry.db.models.fields import FlexibleForeignKey, JSONField
 from sentry.ownership.grammar import load_schema
-from functools32 import reduce
+from functools import reduce
 
 
 class ProjectOwnership(Model):

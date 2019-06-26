@@ -5,7 +5,7 @@ __all__ = ['timing', 'incr']
 
 import logging
 
-import functools32
+import functools
 from contextlib import contextmanager
 from django.conf import settings
 from random import random
@@ -132,7 +132,7 @@ def timer(key, instance=None, tags=None, sample_rate=settings.SENTRY_METRICS_SAM
 
 def wraps(key, instance=None, tags=None):
     def wrapper(f):
-        @functools32.wraps(f)
+        @functools.wraps(f)
         def inner(*args, **kwargs):
             with timer(key, instance=instance, tags=tags):
                 return f(*args, **kwargs)

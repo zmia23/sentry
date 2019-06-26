@@ -7,7 +7,7 @@ sentry.web.frontend.admin
 """
 from __future__ import absolute_import, print_function
 
-import functools32
+import functools
 import logging
 import sys
 import uuid
@@ -224,7 +224,7 @@ def status_warnings(request):
         else:
             warnings.append(warning)
 
-    sort_by_message = functools32.partial(sorted, key=six.binary_type)
+    sort_by_message = functools.partial(sorted, key=six.binary_type)
 
     return render_to_response(
         'sentry/admin/status/warnings.html',

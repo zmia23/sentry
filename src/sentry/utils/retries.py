@@ -7,7 +7,7 @@ import itertools
 import logging
 import random
 import time
-import functools32
+import functools
 
 from django.utils.encoding import force_bytes
 
@@ -44,9 +44,9 @@ class RetryPolicy(object):
         retrier = cls(*args, **kwargs)
 
         def decorator(fn):
-            @functools32.wraps(fn)
+            @functools.wraps(fn)
             def execute_with_retry(*args, **kwargs):
-                return retrier(functools32.partial(fn, *args, **kwargs))
+                return retrier(functools.partial(fn, *args, **kwargs))
 
             return execute_with_retry
         return decorator

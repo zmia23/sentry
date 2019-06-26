@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-import functools32
+import functools
 import sys
 
 from django.core.urlresolvers import reverse
@@ -48,7 +48,7 @@ class OrganizationStatsTest(APITestCase):
             teams=[self.create_team(organization=org, members=[self.user])],
         )
 
-        make_request = functools32.partial(
+        make_request = functools.partial(
             self.client.get,
             reverse('sentry-api-0-organization-stats', args=[org.slug]),
         )
@@ -79,7 +79,7 @@ class OrganizationStatsTest(APITestCase):
             teams=[self.create_team(organization=org, members=[self.user])],
         )
 
-        make_request = functools32.partial(
+        make_request = functools.partial(
             self.client.get,
             reverse('sentry-api-0-organization-stats', args=[org.slug]),
         )

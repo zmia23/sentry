@@ -10,7 +10,7 @@ from django.db.models import Q
 from six.moves import input
 
 from sentry.models import Organization, OrganizationMember, User
-from functools32 import reduce
+from functools import reduce
 
 
 class Command(BaseCommand):

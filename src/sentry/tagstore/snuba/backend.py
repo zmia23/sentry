@@ -8,7 +8,7 @@ sentry.tagstore.snuba.backend
 
 from __future__ import absolute_import
 
-import functools32
+import functools
 from collections import defaultdict, Iterable
 from datetime import timedelta
 from dateutil.parser import parse as parse_datetime
@@ -142,8 +142,8 @@ class SnubaTagStorage(TagStorage):
                 key_ctor = TagKey
                 value_ctor = TagValue
             else:
-                key_ctor = functools32.partial(GroupTagKey, group_id=group_id)
-                value_ctor = functools32.partial(GroupTagValue, group_id=group_id)
+                key_ctor = functools.partial(GroupTagKey, group_id=group_id)
+                value_ctor = functools.partial(GroupTagValue, group_id=group_id)
 
             top_values = [
                 value_ctor(
@@ -211,7 +211,7 @@ class SnubaTagStorage(TagStorage):
         if group_id is None:
             ctor = TagKey
         else:
-            ctor = functools32.partial(GroupTagKey, group_id=group_id)
+            ctor = functools.partial(GroupTagKey, group_id=group_id)
 
         results = set()
         for key, data in six.iteritems(result):
@@ -437,7 +437,7 @@ class SnubaTagStorage(TagStorage):
         if group_id is None:
             value_ctor = TagValue
         else:
-            value_ctor = functools32.partial(GroupTagValue, group_id=group_id)
+            value_ctor = functools.partial(GroupTagValue, group_id=group_id)
 
         for keyobj in keys_with_counts:
             key = keyobj.key

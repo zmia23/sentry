@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from builtins import object
-import functools32
+import functools
 import itertools
 import logging
 import six
@@ -22,7 +22,7 @@ from sentry.models import (
     Rule,
 )
 from sentry.utils.dates import to_timestamp
-from functools32 import reduce
+from functools import reduce
 
 logger = logging.getLogger('sentry.digests')
 
@@ -220,7 +220,7 @@ def build_digest(project, records, state=None):
         return record.value.event.group.get_status() == GroupStatus.UNRESOLVED
 
     pipeline = Pipeline(). \
-        map(functools32.partial(rewrite_record, **state)). \
+        map(functools.partial(rewrite_record, **state)). \
         filter(bool). \
         filter(check_group_state). \
         reduce(group_records, lambda sequence: defaultdict(lambda: defaultdict(list))). \

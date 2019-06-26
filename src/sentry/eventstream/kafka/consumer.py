@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from builtins import object
-import functools32
+import functools
 import logging
 import threading
 import uuid
@@ -187,7 +187,7 @@ class SynchronizedConsumer(object):
         stop_request_event = threading.Event()
         start_event = threading.Event()
         result = execute(
-            functools32.partial(
+            functools.partial(
                 run_commit_log_consumer,
                 bootstrap_servers=self.bootstrap_servers,
                 consumer_group='{}:sync:{}'.format(self.consumer_group, uuid.uuid1().hex),

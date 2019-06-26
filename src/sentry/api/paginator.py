@@ -11,7 +11,7 @@ from builtins import map
 from builtins import zip
 from builtins import object
 import bisect
-import functools32
+import functools
 import math
 
 from datetime import datetime
@@ -300,7 +300,7 @@ class SequencePaginator(object):
             list(zip(*sorted(data, reverse=reverse))),
         )) if data else ([], [])
         self.reverse = reverse
-        self.search = functools32.partial(
+        self.search = functools.partial(
             reverse_bisect_left if reverse else bisect.bisect_left,
             self.scores,
         )

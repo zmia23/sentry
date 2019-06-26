@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from datetime import timedelta
 from django.utils import timezone
-from functools32 import partial
+from functools import partial
 
 from sentry import options
 from sentry.api.base import DocSection

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from builtins import map
 from builtins import object
-import functools32
+import functools
 import logging
 import posixpath
 import six
@@ -46,7 +46,7 @@ def _shared_pool(**opts):
         return pool
 
 
-_make_rb_cluster = functools32.partial(rb.Cluster, pool_cls=_shared_pool)
+_make_rb_cluster = functools.partial(rb.Cluster, pool_cls=_shared_pool)
 
 
 def make_rb_cluster(*args, **kwargs):

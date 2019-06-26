@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function
 
-import functools32
+import functools
 
 import six
 from rest_framework.response import Response
@@ -133,7 +133,7 @@ class ProjectGroupIndexEndpoint(ProjectEndpoint, EnvironmentMixin):
             # disable stats
             stats_period = None
 
-        serializer = functools32.partial(
+        serializer = functools.partial(
             StreamGroupSerializer,
             environment_func=self._get_environment_func(request, project.organization_id),
             stats_period=stats_period,
@@ -270,7 +270,7 @@ class ProjectGroupIndexEndpoint(ProjectEndpoint, EnvironmentMixin):
         :auth: required
         """
 
-        search_fn = functools32.partial(self._search, request, project)
+        search_fn = functools.partial(self._search, request, project)
         return update_groups(
             request,
             [project],
@@ -300,7 +300,7 @@ class ProjectGroupIndexEndpoint(ProjectEndpoint, EnvironmentMixin):
                                      belong to.
         :auth: required
         """
-        search_fn = functools32.partial(self._search, request, project)
+        search_fn = functools.partial(self._search, request, project)
         return delete_groups(
             request,
             [project],

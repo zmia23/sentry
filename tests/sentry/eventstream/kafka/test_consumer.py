@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from builtins import range
-import functools32
+import functools
 import os
 import subprocess
 import uuid
@@ -41,7 +41,7 @@ def create_topic(partitions=1, replication_factor=1):
 
 
 def requires_kafka(function):
-    @functools32.wraps(function)
+    @functools.wraps(function)
     def wrapper(*args, **kwargs):
         if not has_kafka_client:
             return pytest.xfail('test requires confluent_kafka which is not installed')
