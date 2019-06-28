@@ -45,6 +45,21 @@ SCHEMA = {
             },
         },
 
+        'componentset': {
+            'type': 'array',
+            'minItems': 1,
+            'items': {
+                'anyOf': [
+                    {'$ref': '#/definitions/header'},
+                    {'$ref': '#/definitions/markdown'},
+                    {'$ref': '#/definitions/image'},
+                    {'$ref': '#/definitions/video'},
+                    {'$ref': '#/definitions/panel'},
+                    {'$ref': '#/definitions/string'},
+                ],
+            },
+        },
+
         # Form Components
 
         'select': {
@@ -181,6 +196,51 @@ SCHEMA = {
             'required': ['type', 'text'],
         },
 
+        'panel': {
+            'type': 'object',
+            'properties': {
+                'type': {
+                    'type': 'string',
+                    'enum': ['panel'],
+                },
+                'name': {
+                    'type': 'string',
+                },
+                'headers': {
+                    'type': 'array',
+                    'minItems': 1,
+                    'items': {
+                        '$ref': '#/definitions/header',
+                    },
+                },
+                'body': {
+                    'type': 'array',
+                    'minItems': 1,
+                    'items': {
+                        '$ref': '#/definitions/componentset',
+                    },
+                },
+            },
+            'required': ['type', 'name', 'headers', 'body'],
+        },
+
+        'string': {
+            'type': 'object',
+            'properties': {
+                'type': {
+                    'type': 'string',
+                    'enum': ['string'],
+                },
+                'name': {
+                    'type': 'string',
+                },
+                'text': {
+                    'type': 'string',
+                },
+            },
+            'required': ['type', 'name', 'text'],
+        },
+
         # Feature Components
 
         'issue-link': {
@@ -254,16 +314,7 @@ SCHEMA = {
                     'type': 'string',
                 },
                 'elements': {
-                    'type': 'array',
-                    'minItems': 1,
-                    'items': {
-                        'anyOf': [
-                            {'$ref': '#/definitions/header'},
-                            {'$ref': '#/definitions/markdown'},
-                            {'$ref': '#/definitions/image'},
-                            {'$ref': '#/definitions/video'},
-                        ],
-                    },
+                    '$ref': '#/definitions/componentset',
                 },
             },
             'required': ['type', 'title', 'elements'],
@@ -282,6 +333,21 @@ SCHEMA = {
             },
             'required': ['type', 'uri']
         },
+
+        'info-pane': {
+            'type': 'object',
+            'properties': {
+                'type': {
+                    'type': 'string',
+                    'enum': ['info-pane'],
+                },
+                'title': {'$ref': '#/definitions/header'},
+                'elements': {
+                    '$ref': '#/definitions/componentset',
+                },
+            },
+            'required': ['type', 'title'],
+        },
     },
 
     'properties': {
@@ -294,6 +360,7 @@ SCHEMA = {
                     {'$ref': '#/definitions/alert-rule-action'},
                     {'$ref': '#/definitions/issue-media'},
                     {'$ref': '#/definitions/stacktrace-link'},
+                    {'$ref': '#/definitions/info-pane'},
                 ],
             },
         },
