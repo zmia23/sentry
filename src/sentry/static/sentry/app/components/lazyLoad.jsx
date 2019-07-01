@@ -26,12 +26,14 @@ class LazyLoad extends React.Component {
     }),
   };
 
-  getComponentGetter = () => this.props.component || this.props.route.componentPromise;
+  get componentFactory() {
+    return this.props.component || this.props.route.componentPromise;
+  }
 
   render() {
     // eslint-disable-next-line no-unused-vars
     const {hideBusy, hideError, component, ...otherProps} = this.props;
-    const Component = React.lazy(this.getComponentGetter());
+    const Component = React.lazy(this.componentFactory);
 
     return (
       <LazyLoadErrorBoundary>
