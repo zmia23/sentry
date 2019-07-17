@@ -88,7 +88,7 @@ def drop_db():
     report('db', 'Dropping database')
     config = settings.DATABASES['default']
     check_output([
-        'dropdb', '-U', config['USER'], '-h', config['HOST'], config['NAME']
+        'dropdb', '--if-exists', '-U', config['USER'], '-h', config['HOST'], config['NAME']
     ])
     check_output([
         'createdb', '-U', config['USER'], '-h', config['HOST'], config['NAME']
@@ -104,8 +104,8 @@ class SentryBox(object):
 
     def __enter__(self):
         self.redis = launch_redis()
-        self.sentry = spawn_sentry()
         init_db()
+        self.sentry = spawn_sentry()
         return self
 
     def __exit__(self, exc_type, exc_value, tb):
