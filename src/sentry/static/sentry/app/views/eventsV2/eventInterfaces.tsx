@@ -36,7 +36,7 @@ const ActiveTab = (props: ActiveTabProps) => {
   }
   const entry = event.entries.find(item => item.type === activeTab);
   if (INTERFACES[activeTab] && entry) {
-    const Component = INTERFACES[activeTab];
+    const Component = INTERFACES.spans;
     return (
       <Component
         projectId={projectId}
