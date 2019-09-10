@@ -1,5 +1,4 @@
 import {AutoSizer, List} from 'react-virtualized';
-import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
 import styled from 'react-emotion';
@@ -11,161 +10,167 @@ import Input from 'app/views/settings/components/forms/controls/input';
 import LoadingIndicator from 'app/components/loadingIndicator';
 import space from 'app/styles/space';
 
-const ItemObjectPropType = {
-  value: PropTypes.any,
-  searchKey: PropTypes.string,
-  label: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+type ItemObject = {
+  value: any;
+  searchKey: string;
+  label: React.ReactNode; //| (args: any) => React.ReactNode;
+  groupLabel?: boolean;
+  index?: number;
 };
-const ItemShapePropType = PropTypes.shape(ItemObjectPropType);
 
-class DropdownAutoCompleteMenu extends React.Component {
-  static propTypes = {
-    items: PropTypes.oneOfType([
-      // flat item array
-      PropTypes.arrayOf(ItemShapePropType),
+type GroupedItem = ItemObject & {
+  items: ItemObject[];
 
-      // grouped item array
-      PropTypes.arrayOf(
-        PropTypes.shape({
-          ...ItemObjectPropType,
-          items: PropTypes.arrayOf(ItemShapePropType),
-          // Should hide group label
-          hideGroupLabel: PropTypes.bool,
-        })
-      ),
-    ]),
+  // Should hide group label
+  hideGroupLabel: boolean;
+};
 
-    /**
-     * If this is undefined, autocomplete filter will use this value instead of the
-     * current value in the filter input element.
-     *
-     * This is useful if you need to strip characters out of the search
-     */
-    filterValue: PropTypes.string,
+type Props = {
+  children: (a: any) => React.ReactNode;
 
-    /**
-     * Used to control dropdown state (optional)
-     */
-    isOpen: PropTypes.bool,
+  // Flat item array or grouped item array
+  items: ItemObject[] | GroupedItem[];
 
-    /**
-     * Show loading indicator next to input
-     */
-    busy: PropTypes.bool,
+  className?: string;
 
-    /**
-     * Hide's the input when there are no items. Avoid using this when querying
-     * results in an async fashion.
-     */
-    emptyHidesInput: PropTypes.bool,
+  /**
+   * If this is undefined, autocomplete filter will use this value instead of the
+   * current value in the filter input element.
+   *
+   * This is useful if you need to strip characters out of the search
+   */
+  filterValue: string;
 
-    /**
-     * When an item is selected (via clicking dropdown, or keyboard navigation)
-     */
-    onSelect: PropTypes.func,
-    /**
-     * When AutoComplete input changes
-     */
-    onChange: PropTypes.func,
+  /**
+   * Used to control dropdown state (optional)
+   */
+  isOpen?: boolean;
 
-    /**
-     * Callback for when dropdown menu opens
-     */
-    onOpen: PropTypes.func,
+  /**
+   * Show loading indicator next to input
+   */
+  busy: boolean;
 
-    /**
-     * Callback for when dropdown menu closes
-     */
-    onClose: PropTypes.func,
+  /**
+   * Hide's the input when there are no items. Avoid using this when querying
+   * results in an async fashion.
+   */
+  emptyHidesInput: boolean;
 
-    /**
-     * Message to display when there are no items initially
-     */
-    emptyMessage: PropTypes.node,
+  /**
+   * When an item is selected (via clicking dropdown, or keyboard navigation)
+   */
+  onSelect: Function;
+  /**
+   * When AutoComplete input changes
+   */
+  onChange: Function;
 
-    /**
-     * Message to display when there are no items that match the search
-     */
-    noResultsMessage: PropTypes.node,
+  /**
+   * Callback for when dropdown menu opens
+   */
+  onOpen: Function;
 
-    /**
-     * Presentational properties
-     */
+  /**
+   * Callback for when dropdown menu closes
+   */
+  onClose: Function;
 
-    /**
-     * Dropdown menu alignment.
-     */
-    alignMenu: PropTypes.oneOf(['left', 'right']),
+  /**
+   * Message to display when there are no items initially
+   */
+  emptyMessage: React.ReactNode;
 
-    /**
-     * Should menu visually lock to a direction (so we don't display a rounded corner)
-     */
-    blendCorner: PropTypes.bool,
+  /**
+   * Message to display when there are no items that match the search
+   */
+  noResultsMessage: React.ReactNode;
 
-    /**
-     * Hides the default filter input
-     */
-    hideInput: PropTypes.bool,
+  /**
+   * Presentational properties
+   */
 
-    /**
-     * Max height of dropdown menu. Units are assumed as `px` if number, otherwise will assume string has units
-     */
-    maxHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  /**
+   * Dropdown menu alignment.
+   */
+  alignMenu: 'left' | 'right';
 
-    /**
-     * Supplying this height will force the dropdown menu to be a virtualized list.
-     * This is very useful (and probably required) if you have a large list. e.g. Project selector with many projects.
-     *
-     * Currently, our implementation of the virtualized list requires a fixed height.
-     */
-    virtualizedHeight: PropTypes.number,
+  /**
+   * Should menu visually lock to a direction (so we don't display a rounded corner)
+   */
+  blendCorner: boolean;
 
-    /**
-     * If you use grouping with virtualizedHeight, the labels will be that height unless specified here
-     */
-    virtualizedLabelHeight: PropTypes.number,
+  /**
+   * Hides the default filter input
+   */
+  hideInput: boolean;
 
-    /**
-     * Search input's placeholder text
-     */
-    searchPlaceholder: PropTypes.string,
+  /**
+   * Search input's placeholder text
+   */
+  searchPlaceholder: string;
 
-    /**
-     * Size for dropdown items
-     */
-    itemSize: PropTypes.oneOf(['zero', 'small', '']),
+  /**
+   * Size for dropdown items
+   */
+  itemSize: 'zero' | 'small' | '';
 
-    /**
-     * Changes the menu style to have an arrow at the top
-     */
-    menuWithArrow: PropTypes.bool,
+  /**
+   * Changes the menu style to have an arrow at the top
+   */
+  menuWithArrow: boolean;
 
-    menuFooter: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-    menuHeader: PropTypes.node,
-    /**
-     * Props to pass to menu component
-     */
-    menuProps: PropTypes.object,
+  menuFooter: React.ReactNode | Function;
+  menuHeader: React.ReactNode;
+  /**
+   * Props to pass to menu component
+   */
+  menuProps: object;
 
-    /**
-     * for passing simple styles to the root container
-     */
-    rootClassName: PropTypes.string,
+  /**
+   * for passing simple styles to the root container
+   */
+  rootClassName: string;
 
-    /**
-     * Props to pass to input/filter component
-     */
-    inputProps: PropTypes.object,
+  /**
+   * Props to pass to input/filter component
+   */
+  inputProps: object;
 
-    /**
-     * renderProp for the end (right side) of the search input
-     */
-    inputActions: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  /**
+   * renderProp for the end (right side) of the search input
+   */
+  inputActions: React.ReactNode | Function;
 
-    css: PropTypes.object,
-    style: PropTypes.object,
-  };
+  css: object;
+  style: object;
+} & (
+  | {
+      /**
+       * Max height of dropdown menu. Units are assumed as `px` if number, otherwise will assume string has units
+       */
+      maxHeight: number;
 
+      /**
+       * Supplying this height will force the dropdown menu to be a virtualized list.
+       * This is very useful (and probably required) if you have a large list. e.g. Project selector with many projects.
+       *
+       * Currently, our implementation of the virtualized list requires a fixed height.
+       */
+      virtualizedHeight: number;
+
+      /**
+       * If you use grouping with virtualizedHeight, the labels will be that height unless specified here
+       */
+      virtualizedLabelHeight?: number;
+    }
+  | {
+      maxHeight: number | string;
+      virtualizedHeight?: false | null;
+      virtualizedLabelHeight?: false | null;
+    });
+
+class DropdownAutoCompleteMenu extends React.Component<Props> {
   static defaultProps = {
     onSelect: () => {},
     maxHeight: 300,
@@ -224,13 +229,19 @@ class DropdownAutoCompleteMenu extends React.Component {
 
   getHeight = items => {
     const {maxHeight, virtualizedHeight, virtualizedLabelHeight} = this.props;
-    const minHeight = virtualizedLabelHeight
-      ? items.reduce(
-          (a, r) => a + (r.groupLabel ? virtualizedLabelHeight : virtualizedHeight),
-          0
-        )
-      : items.length * virtualizedHeight;
-    return Math.min(minHeight, maxHeight);
+
+    if (typeof virtualizedHeight === 'number' && typeof maxHeight === 'number') {
+      const minHeight = virtualizedLabelHeight
+        ? items.reduce(
+            (a, r) => a + (r.groupLabel ? virtualizedLabelHeight : virtualizedHeight),
+            0
+          )
+        : items.length * virtualizedHeight;
+      return Math.min(minHeight, maxHeight);
+    }
+
+    console.error('`virtualizedHeight` and `height` must be a number'); // eslint-disable-line no-console
+    return 0;
   };
 
   renderList = ({items, ...otherProps}) => {
@@ -246,10 +257,10 @@ class DropdownAutoCompleteMenu extends React.Component {
               style={{outline: 'none'}}
               height={this.getHeight(items)}
               rowCount={items.length}
-              rowHeight={({index}) => {
+              rowHeight={({index}): number => {
                 return items[index].groupLabel && virtualizedLabelHeight
-                  ? virtualizedLabelHeight
-                  : virtualizedHeight;
+                  ? (virtualizedLabelHeight as number)
+                  : (virtualizedHeight as number);
               }}
               rowRenderer={({key, index, style}) => {
                 const item = items[index];
@@ -277,16 +288,24 @@ class DropdownAutoCompleteMenu extends React.Component {
   renderRow = ({
     item,
     style,
-    itemSize,
     key,
+    itemSize,
     highlightedIndex,
     inputValue,
     getItemProps,
+  }: {
+    item: ItemObject;
+    key?: string;
+    itemSize?: number;
+    highlightedIndex?: number;
+    inputValue?: string;
+    getItemProps?: Function;
+    style?: React.CSSProperties;
   }) => {
     const {index} = item;
 
     return item.groupLabel ? (
-      <LabelWithBorder style={style} key={item.id}>
+      <LabelWithBorder style={style} key={index}>
         {item.label && <GroupLabel>{item.label}</GroupLabel>}
       </LabelWithBorder>
     ) : (
@@ -566,7 +585,7 @@ const GroupLabel = styled('div')`
   padding: ${space(0.25)} ${space(1)};
 `;
 
-const StyledItemList = styled('div')`
+const StyledItemList = styled('div')<{maxHeight: number | string}>`
   max-height: ${p =>
     typeof p.maxHeight === 'number' ? `${p.maxHeight}px` : p.maxHeight};
   overflow-y: auto;
