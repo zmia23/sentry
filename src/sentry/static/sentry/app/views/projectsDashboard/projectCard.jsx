@@ -6,6 +6,7 @@ import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import styled from 'react-emotion';
 
+import {metric} from 'app/utils/analytics';
 import BookmarkStar from 'app/components/projects/bookmarkStar';
 import {Client} from 'app/api';
 import {loadStatsForProject} from 'app/actionCreators/projects';
@@ -37,6 +38,7 @@ class ProjectCard extends React.Component {
     loadStatsForProject(this.api, project.id, {
       orgId: params.orgId,
     });
+    metric.mark(`project-${project.name}-loaded`);
   }
 
   render() {

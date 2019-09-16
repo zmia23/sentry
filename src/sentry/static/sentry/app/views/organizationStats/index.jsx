@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import DocumentTitle from 'react-document-title';
 
+import {metric} from 'app/utils/analytics';
 import withApi from 'app/utils/withApi';
 import LazyLoad from 'app/components/lazyLoad';
 import withOrganization from 'app/utils/withOrganization';
@@ -84,7 +85,7 @@ class OrganizationStatsContainer extends React.Component {
   fetchProjectData() {
     this.props.api.request(this.getOrganizationProjectsEndpoint(), {
       query: this.props.location.query,
-      success: (data, textStatus, jqxhr) => {
+      success: (data, _textStatus, jqxhr) => {
         const projectMap = {};
         data.forEach(project => {
           projectMap[project.id] = project;
@@ -209,17 +210,20 @@ class OrganizationStatsContainer extends React.Component {
         aReceived[1] += 1;
       }
     });
-    this.setState({
-      orgStats: orgPoints,
-      orgTotal: {
-        received: oReceived,
-        rejected: oRejected,
-        blacklisted: oBlacklisted,
-        accepted: Math.max(0, oReceived - oRejected - oBlacklisted),
-        avgRate: aReceived[1] ? parseInt(aReceived[0] / aReceived[1] / 60, 10) : 0,
+    this.setState(
+      {
+        orgStats: orgPoints,
+        orgTotal: {
+          received: oReceived,
+          rejected: oRejected,
+          blacklisted: oBlacklisted,
+          accepted: Math.max(0, oReceived - oRejected - oBlacklisted),
+          avgRate: aReceived[1] ? parseInt(aReceived[0] / aReceived[1] / 60, 10) : 0,
+        },
+        statsLoading: false,
       },
-      statsLoading: false,
-    });
+      () => metric.mark('stats-loaded')
+    );
   }
 
   processProjectData() {
@@ -242,10 +246,13 @@ class OrganizationStatsContainer extends React.Component {
         accepted: Math.max(0, pReceived - pRejected - pBlacklisted),
       });
     });
-    this.setState({
-      projectTotals,
-      projectsLoading: false,
-    });
+    this.setState(
+      {
+        projectTotals,
+        projectsLoading: false,
+      },
+      () => metric.mark('projects-loaded')
+    );
   }
 
   render() {

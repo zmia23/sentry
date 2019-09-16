@@ -11,7 +11,7 @@ import qs from 'query-string';
 import {Client} from 'app/api';
 import {DEFAULT_STATS_PERIOD} from 'app/constants';
 import {Panel, PanelBody} from 'app/components/panels';
-import {analytics} from 'app/utils/analytics';
+import {metric, analytics} from 'app/utils/analytics';
 import {defined} from 'app/utils';
 import {
   deleteSavedSearch,
@@ -307,7 +307,7 @@ const IssueList = createReactClass({
     this.lastRequest = this.api.request(this.getGroupListEndpoint(), {
       method: 'GET',
       data: qs.stringify(requestParams),
-      success: (data, ignore, jqXHR) => {
+      success: (data, _ignore, jqXHR) => {
         const {orgId} = this.props.params;
         // If this is a direct hit, we redirect to the intended result directly.
         if (jqXHR.getResponseHeader('X-Sentry-Direct-Hit') === '1') {
@@ -333,15 +333,18 @@ const IssueList = createReactClass({
         const queryMaxCount = jqXHR.getResponseHeader('X-Max-Hits');
         const pageLinks = jqXHR.getResponseHeader('Link');
 
-        this.setState({
-          error: false,
-          issuesLoading: false,
-          queryCount:
-            typeof queryCount !== 'undefined' ? parseInt(queryCount, 10) || 0 : 0,
-          queryMaxCount:
-            typeof queryMaxCount !== 'undefined' ? parseInt(queryMaxCount, 10) || 0 : 0,
-          pageLinks,
-        });
+        this.setState(
+          {
+            error: false,
+            issuesLoading: false,
+            queryCount:
+              typeof queryCount !== 'undefined' ? parseInt(queryCount, 10) || 0 : 0,
+            queryMaxCount:
+              typeof queryMaxCount !== 'undefined' ? parseInt(queryMaxCount, 10) || 0 : 0,
+            pageLinks,
+          },
+          () => metric.mark('issues-loaded')
+        );
       },
       error: err => {
         this.setState({
@@ -349,7 +352,7 @@ const IssueList = createReactClass({
           issuesLoading: false,
         });
       },
-      complete: jqXHR => {
+      complete: () => {
         this.lastRequest = null;
 
         this.resumePolling();
@@ -389,7 +392,7 @@ const IssueList = createReactClass({
     }
   },
 
-  onRealtimePoll(data, links) {
+  onRealtimePoll(data) {
     // Note: We do not update state with cursors from polling,
     // `CursorPoller` updates itself with new cursors
     this._streamManager.unshift(data);
@@ -427,7 +430,7 @@ const IssueList = createReactClass({
     this.transitionTo({sort});
   },
 
-  onCursorChange(cursor, path, query, pageDiff) {
+  onCursorChange(cursor, _path, query, pageDiff) {
     const queryPageInt = parseInt(query.page, 10);
     let nextPage = isNaN(queryPageInt) ? pageDiff : queryPageInt + pageDiff;
 
@@ -607,7 +610,7 @@ const IssueList = createReactClass({
 
   fetchSavedSearches() {
     const {organization} = this.props;
-    fetchSavedSearches(this.api, organization.slug).then(data => {}, error => {});
+    fetchSavedSearches(this.api, organization.slug).then(() => {}, () => {});
   },
 
   onSavedSearchCreate(newSavedSearch) {
