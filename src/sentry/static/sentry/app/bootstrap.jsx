@@ -6,6 +6,7 @@ import 'focus-visible';
 import 'app/utils/statics-setup';
 import 'app/utils/emotion-setup';
 
+import {unstable_trace as trace} from 'scheduler/tracing';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -86,7 +87,9 @@ const render = Component => {
   const rootEl = document.getElementById('blk_router');
 
   try {
-    ReactDOM.render(<Component />, rootEl);
+    trace('initial render', performance.now(), () =>
+      ReactDOM.render(<Component />, rootEl)
+    );
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(

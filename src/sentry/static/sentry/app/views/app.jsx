@@ -1,3 +1,6 @@
+import * as Sentry from '@sentry/browser';
+import {unstable_Profiler as Profiler} from 'react';
+
 import $ from 'jquery';
 import {ThemeProvider} from 'emotion-theming';
 import {browserHistory} from 'react-router';
@@ -24,6 +27,7 @@ import Indicators from 'app/components/indicators';
 import LoadingIndicator from 'app/components/loadingIndicator';
 import NewsletterConsent from 'app/views/newsletterConsent';
 import OrganizationsStore from 'app/stores/organizationsStore';
+import getDisplayName from 'app/utils/getDisplayName';
 import getRouteStringFromRoutes from 'app/utils/getRouteStringFromRoutes';
 import theme from 'app/utils/theme';
 import withApi from 'app/utils/withApi';
@@ -40,6 +44,125 @@ function getAlertTypeForProblem(problem) {
       return 'warning';
   }
 }
+
+/*
+const originalCreateElement = React.createElement;
+
+const _profilesByCommitTime = new Map([]);
+function onRender(
+  id,
+  phase,
+  actualDuration,
+  baseDuration,
+  startTime,
+  commitTime,
+  interactions
+) {
+  if (phase !== 'mount') {
+    return;
+  }
+
+  let parentSpan;
+
+  if (!_profilesByCommitTime.has(commitTime)) {
+    console.log('start span', Sentry.getCurrentHub().getStackTop());
+    parentSpan = Sentry.getCurrentHub().startSpan({
+      data: {},
+      op: 'react',
+      transaction: `<${id}>`,
+    });
+    _profilesByCommitTime.set(commitTime, {
+      id,
+      span: parentSpan,
+      profiles: [],
+      actualDuration,
+      baseDuration,
+      startTime,
+      commitTime,
+    });
+  } else {
+    parentSpan = _profilesByCommitTime.get(commitTime).span;
+  }
+
+  // console.log(parentSpan);
+  // const span = parentSpan.newSpan();
+  const span = Sentry.getCurrentHub().startSpan();
+
+  const start = performance.timing.navigationStart;
+
+  const data = {
+    data: span.data,
+    description: id,
+    op: 'react',
+    parent_span_id: span._parentSpanId,
+    // sampled: span.sampled,
+    span_id: span._spanId,
+    start_timestamp: (start + startTime) / 1000,
+    tags: span.tags,
+    timestamp: (start + startTime + actualDuration) / 1000,
+    trace_id: span._traceId,
+    transaction: span.transaction,
+  };
+
+  _profilesByCommitTime.get(commitTime).profiles.push(data);
+  // Sentry.getCurrentHub().captureEvent(event);
+
+  // console.log(
+  // id,
+  // phase,
+  // actualDuration,
+  // baseDuration,
+  // startTime,
+  // commitTime,
+  // interactions
+  // );
+}
+setTimeout(function() {
+  window._profilesByCommitTime.forEach(profile => {
+    console.log('awerawe', profile);
+    commit(profile);
+  });
+}, 10000);
+function commit(profile) {
+  const start = performance.timing.navigationStart;
+
+  const parentSpan = profile.span;
+
+  const event = {
+    contexts: {
+      trace: {
+        data: parentSpan.data,
+        description: profile.id,
+        op: 'react',
+        parent_span_id: parentSpan._parentSpanId,
+        span_id: parentSpan._spanId,
+        tags: parentSpan.tags,
+        trace_id: parentSpan._traceId,
+      },
+    },
+    spans: profile.profiles.length ? profile.profiles : undefined,
+    start_timestamp: (start + profile.startTime) / 1000,
+    timestamp: (start + profile.startTime + profile.actualDuration) / 1000,
+    transaction: parentSpan.transaction,
+    type: 'transaction',
+  };
+  Sentry.getCurrentHub().captureEvent(event);
+}
+window._profilesByCommitTime = _profilesByCommitTime;
+
+React.createElement = function(type, ...rest) {
+  if (typeof type === 'string') {
+    return originalCreateElement.apply(React, [type, ...rest]);
+  }
+
+  const displayName = getDisplayName(type);
+  return originalCreateElement(
+    Profiler,
+    {id: displayName, onRender},
+    originalCreateElement.apply(React, [type, ...rest])
+  );
+};
+*/
 
 class App extends React.Component {
   static propTypes = {

@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/browser';
 let firstPageLoad = true;
 
 function startTransaction() {
+  console.log('start transaction');
   // We do set the transaction name in the router but we want to start it here
   // since in the App component where we set the transaction name, it's called multiple
   // times. This would result in losing the start of the transaction.
@@ -13,6 +14,7 @@ function startTransaction() {
       firstPageLoad = false;
     } else {
       const prevTransactionSpan = scope.getSpan();
+      console.log('prev', prevTransactionSpan);
       // If there is a transaction we set the name to the route
       if (prevTransactionSpan && prevTransactionSpan.timestamp === undefined) {
         hub.finishSpan(prevTransactionSpan);

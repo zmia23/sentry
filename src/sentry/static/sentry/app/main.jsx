@@ -1,3 +1,4 @@
+import {unstable_Profiler as Profiler} from 'react';
 import {hot} from 'react-hot-loader/root'; // This needs to come before react
 import React from 'react';
 import {Router, browserHistory} from 'react-router';
@@ -10,8 +11,16 @@ class Main extends React.Component {
     loadPreferencesState();
   }
 
+  handleRender = (...args) => {
+    console.log('handle render', ...args);
+  };
+
   render() {
-    return <Router history={browserHistory}>{routes()}</Router>;
+    return (
+      <Profiler id="Application" onRender={this.handleRender}>
+        <Router history={browserHistory}>{routes()}</Router>
+      </Profiler>
+    );
   }
 }
 
