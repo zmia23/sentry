@@ -86,6 +86,7 @@ def configure_sdk():
     from sentry_sdk.integrations.logging import LoggingIntegration
     from sentry_sdk.integrations.django import DjangoIntegration
     from sentry_sdk.integrations.celery import CeleryIntegration
+    from sentry_sdk.integrations.redis import RedisIntegration
 
     assert sentry_sdk.Hub.main.client is None
 
@@ -119,6 +120,7 @@ def configure_sdk():
             CeleryIntegration(),
             LoggingIntegration(event_level=None),
             RustInfoIntegration(),
+            RedisIntegration(),
         ],
         transport=capture_event,
         traceparent_v2=True,
