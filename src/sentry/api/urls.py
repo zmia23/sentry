@@ -15,6 +15,7 @@ from .endpoints.auth_login import AuthLoginEndpoint
 from .endpoints.authenticator_index import AuthenticatorIndexEndpoint
 from .endpoints.broadcast_details import BroadcastDetailsEndpoint
 from .endpoints.broadcast_index import BroadcastIndexEndpoint
+from .endpoints.organization_api_tokens import OrganizationApiTokensEndpoint
 from .endpoints.builtin_symbol_sources import BuiltinSymbolSourcesEndpoint
 from .endpoints.catchall import CatchallEndpoint
 from .endpoints.chunk import ChunkUploadEndpoint
@@ -972,6 +973,11 @@ urlpatterns = patterns(
                 url(
                     r"^(?P<organization_slug>[^\/]+)/broadcasts/$",
                     BroadcastIndexEndpoint.as_view(),
+                    name="sentry-api-0-organization-broadcasts",
+                ),
+                url(
+                    r"^(?P<organization_slug>[^\/]+)/api-tokens/$",
+                    OrganizationApiTokensEndpoint.as_view(),
                     name="sentry-api-0-organization-broadcasts",
                 ),
             ]
