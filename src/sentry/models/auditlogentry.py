@@ -94,6 +94,9 @@ class AuditLogEntryEvent(object):
     INTERNAL_INTEGRATION_ADD_TOKEN = 135
     INTERNAL_INTEGRATION_REMOVE_TOKEN = 136
 
+    ORG_ADD_TOKEN = 140
+    ORG_REMOVE_TOKEN = 141
+
 
 class AuditLogEntry(Model):
     __core__ = False
@@ -372,5 +375,9 @@ class AuditLogEntry(Model):
             return "created a token for internal integration %s" % (self.data["sentry_app"])
         elif self.event == AuditLogEntryEvent.INTERNAL_INTEGRATION_REMOVE_TOKEN:
             return "revoked a token for internal integration %s" % (self.data["sentry_app"])
+        elif self.event == AuditLogEntryEvent.ORG_ADD_TOKEN:
+            return "created a token for organization %s" % (self.organization.slug)
+        elif self.event == AuditLogEntryEvent.ORG_REMOVE_TOKEN:
+            return "revoked a token for organization %s" % (self.organization.slug)
 
         return ""

@@ -32,6 +32,7 @@ from sentry.mediators import (
     sentry_app_installations,
     sentry_app_installation_tokens,
     service_hooks,
+    organization_api_tokens,
 )
 from sentry.models import (
     Activity,
@@ -738,6 +739,10 @@ class Factories(object):
             organization=organization,
             user=(user or Factories.create_user()),
         )
+
+    @staticmethod
+    def create_organization_api_token(**kwargs):
+        return organization_api_tokens.Creator.run(**kwargs)
 
     @staticmethod
     def create_issue_link_schema():

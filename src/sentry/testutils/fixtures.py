@@ -193,6 +193,9 @@ class Fixtures(object):
     def create_sentry_app_feature(self, *args, **kwargs):
         return Factories.create_sentry_app_feature(*args, **kwargs)
 
+    def create_organization_api_token(self, *args, **kwargs):
+        return Factories.create_organization_api_token(*args, **kwargs)
+
     def create_service_hook(self, *args, **kwargs):
         return Factories.create_service_hook(*args, **kwargs)
 

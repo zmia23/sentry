@@ -3,11 +3,10 @@ from __future__ import absolute_import
 from rest_framework import serializers
 
 
-class MultipleChoiceField(serializers.Field):
-    error_messages = {
-        "invalid_choice": ("Select a valid choice. {value} is not one of " "the available choices.")
-    }
+invalid_choice_message = "Select a valid choice. {value} is not one of the available choices."
 
+
+class MultipleChoiceField(serializers.Field):
     def __init__(self, choices=None, *args, **kwargs):
         self.choices = set(choices or ())
         super(MultipleChoiceField, self).__init__(*args, **kwargs)
@@ -19,8 +18,6 @@ class MultipleChoiceField(serializers.Field):
         if isinstance(data, list):
             for item in data:
                 if item not in self.choices:
-                    raise serializers.ValidationError(
-                        self.error_messages["invalid_choice"].format(value=item)
-                    )
+                    raise serializers.ValidationError(invalid_choice_message.format(value=item))
             return data
         raise serializers.ValidationError("Please provide a valid list.")

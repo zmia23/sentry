@@ -978,7 +978,7 @@ urlpatterns = patterns(
                 url(
                     r"^(?P<organization_slug>[^\/]+)/api-tokens/$",
                     OrganizationApiTokensEndpoint.as_view(),
-                    name="sentry-api-0-organization-broadcasts",
+                    name="sentry-api-0-organization-api-tokens",
                 ),
             ]
         ),
