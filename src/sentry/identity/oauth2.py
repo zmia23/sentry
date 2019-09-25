@@ -273,6 +273,7 @@ class OAuth2CallbackView(PipelineView):
     def exchange_token(self, request, pipeline, code):
         # TODO: this needs the auth yet
         data = self.get_token_params(code=code, redirect_uri=absolute_uri(pipeline.redirect_url()))
+        pipeline.logger.info("identity.token-exchange-data", extra={"data": data})
         verify_ssl = pipeline.config.get("verify_ssl", True)
         try:
             req = safe_urlopen(self.access_token_url, data=data, verify_ssl=verify_ssl)
@@ -326,7 +327,7 @@ class OAuth2CallbackView(PipelineView):
             return pipeline.error(data["error_description"])
 
         if "error" in data:
-            pipeline.logger.info("identity.token-exchange-error", extra={"error": data["error"]})
+            pipeline.logger.info("identity.token-exchange-error", extra={"error": data["error"], "data": data})
             return pipeline.error("Failed to retrieve token from the upstream service.")
 
         # we can either expect the API to be implicit and say "im looking for
