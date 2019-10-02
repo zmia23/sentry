@@ -4,7 +4,7 @@ import collections
 import six
 
 from sentry.tsdb.base import BaseTSDB, TSDBModel
-from sentry.utils import snuba
+from sentry.utils import snuba, outcomes
 from sentry.utils.dates import to_datetime
 
 
@@ -24,14 +24,80 @@ class SnubaTSDB(BaseTSDB):
     # values are in the form ``(groupby_column, aggregateby_column or None)``.
     # Only the models that are listed in this mapping are supported.
     model_columns = {
-        TSDBModel.project: ("project_id", None),
-        TSDBModel.group: ("issue", None),
-        TSDBModel.release: ("tags[sentry:release]", None),
-        TSDBModel.users_affected_by_group: ("issue", "tags[sentry:user]"),
-        TSDBModel.users_affected_by_project: ("project_id", "tags[sentry:user]"),
-        TSDBModel.frequent_environments_by_group: ("issue", "environment"),
-        TSDBModel.frequent_releases_by_group: ("issue", "tags[sentry:release]"),
-        TSDBModel.frequent_issues_by_project: ("project_id", "issue"),
+        TSDBModel.project: ("project_id", None, "events", "count()", None),
+        TSDBModel.group: ("issue", None, "events", "count()", None),
+        TSDBModel.release: ("tags[sentry:release]", None, "events", "count()", None),
+        TSDBModel.users_affected_by_group: (
+            "issue",
+            "tags[sentry:user]",
+            "events",
+            "count()",
+            None,
+        ),
+        TSDBModel.users_affected_by_project: (
+            "project_id",
+            "tags[sentry:user]",
+            "events",
+            "count()",
+            None,
+        ),
+        TSDBModel.frequent_environments_by_group: (
+            "issue",
+            "environment",
+            "events",
+            "count()",
+            None,
+        ),
+        TSDBModel.frequent_releases_by_group: (
+            "issue",
+            "tags[sentry:release]",
+            "events",
+            "count()",
+            None,
+        ),
+        TSDBModel.frequent_issues_by_project: ("project_id", "issue", "events", "count()", None),
+        TSDBModel.organization_total_received: (
+            "org_id",
+            "times_seen",
+            "outcomes",
+            "sum",
+            [["outcome", "=", outcomes.Outcome.ACCEPTED]],
+        ),
+        TSDBModel.organization_total_rejected: (
+            "org_id",
+            "times_seen",
+            "outcomes",
+            "sum",
+            [["outcome", "=", outcomes.Outcome.RATE_LIMITED]],
+        ),
+        TSDBModel.organization_total_blacklisted: (
+            "org_id",
+            "times_seen",
+            "outcomes",
+            "sum",
+            [["outcome", "=", outcomes.Outcome.FILTERED]],
+        ),
+        TSDBModel.project_total_received: (
+            "project_id",
+            "times_seen",
+            "outcomes",
+            "sum",
+            [["outcome", "=", outcomes.Outcome.ACCEPTED]],
+        ),
+        TSDBModel.project_total_rejected: (
+            "project_id",
+            "times_seen",
+            "outcomes",
+            "sum",
+            [["outcome", "=", outcomes.Outcome.RATE_LIMITED]],
+        ),
+        TSDBModel.project_total_blacklisted: (
+            "project_id",
+            "times_seen",
+            "outcomes",
+            "sum",
+            [["outcome", "=", outcomes.Outcome.FILTERED]],
+        ),
     }
 
     def __init__(self, **options):
@@ -60,7 +126,7 @@ class SnubaTSDB(BaseTSDB):
         if model_columns is None:
             raise Exception(u"Unsupported TSDBModel: {}".format(model.name))
 
-        model_group, model_aggregate = model_columns
+        model_group, model_aggregate, dataset, _, conditions = model_columns
 
         groupby = []
         if group_on_model and model_group is not None:
@@ -75,6 +141,7 @@ class SnubaTSDB(BaseTSDB):
 
         keys_map = dict(zip(model_columns, self.flatten_keys(keys)))
         keys_map = {k: v for k, v in six.iteritems(keys_map) if k is not None and v is not None}
+
         if environment_ids is not None:
             keys_map["environment"] = environment_ids
 
@@ -90,10 +157,11 @@ class SnubaTSDB(BaseTSDB):
 
         if keys:
             result = snuba.query(
+                dataset=dataset,
                 start=start,
                 end=end,
                 groupby=groupby,
-                conditions=None,
+                conditions=conditions,
                 filter_keys=keys_map,
                 aggregations=aggregations,
                 rollup=rollup,
@@ -150,6 +218,13 @@ class SnubaTSDB(BaseTSDB):
                         del result[rk]
 
     def get_range(self, model, keys, start, end, rollup=None, environment_ids=None):
+        model_columns = self.model_columns.get(model)
+
+        if model_columns is None:
+            raise Exception(u"Unsupported TSDBModel: {}".format(model.name))
+
+        _, _, _, aggregation, _ = model_columns
+
         result = self.get_data(
             model,
             keys,
@@ -157,7 +232,7 @@ class SnubaTSDB(BaseTSDB):
             end,
             rollup,
             environment_ids,
-            aggregation="count()",
+            aggregation=aggregation,
             group_on_time=True,
         )
         # convert

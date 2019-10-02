@@ -630,6 +630,9 @@ def _prepare_query_params(query_params):
                 for k in query_params.filter_keys
             ]
             project_ids = list(set.union(*map(set, ids)))
+
+        # if not project_ids:
+        #     project_ids = [1L, 2L]
     else:
         project_ids = []
 
@@ -671,12 +674,13 @@ def _prepare_query_params(query_params):
 
     query_params.kwargs.update(
         {
+            "dataset": query_params.dataset,
             "from_date": start.isoformat(),
             "to_date": end.isoformat(),
             "groupby": query_params.groupby,
             "conditions": query_params.conditions,
             "aggregations": query_params.aggregations,
-            "project": project_ids,
+            # "project": project_ids,
             "granularity": query_params.rollup,  # TODO name these things the same
         }
     )
@@ -715,6 +719,7 @@ class SnubaQueryParams(object):
 
     def __init__(
         self,
+        dataset=None,
         start=None,
         end=None,
         groupby=None,
@@ -726,6 +731,7 @@ class SnubaQueryParams(object):
         is_grouprelease=False,
         **kwargs
     ):
+        self.dataset = dataset or "events"
         self.start = start or datetime.utcfromtimestamp(0)  # will be clamped to project retention
         self.end = end or datetime.utcnow()
         self.groupby = groupby or []
@@ -739,6 +745,7 @@ class SnubaQueryParams(object):
 
 
 def raw_query(
+    dataset=None,
     start=None,
     end=None,
     groupby=None,
@@ -754,7 +761,9 @@ def raw_query(
     Sends a query to snuba.  See `SnubaQueryParams` docstring for param
     descriptions.
     """
+
     snuba_params = SnubaQueryParams(
+        dataset=dataset,
         start=start,
         end=end,
         groupby=groupby,
@@ -765,6 +774,7 @@ def raw_query(
         is_grouprelease=is_grouprelease,
         **kwargs
     )
+
     return bulk_raw_query([snuba_params], referrer=referrer)[0]
 
 
@@ -829,6 +839,7 @@ def bulk_raw_query(snuba_param_list, referrer=None):
 
 
 def query(
+    dataset=None,
     start=None,
     end=None,
     groupby=None,
@@ -839,7 +850,6 @@ def query(
     totals=None,
     **kwargs
 ):
-
     aggregations = aggregations or [["count()", "", "aggregate"]]
     filter_keys = filter_keys or {}
     selected_columns = selected_columns or []
@@ -847,6 +857,7 @@ def query(
 
     try:
         body = raw_query(
+            dataset=dataset,
             start=start,
             end=end,
             groupby=groupby,
