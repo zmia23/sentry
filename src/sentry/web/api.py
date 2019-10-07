@@ -44,6 +44,7 @@ from sentry.coreapi import (
     logger as api_logger,
 )
 from sentry.event_manager import EventManager
+from sentry.ingest.outcomes_consumer import mark_signal_sent
 from sentry.interfaces import schemas
 from sentry.interfaces.base import get_interface
 from sentry.lang.native.unreal import (
@@ -120,7 +121,8 @@ def allow_cors_options(func):
         response["Allow"] = allow
         response["Access-Control-Allow-Methods"] = allow
         response["Access-Control-Allow-Headers"] = (
-            "X-Sentry-Auth, X-Requested-With, Origin, Accept, " "Content-Type, Authentication"
+            "X-Sentry-Auth, X-Requested-With, Origin, Accept, "
+            "Content-Type, Authentication, Authorization"
         )
         response["Access-Control-Expose-Headers"] = "X-Sentry-Error, Retry-After"
 
@@ -199,6 +201,11 @@ def process_event(event_manager, project, key, remote_addr, helper, attachments,
     event_id = data["event_id"]
 
     if should_filter:
+        # Mark that the event_filtered signal is sent. Do this before emitting
+        # the outcome to avoid a potential race between OutcomesConsumer and
+        # `event_filtered.send_robust` below.
+        mark_signal_sent(project_config.project_id, event_id)
+
         track_outcome(
             project_config.organization_id,
             project_config.project_id,
@@ -223,6 +230,11 @@ def process_event(event_manager, project, key, remote_addr, helper, attachments,
     if rate_limit is None or rate_limit.is_limited:
         if rate_limit is None:
             api_logger.debug("Dropped event due to error with rate limiter")
+
+        # Mark that the event_dropped signal is sent. Do this before emitting
+        # the outcome to avoid a potential race between OutcomesConsumer and
+        # `event_dropped.send_robust` below.
+        mark_signal_sent(project_config.project_id, event_id)
 
         reason = rate_limit.reason_code if rate_limit else None
         track_outcome(
@@ -620,9 +632,7 @@ class StoreView(APIView):
             )
             raise APIForbidden("Event size exceeded 10MB after normalization.")
 
-        metrics.timing(
-            "events.size.data.post_storeendpoint", data_size, tags={"project_id": project_id}
-        )
+        metrics.timing("events.size.data.post_storeendpoint", data_size)
 
         return process_event(
             event_manager, project, key, remote_addr, helper, attachments, project_config
@@ -743,9 +753,15 @@ class MinidumpView(StoreView):
             else:
                 # Custom clients can submit longer payloads and should JSON
                 # encode event data into the optional `sentry` field.
-                extra = request.POST
+                extra = request.POST.dict()
                 json_data = extra.pop("sentry", None)
-                data = json.loads(json_data[0]) if json_data else {}
+                try:
+                    data = json.loads(json_data) if json_data else {}
+                except ValueError:
+                    data = {}
+
+            if not isinstance(data, dict):
+                data = {}
 
             # Merge additional form fields from the request with `extra` data
             # from the event payload and set defaults for processing. This is

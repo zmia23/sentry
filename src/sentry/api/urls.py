@@ -88,11 +88,7 @@ from .endpoints.organization_dashboard_widgets import OrganizationDashboardWidge
 from .endpoints.organization_dashboards import OrganizationDashboardsEndpoint
 from .endpoints.organization_details import OrganizationDetailsEndpoint
 from .endpoints.organization_environments import OrganizationEnvironmentsEndpoint
-from .endpoints.organization_event_details import (
-    OrganizationEventDetailsEndpoint,
-    OrganizationEventDetailsLatestEndpoint,
-    OrganizationEventDetailsOldestEndpoint,
-)
+from .endpoints.organization_event_details import OrganizationEventDetailsEndpoint
 from .endpoints.organization_eventid import EventIdLookupEndpoint
 from .endpoints.organization_events import OrganizationEventsEndpoint, OrganizationEventsV2Endpoint
 from .endpoints.organization_events_distribution import OrganizationEventsDistributionEndpoint
@@ -150,6 +146,7 @@ from .endpoints.organization_releases import OrganizationReleasesEndpoint
 from .endpoints.organization_repositories import OrganizationRepositoriesEndpoint
 from .endpoints.organization_repository_commits import OrganizationRepositoryCommitsEndpoint
 from .endpoints.organization_repository_details import OrganizationRepositoryDetailsEndpoint
+from .endpoints.organization_join_request import OrganizationJoinRequestEndpoint
 from .endpoints.organization_search_details import OrganizationSearchDetailsEndpoint
 from .endpoints.organization_searches import OrganizationSearchesEndpoint
 from .endpoints.organization_sentry_apps import OrganizationSentryAppsEndpoint
@@ -159,7 +156,11 @@ from .endpoints.organization_stats import OrganizationStatsEndpoint
 from .endpoints.organization_tagkey_values import OrganizationTagKeyValuesEndpoint
 from .endpoints.organization_tags import OrganizationTagsEndpoint
 from .endpoints.organization_teams import OrganizationTeamsEndpoint
+from .endpoints.organization_user_teams import OrganizationUserTeamsEndpoint
 from .endpoints.organization_user_details import OrganizationUserDetailsEndpoint
+from .endpoints.organization_projects_sent_first_event import (
+    OrganizationProjectsSentFirstEventEndpoint,
+)
 from .endpoints.organization_user_issues import OrganizationUserIssuesEndpoint
 from .endpoints.organization_user_issues_search import OrganizationUserIssuesSearchEndpoint
 from .endpoints.organization_user_reports import OrganizationUserReportsEndpoint
@@ -283,6 +284,12 @@ from sentry.incidents.endpoints.organization_alert_rule_details import (
 )
 from sentry.incidents.endpoints.organization_alert_rule_index import (
     OrganizationAlertRuleIndexEndpoint,
+)
+from sentry.incidents.endpoints.organization_alert_rule_trigger_details import (
+    OrganizationAlertRuleTriggerDetailsEndpoint,
+)
+from sentry.incidents.endpoints.organization_alert_rule_trigger_index import (
+    OrganizationAlertRuleTriggerIndexEndpoint,
 )
 from sentry.incidents.endpoints.project_alert_rule_details import ProjectAlertRuleDetailsEndpoint
 from sentry.incidents.endpoints.project_alert_rule_index import ProjectAlertRuleIndexEndpoint
@@ -550,6 +557,16 @@ urlpatterns = patterns(
                     OrganizationAlertRuleIndexEndpoint.as_view(),
                     name="sentry-api-0-organization-alert-rules",
                 ),
+                url(
+                    r"^(?P<organization_slug>[^\/]+)/alert-rules/(?P<alert_rule_id>[^\/]+)/triggers/(?P<alert_rule_trigger_id>[^\/]+)$",
+                    OrganizationAlertRuleTriggerDetailsEndpoint.as_view(),
+                    name="sentry-api-0-organization-alert-rule-trigger-details",
+                ),
+                url(
+                    r"^(?P<organization_slug>[^\/]+)/alert-rules/(?P<alert_rule_id>[^\/]+)/triggers/$",
+                    OrganizationAlertRuleTriggerIndexEndpoint.as_view(),
+                    name="sentry-api-0-organization-alert-rules-triggers",
+                ),
                 # Incidents
                 url(
                     r"^(?P<organization_slug>[^\/]+)/incidents/(?P<incident_identifier>[^\/]+)/activity/$",
@@ -725,16 +742,6 @@ urlpatterns = patterns(
                     name="sentry-api-0-organization-event-details",
                 ),
                 url(
-                    r"^(?P<organization_slug>[^\/]+)/events/latest/$",
-                    OrganizationEventDetailsLatestEndpoint.as_view(),
-                    name="sentry-api-0-organization-event-details-latest",
-                ),
-                url(
-                    r"^(?P<organization_slug>[^\/]+)/events/oldest/$",
-                    OrganizationEventDetailsOldestEndpoint.as_view(),
-                    name="sentry-api-0-organization-event-details-oldest",
-                ),
-                url(
                     r"^(?P<organization_slug>[^\/]+)/events-stats/$",
                     OrganizationEventsStatsEndpoint.as_view(),
                     name="sentry-api-0-organization-events-stats",
@@ -857,6 +864,11 @@ urlpatterns = patterns(
                     name="sentry-api-0-organization-projects",
                 ),
                 url(
+                    r"^(?P<organization_slug>[^\/]+)/sent-first-event/$",
+                    OrganizationProjectsSentFirstEventEndpoint.as_view(),
+                    name="sentry-api-0-organization-sent-first-event",
+                ),
+                url(
                     r"^(?P<organization_slug>[^\/]+)/repos/$",
                     OrganizationRepositoriesEndpoint.as_view(),
                     name="sentry-api-0-organization-repositories",
@@ -922,6 +934,11 @@ urlpatterns = patterns(
                     name="sentry-api-0-organization-user-feedback",
                 ),
                 url(
+                    r"^(?P<organization_slug>[^\/]+)/user-teams/$",
+                    OrganizationUserTeamsEndpoint.as_view(),
+                    name="sentry-api-0-organization-user-teams",
+                ),
+                url(
                     r"^(?P<organization_slug>[^\/]+)/users/$",
                     OrganizationUsersEndpoint.as_view(),
                     name="sentry-api-0-organization-users",
@@ -985,6 +1002,11 @@ urlpatterns = patterns(
                     r"^(?P<organization_slug>[^\/]+)/api-tokens/(?P<api_token>[^\/]+)/$",
                     OrganizationApiTokenDetailsEndpoint.as_view(),
                     name="sentry-api-0-organization-api-token-details",
+                ),
+                url(
+                    r"^(?P<organization_slug>[^\/]+)/join-request/$",
+                    OrganizationJoinRequestEndpoint.as_view(),
+                    name="sentry-api-0-organization-join-request",
                 ),
             ]
         ),

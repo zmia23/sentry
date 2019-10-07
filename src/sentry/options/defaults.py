@@ -110,9 +110,6 @@ register("analytics.options", default={}, flags=FLAG_NOSTORE)
 
 register("cloudflare.secret-key", default="")
 
-# Tagstore
-register("tagstore.multi-sampling", default=0.0)
-
 # Slack Integration
 register("slack.client-id", flags=FLAG_PRIORITIZE_DISK)
 register("slack.client-secret", flags=FLAG_PRIORITIZE_DISK)
@@ -166,9 +163,6 @@ register("symbolicator.minidump-refactor-random-sampling", default=0.0)  # unuse
 # Normalization after processors
 register("store.normalize-after-processing", default=0.0)  # unused
 register("store.disable-trim-in-renormalization", default=0.0)  # unused
-
-# Percent ingested events with duplicate checking from nodestore instead of events table
-register("store.nodestore-sample-rate", default=0.0, flags=FLAG_PRIORITIZE_DISK)
 
 # Post Process Error Hook Sampling
 register("post-process.use-error-hook-sampling", default=False)  # unused

@@ -1,5 +1,6 @@
 import {SpanEntry} from 'app/components/events/interfaces/spans/types';
 import {API_SCOPES} from 'app/constants';
+import {Field} from 'app/views/settings/components/forms/type';
 
 export type ObjectStatus =
   | 'active'
@@ -13,6 +14,7 @@ export type Organization = {
   projects: Project[];
   access: string[];
   features: string[];
+  teams: Team[];
 };
 
 export type OrganizationDetailed = Organization & {
@@ -338,11 +340,26 @@ export type Group = {
   userReportCount: number;
 };
 
+export type Member = {
+  id: string;
+  user: User;
+  name: string;
+  email: string;
+  pending: boolean | undefined;
+  role: string;
+  roleName: string;
+  flags: {
+    'sso:linked': boolean;
+    'sso:invalid': boolean;
+  };
+  dateCreated: string;
+};
+
 export type EventViewv1 = {
   name: string;
   data: {
     fields: string[];
-    columnNames: string[];
+    fieldnames: string[];
     sort: string[];
     query?: string;
   };
@@ -409,7 +426,22 @@ export type Integration = {
   accountType: string;
   status: ObjectStatus;
   provider: IntegrationProvider;
-  configOrganization: Array<any>;
+  configOrganization: Field[];
+  //TODO(ts): This includes the initial data that is passed into the integration's configuration form
+  configData: object;
+};
+
+export type IntegrationExternalIssue = {
+  id: string;
+  key: string;
+  url: string;
+  title: string;
+  description: string;
+  displayName: string;
+};
+
+export type GroupIntegration = Integration & {
+  externalIssues: IntegrationExternalIssue[];
 };
 
 export type SentryAppInstallation = {
@@ -465,4 +497,10 @@ export type Commit = {
   dateCreated: string;
   repository?: Repository;
   author?: User;
+};
+
+export type MemberRole = {
+  id: string;
+  name: string;
+  desc: string;
 };

@@ -1,26 +1,20 @@
 import {Location, Query} from 'history';
 import {isString, cloneDeep, pick} from 'lodash';
 
-import {EventViewv1} from 'app/types';
-import {SavedQuery} from 'app/views/discover/types';
 import {DEFAULT_PER_PAGE} from 'app/constants';
+import {EventViewv1} from 'app/types';
+import {SavedQuery as LegacySavedQuery} from 'app/views/discover/types';
+import {SavedQuery, NewQuery} from 'app/stores/discoverSavedQueriesStore';
 
 import {AUTOLINK_FIELDS, SPECIAL_FIELDS, FIELD_FORMATTERS} from './data';
 import {MetaType, EventQuery, getAggregateAlias} from './utils';
 
-type Descending = {
-  kind: 'desc';
+export type Sort = {
+  kind: 'asc' | 'desc';
   field: string;
 };
 
-type Ascending = {
-  kind: 'asc';
-  field: string;
-};
-
-type Sort = Descending | Ascending;
-
-type Field = {
+export type Field = {
   field: string;
   title: string;
   // TODO: implement later
@@ -35,17 +29,17 @@ const decodeFields = (location: Location): Array<Field> => {
   }
 
   const fields: string[] = isString(query.field) ? [query.field] : query.field;
-  const aliases: string[] = Array.isArray(query.alias)
-    ? query.alias
-    : isString(query.alias)
-    ? [query.alias]
+  const fieldnames: string[] = Array.isArray(query.fieldnames)
+    ? query.fieldnames
+    : isString(query.fieldnames)
+    ? [query.fieldnames]
     : [];
 
   const parsed: Field[] = [];
   fields.forEach((field, i) => {
     let title = field;
-    if (aliases[i]) {
-      title = aliases[i];
+    if (fieldnames[i]) {
+      title = fieldnames[i];
     }
     parsed.push({field, title});
   });
@@ -165,11 +159,17 @@ const decodeScalar = (
   return isString(unwrapped) ? unwrapped : void 0;
 };
 
-const queryStringFromSavedQuery = (saved: SavedQuery): string => {
-  if (saved.query) {
+function isLegacySavedQuery(
+  query: LegacySavedQuery | SavedQuery
+): query is LegacySavedQuery {
+  return (query as LegacySavedQuery).conditions !== undefined;
+}
+
+const queryStringFromSavedQuery = (saved: LegacySavedQuery | SavedQuery): string => {
+  if (!isLegacySavedQuery(saved) && saved.query) {
     return saved.query;
   }
-  if (saved.conditions) {
+  if (isLegacySavedQuery(saved) && saved.conditions) {
     const conditions = saved.conditions.map(item => {
       const [field, op, value] = item;
       let operator = op;
@@ -185,6 +185,7 @@ const queryStringFromSavedQuery = (saved: SavedQuery): string => {
 };
 
 class EventView {
+  id: string | undefined;
   name: string | undefined;
   fields: Field[];
   sorts: Sort[];
@@ -196,6 +197,7 @@ class EventView {
   end: string | undefined;
 
   constructor(props: {
+    id: string | undefined;
     name: string | undefined;
     fields: Field[];
     sorts: Sort[];
@@ -206,6 +208,7 @@ class EventView {
     start: string | undefined;
     end: string | undefined;
   }) {
+    this.id = props.id;
     this.name = props.name;
     this.fields = props.fields;
     this.sorts = props.sorts;
@@ -219,6 +222,7 @@ class EventView {
 
   static fromLocation(location: Location): EventView {
     return new EventView({
+      id: decodeScalar(location.query.id),
       name: decodeScalar(location.query.name),
       fields: decodeFields(location),
       sorts: decodeSorts(location),
@@ -235,7 +239,7 @@ class EventView {
     const fields = eventViewV1.data.fields.map((fieldName: string, index: number) => {
       return {
         field: fieldName,
-        title: eventViewV1.data.columnNames[index],
+        title: eventViewV1.data.fieldnames[index],
       };
     });
 
@@ -246,19 +250,30 @@ class EventView {
       tags: eventViewV1.tags,
       query: eventViewV1.data.query,
       project: [],
+      id: undefined,
       range: undefined,
       start: undefined,
       end: undefined,
     });
   }
 
-  static fromSavedQuery(saved: SavedQuery): EventView {
-    const fields = saved.fields.map(field => {
-      return {field, title: field};
-    });
+  static fromSavedQuery(saved: SavedQuery | LegacySavedQuery): EventView {
+    let fields;
+    if (isLegacySavedQuery(saved)) {
+      fields = saved.fields.map(field => {
+        return {field, title: field};
+      });
+    } else {
+      fields = saved.fields.map((field, i) => {
+        const title =
+          saved.fieldnames && saved.fieldnames[i] ? saved.fieldnames[i] : field;
+        return {field, title};
+      });
+    }
 
     return new EventView({
       fields,
+      id: saved.id,
       name: saved.name,
       query: queryStringFromSavedQuery(saved),
       project: saved.projects,
@@ -270,10 +285,26 @@ class EventView {
     });
   }
 
+  toNewQuery(): NewQuery {
+    return {
+      id: this.id,
+      version: 2,
+      name: this.name || '',
+      query: this.query || '',
+      projects: this.project,
+      start: this.start,
+      end: this.end,
+      range: this.range,
+      fields: this.fields.map(item => item.field),
+      fieldnames: this.fields.map(item => item.title),
+    };
+  }
+
   generateQueryStringObject(): Query {
     const output = {
+      id: this.id,
       field: this.fields.map(item => item.field),
-      alias: this.fields.map(item => item.title),
+      fieldnames: this.fields.map(item => item.title),
       sort: encodeSorts(this.sorts),
       tag: this.tags,
       query: this.query,

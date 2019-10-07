@@ -8,6 +8,7 @@ import json
 import logging
 import mock
 import six
+from time import sleep
 import zlib
 
 from sentry import eventstore, tagstore
@@ -163,7 +164,7 @@ class RavenIntegrationTest(TransactionTestCase):
         for _request in requests:
             self.send_event(*_request)
 
-        assert request.call_count is 1
+        assert request.call_count == 1
         assert Group.objects.count() == 1
         group = Group.objects.get()
         assert group.data["title"] == "foo"
@@ -601,6 +602,11 @@ class CspReportTest(TestCase, SnubaTestCase):
     def assertReportCreated(self, input, output):
         resp = self._postCspWithHeader(input)
         assert resp.status_code == 201, resp.content
+        # XXX: there appears to be a race condition between the 201 return and get_events,
+        # leading this test to sometimes fail. .1s seems to be sufficient.
+        # Modifying the timestamp of store_event, like how it's done in other snuba tests,
+        # doesn't work here because the event isn't created directly by this test.
+        sleep(0.1)
         events = eventstore.get_events(
             filter_keys={"project_id": [self.project.id]}, conditions=[["type", "=", "csp"]]
         )
