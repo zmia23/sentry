@@ -202,7 +202,7 @@ def configure_structlog():
     Make structlog comply with all of our options.
     """
     from django.conf import settings
-    import logging
+    import logging.config
     import structlog
     from sentry import options
     from sentry.logging import LoggingFormat
@@ -268,7 +268,8 @@ def initialize_app(config, skip_service_validation=False):
         fix_south(settings)
     monkeypatch_django_migrations()
 
-    apply_legacy_settings(settings)
+    # TODO: This probably needs to keep working, unbreak
+    # apply_legacy_settings(settings)
 
     # Commonly setups don't correctly configure themselves for production envs
     # so lets try to provide a bit more guidance
@@ -312,9 +313,9 @@ def initialize_app(config, skip_service_validation=False):
 
     bind_cache_to_option_store()
 
-    register_plugins(settings)
+    # register_plugins(settings)
 
-    initialize_receivers()
+    # initialize_receivers()
 
     validate_options(settings)
 
@@ -322,7 +323,7 @@ def initialize_app(config, skip_service_validation=False):
 
     configure_sdk()
 
-    setup_services(validate=not skip_service_validation)
+    # setup_services(validate=not skip_service_validation)
 
     from django.utils import timezone
     from sentry.app import env
