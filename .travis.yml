@@ -141,8 +141,17 @@ matrix:
       env: TEST_SUITE=acceptance USE_SNUBA=1
 
     - python: 2.7
-      name: 'Frontend'
+      name: 'Frontend [test]'
       env: TEST_SUITE=js
+      before_install:
+        - find "$NODE_DIR" -type d -empty -delete
+        - nvm install
+      install:
+        - ./bin/yarn install --pure-lockfile
+
+    - python: 2.7
+      name: 'Frontend [webpack]'
+      env: TEST_SUITE=js-build
       before_install:
         - find "$NODE_DIR" -type d -empty -delete
         - nvm install
