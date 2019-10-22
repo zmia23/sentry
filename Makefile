@@ -228,12 +228,13 @@ travis-noop:
 .PHONY: travis-test-lint
 travis-test-lint: lint-python lint-js
 
-.PHONY: travis-test-postgres travis-test-acceptance travis-test-snuba travis-test-symbolicator travis-test-js travis-test-cli travis-test-dist
+.PHONY: travis-test-postgres travis-test-acceptance travis-test-snuba travis-test-symbolicator travis-test-js travis-test-js-build travis-test-cli travis-test-dist
 travis-test-postgres: test-python
 travis-test-acceptance: test-acceptance
 travis-test-snuba: test-snuba
 travis-test-symbolicator: test-symbolicator
 travis-test-js: test-js
+travis-test-js-build: test-js-build
 travis-test-cli: test-cli
 travis-test-dist:
 	# NOTE: We quiet down output here to workaround an issue in travis that
