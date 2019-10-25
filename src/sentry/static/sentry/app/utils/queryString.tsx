@@ -66,7 +66,7 @@ const NO_KEY = '__NO_KEY__';
  */
 export function addKeyValueToQueryStringQuery(qs: Query = {}, tag: string): Query {
   const {query} = qs;
-  const queryObject = decodeQueryValueToObject(query);
+  const queryObject = _decodeQueryValueToObject(query);
 
   let key, value;
   const keyValue = tag.split(':');
@@ -91,7 +91,7 @@ export function addKeyValueToQueryStringQuery(qs: Query = {}, tag: string): Quer
 
   return {
     ...qs,
-    query: encodeObjectToQueryValue(queryObject),
+    query: _encodeObjectToQueryValue(queryObject),
   };
 }
 
@@ -99,14 +99,20 @@ export function addKeyValueToQueryStringQuery(qs: Query = {}, tag: string): Quer
  * This method specifically parses "?query=key:value" into an object and
  * resolves duplicate keys. In the case of duplicate keys, the last value will
  * be used.
+ *
+ * Do not include this in `export default`. This is currently exported for
+ * testing purposes only.
  */
-function decodeQueryValueToObject(query: Query['query']): {[key: string]: string} {
+export function _decodeQueryValueToObject(
+  query: Query['query']
+): {[key: string]: string} {
   const currQuery: string = isString(query)
     ? query
     : Array.isArray(query)
     ? query.reduce((acc, q) => `${acc} ${q}`, '')
     : '';
 
+  // There
   // 1) Start with the QueryValue: "key1:value1 key2:value2"
   // 2) Split it into their pairs: ["key1:value1", "key2:value2"]
   // 3) Split it into key-values:  { key1: value1, key2: value2 }
@@ -126,13 +132,74 @@ function decodeQueryValueToObject(query: Query['query']): {[key: string]: string
 
 /**
  * This method is the opposite of `decodeQueryValueToObject`.
+ *
+ * Do not include this in `export default`. This is currently exported for
+ * testing purposes only.
  */
-function encodeObjectToQueryValue(obj: {[key: string]: string}): Query['query'] {
+export function _encodeObjectToQueryValue(obj: {[key: string]: string}): Query['query'] {
   const queryValue = Object.keys(obj).reduce((acc, key) => {
-    return key === NO_KEY ? `${acc} ${obj[key]}` : `${acc} ${key}:${obj[key]}`;
+    if (key === NO_KEY) {
+      return `${acc} ${obj[key]}`;
+    }
+
+    const validatedKey = _encodeKey(key);
+    const validatedValue = _encodeValue(obj[key]);
+
+    return `${acc} ${validatedKey}:${validatedValue}`;
   }, '');
 
   return queryValue.trim();
+}
+
+const regexKey = /^[a-zA-Z0-9_\.-]+$/;
+const regexKeyWithColon = /^[a-zA-Z0-9_\.-]+:[[a-zA-Z0-9_\.:-]+$/;
+const regexKeyWithColonQuoted = /^"[a-zA-Z0-9_\.-]+:[[a-zA-Z0-9_\.:-]+"$/;
+export function _encodeKey(key: string): string {
+  if (regexKeyWithColonQuoted.test(key)) {
+    return key;
+  }
+
+  if (regexKeyWithColon.test(key)) {
+    return `"${key}"`;
+  }
+
+  if (regexKey.test(key)) {
+    return key;
+  }
+
+  throw new Error('Invalid key');
+}
+
+const regexValue = /^[a-zA-Z0-9_\.-]+$/;
+const regexValueWithSpace = /^[a-zA-Z0-9_\.-\s]+$/;
+const regexValueWithSpaceQuoted = /^"[a-zA-Z0-9_\.-\s]+"$/;
+const regexValueWithNamespaceSpace = /^[a-zA-Z0-9_\.-\s]+:(\\\")[a-zA-Z0-9_\.-\s]+(\\\")$/;
+const regexValueWithNamespaceSpaceQuoted = /^"[a-zA-Z0-9_\.-\s]+:(\\\")[a-zA-Z0-9_\.-\s]+(\\\")"$/;
+/**
+ * This will add TODO(leedongwei)
+ */
+export function _encodeValue(value: string): string {
+  if (regexValueWithNamespaceSpaceQuoted.test(value)) {
+    return value;
+  }
+
+  if (regexValueWithNamespaceSpace.test(value)) {
+    return `"${value}"`;
+  }
+
+  if (regexValueWithSpaceQuoted.test(value)) {
+    return value;
+  }
+
+  if (regexValueWithSpace.test(value)) {
+    return `"${value}"`;
+  }
+
+  if (regexValue.test(value)) {
+    return value;
+  }
+
+  throw new Error('Invalid value');
 }
 
 export default {
