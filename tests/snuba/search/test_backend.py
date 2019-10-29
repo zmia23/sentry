@@ -2,9 +2,7 @@ from __future__ import absolute_import
 
 import mock
 import pytz
-import pytest
 from datetime import datetime, timedelta
-from django.conf import settings
 from django.utils import timezone
 from hashlib import md5
 
@@ -22,7 +20,7 @@ from sentry.models import (
 from sentry.search.snuba.backend import SnubaSearchBackend
 from sentry.testutils import SnubaTestCase, TestCase, xfail_if_not_postgres
 from sentry.testutils.helpers.datetime import iso_format
-from sentry.utils.snuba import SENTRY_SNUBA_MAP, SnubaError
+from sentry.utils.snuba import Dataset, SENTRY_SNUBA_MAP, SnubaError
 
 
 def date_to_query_format(date):
@@ -40,7 +38,7 @@ class SnubaSearchTest(TestCase, SnubaTestCase):
             data={
                 "fingerprint": ["put-me-in-group1"],
                 "event_id": "a" * 32,
-                "message": "foo",
+                "message": "foo. Also,this message is intended to be greater than 256 characters so that we can put some unique string identifier after that point in the string. The purpose of this is in order to verify we are using snuba to search messsages instead of Postgres (postgres truncates at 256 characters and clickhouse does not). santryrox.",
                 "environment": "production",
                 "tags": {"server": "example.com"},
                 "timestamp": event1_timestamp,
@@ -163,6 +161,7 @@ class SnubaSearchTest(TestCase, SnubaTestCase):
             search_filters = self.build_search_filter(
                 search_filter_query, projects, environments=environments
             )
+
         kwargs = {}
         if limit is not None:
             kwargs["limit"] = limit
@@ -205,6 +204,15 @@ class SnubaSearchTest(TestCase, SnubaTestCase):
             environments=[self.environments["staging"]], search_filter_query="bar"
         )
         assert set(results) == set([self.group2])
+
+    def test_query_for_text_in_long_message(self):
+        results = self.make_query(
+            [self.project],
+            environments=[self.environments["production"]],
+            search_filter_query="santryrox",
+        )
+
+        assert set(results) == set([self.group1])
 
     def test_multi_environments(self):
         self.set_up_multi_project()
@@ -734,10 +742,6 @@ class SnubaSearchTest(TestCase, SnubaTestCase):
         )
         assert set(results) == set([self.group1, self.group2])
 
-    @pytest.mark.xfail(
-        not settings.SENTRY_TAGSTORE.startswith("sentry.tagstore.v2"),
-        reason="unsupported on legacy backend due to insufficient index",
-    )
     def test_date_filter_with_environment(self):
         results = self.backend.query(
             [self.project],
@@ -848,12 +852,12 @@ class SnubaSearchTest(TestCase, SnubaTestCase):
 
     @mock.patch("sentry.utils.snuba.raw_query")
     def test_snuba_not_called_optimization(self, query_mock):
-        assert self.make_query(search_filter_query="foo").results == [self.group1]
+        assert self.make_query(search_filter_query="status:unresolved").results == [self.group1]
         assert not query_mock.called
 
         assert (
             self.make_query(
-                search_filter_query="last_seen:>%s foo" % date_to_query_format(timezone.now()),
+                search_filter_query="last_seen:>%s" % date_to_query_format(timezone.now()),
                 sort_by="date",
             ).results
             == []
@@ -878,9 +882,14 @@ class SnubaSearchTest(TestCase, SnubaTestCase):
         limit = int(DEFAULT_LIMIT * chunk_growth)
 
         common_args = {
+            "arrayjoin": None,
+            "dataset": Dataset.Events,
             "start": Any(datetime),
             "end": Any(datetime),
-            "filter_keys": {"project_id": [self.project.id], "issue": [self.group1.id]},
+            "filter_keys": {
+                "project_id": [self.project.id],
+                "issue": [self.group1.id, self.group2.id],
+            },
             "referrer": "search",
             "groupby": ["issue"],
             "conditions": [[["positionCaseInsensitive", ["message", "'foo'"]], "!=", 0]],
@@ -892,7 +901,7 @@ class SnubaSearchTest(TestCase, SnubaTestCase):
             "sample": 1,
         }
 
-        self.make_query(search_filter_query="foo")
+        self.make_query(search_filter_query="status:unresolved")
         assert not query_mock.called
 
         self.make_query(
@@ -975,7 +984,7 @@ class SnubaSearchTest(TestCase, SnubaTestCase):
     def test_hits_estimate(self):
         # 400 Groups/Events
         # Every 3rd one is Unresolved
-        # Evey 2nd one has tag match=1
+        # Every 2nd one has tag match=1
         for i in range(400):
             event = self.store_event(
                 data={
@@ -1340,7 +1349,7 @@ class SnubaSearchTest(TestCase, SnubaTestCase):
         assert set(results) == set([self.group1, no_tag_event.group])
 
     def test_all_fields_do_not_error(self):
-        # Just a sanity check to make sure that all fields can be succesfully
+        # Just a sanity check to make sure that all fields can be successfully
         # searched on without returning type errors and other schema related
         # issues.
         def test_query(query):

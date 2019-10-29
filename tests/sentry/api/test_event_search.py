@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from sentry.api.event_search import (
     convert_endpoint_params,
     event_search_grammar,
-    get_snuba_query_args,
+    get_filter,
     resolve_field_list,
     get_reference_event_conditions,
     parse_search_query,
@@ -404,6 +404,23 @@ class ParseSearchQueryTest(unittest.TestCase):
             ),
             SearchFilter(
                 key=SearchKey(name="release"), operator="=", value=SearchValue(raw_value="1.2.1")
+            ),
+        ]
+
+    def test_custom_explicit_tag(self):
+        assert parse_search_query("tags[fruit]:apple release:1.2.1 tags[project_id]:123") == [
+            SearchFilter(
+                key=SearchKey(name="tags[fruit]"),
+                operator="=",
+                value=SearchValue(raw_value="apple"),
+            ),
+            SearchFilter(
+                key=SearchKey(name="release"), operator="=", value=SearchValue(raw_value="1.2.1")
+            ),
+            SearchFilter(
+                key=SearchKey(name="tags[project_id]"),
+                operator="=",
+                value=SearchValue(raw_value="123"),
             ),
         ]
 
@@ -832,217 +849,137 @@ class ParseBooleanSearchQueryTest(unittest.TestCase):
 
 class GetSnubaQueryArgsTest(TestCase):
     def test_simple(self):
-        assert get_snuba_query_args(
+        filter = get_filter(
             "user.email:foo@example.com release:1.2.1 fruit:apple hello",
             {
                 "project_id": [1, 2, 3],
                 "start": datetime.datetime(2015, 5, 18, 10, 15, 1, tzinfo=timezone.utc),
                 "end": datetime.datetime(2015, 5, 19, 10, 15, 1, tzinfo=timezone.utc),
             },
-        ) == {
-            "conditions": [
-                ["email", "=", "foo@example.com"],
-                ["tags[sentry:release]", "=", "1.2.1"],
-                [["ifNull", ["tags[fruit]", "''"]], "=", "apple"],
-                [["positionCaseInsensitive", ["message", "'hello'"]], "!=", 0],
-            ],
-            "filter_keys": {"project_id": [1, 2, 3]},
-            "start": datetime.datetime(2015, 5, 18, 10, 15, 1, tzinfo=timezone.utc),
-            "end": datetime.datetime(2015, 5, 19, 10, 15, 1, tzinfo=timezone.utc),
-        }
+        )
+
+        assert filter.conditions == [
+            ["user.email", "=", "foo@example.com"],
+            ["release", "=", "1.2.1"],
+            [["ifNull", ["fruit", "''"]], "=", "apple"],
+            [["positionCaseInsensitive", ["message", "'hello'"]], "!=", 0],
+        ]
+        assert filter.start == datetime.datetime(2015, 5, 18, 10, 15, 1, tzinfo=timezone.utc)
+        assert filter.end == datetime.datetime(2015, 5, 19, 10, 15, 1, tzinfo=timezone.utc)
+        assert filter.filter_keys == {"project_id": [1, 2, 3]}
+        assert filter.project_ids == [1, 2, 3]
+        assert not filter.group_ids
+        assert not filter.event_ids
 
     def test_negation(self):
-        assert get_snuba_query_args("!user.email:foo@example.com") == {
-            "conditions": [[[["isNull", ["email"]], "=", 1], ["email", "!=", "foo@example.com"]]],
-            "filter_keys": {},
-        }
+        filter = get_filter("!user.email:foo@example.com")
+        assert filter.conditions == [
+            [[["isNull", ["user.email"]], "=", 1], ["user.email", "!=", "foo@example.com"]]
+        ]
+        assert filter.filter_keys == {}
+
+    def test_implicit_and_explicit_tags(self):
+        assert get_filter("tags[fruit]:apple").conditions == [
+            [["ifNull", ["tags[fruit]", "''"]], "=", "apple"]
+        ]
+
+        assert get_filter("fruit:apple").conditions == [[["ifNull", ["fruit", "''"]], "=", "apple"]]
+
+        assert get_filter("tags[project_id]:123").conditions == [
+            [["ifNull", ["tags[project_id]", "''"]], "=", "123"]
+        ]
 
     def test_no_search(self):
-        assert get_snuba_query_args(
+        filter = get_filter(
             params={
                 "project_id": [1, 2, 3],
                 "start": datetime.datetime(2015, 5, 18, 10, 15, 1, tzinfo=timezone.utc),
                 "end": datetime.datetime(2015, 5, 19, 10, 15, 1, tzinfo=timezone.utc),
             }
-        ) == {
-            "conditions": [],
-            "filter_keys": {"project_id": [1, 2, 3]},
-            "start": datetime.datetime(2015, 5, 18, 10, 15, 1, tzinfo=timezone.utc),
-            "end": datetime.datetime(2015, 5, 19, 10, 15, 1, tzinfo=timezone.utc),
-        }
+        )
+        assert not filter.conditions
+        assert filter.filter_keys == {"project_id": [1, 2, 3]}
+        assert filter.start == datetime.datetime(2015, 5, 18, 10, 15, 1, tzinfo=timezone.utc)
+        assert filter.end == datetime.datetime(2015, 5, 19, 10, 15, 1, tzinfo=timezone.utc)
 
     def test_wildcard(self):
-        assert get_snuba_query_args("release:3.1.* user.email:*@example.com") == {
-            "conditions": [
-                [["match", ["tags[sentry:release]", "'(?i)^3\\.1\\..*$'"]], "=", 1],
-                [["match", ["email", "'(?i)^.*\\@example\\.com$'"]], "=", 1],
-            ],
-            "filter_keys": {},
-        }
+        filter = get_filter("release:3.1.* user.email:*@example.com")
+        assert filter.conditions == [
+            [["match", ["release", "'(?i)^3\\.1\\..*$'"]], "=", 1],
+            [["match", ["user.email", "'(?i)^.*\\@example\\.com$'"]], "=", 1],
+        ]
+        assert filter.filter_keys == {}
 
     def test_negated_wildcard(self):
-        assert get_snuba_query_args("!release:3.1.* user.email:*@example.com") == {
-            "conditions": [
-                [
-                    [["isNull", ["tags[sentry:release]"]], "=", 1],
-                    [["match", ["tags[sentry:release]", "'(?i)^3\\.1\\..*$'"]], "!=", 1],
-                ],
-                [["match", ["email", "'(?i)^.*\\@example\\.com$'"]], "=", 1],
+        filter = get_filter("!release:3.1.* user.email:*@example.com")
+        assert filter.conditions == [
+            [
+                [["isNull", ["release"]], "=", 1],
+                [["match", ["release", "'(?i)^3\\.1\\..*$'"]], "!=", 1],
             ],
-            "filter_keys": {},
-        }
+            [["match", ["user.email", "'(?i)^.*\\@example\\.com$'"]], "=", 1],
+        ]
+        assert filter.filter_keys == {}
 
     def test_escaped_wildcard(self):
-        assert get_snuba_query_args("release:3.1.\\* user.email:\\*@example.com") == {
-            "conditions": [
-                [["match", ["tags[sentry:release]", "'(?i)^3\\.1\\.\\*$'"]], "=", 1],
-                [["match", ["email", "'(?i)^\*\\@example\\.com$'"]], "=", 1],
-            ],
-            "filter_keys": {},
-        }
-        assert get_snuba_query_args("release:\\\\\\*") == {
-            "conditions": [[["match", ["tags[sentry:release]", "'(?i)^\\\\\\*$'"]], "=", 1]],
-            "filter_keys": {},
-        }
-        assert get_snuba_query_args("release:\\\\*") == {
-            "conditions": [[["match", ["tags[sentry:release]", "'(?i)^\\\\.*$'"]], "=", 1]],
-            "filter_keys": {},
-        }
+        assert get_filter("release:3.1.\\* user.email:\\*@example.com").conditions == [
+            [["match", ["release", "'(?i)^3\\.1\\.\\*$'"]], "=", 1],
+            [["match", ["user.email", "'(?i)^\*\\@example\\.com$'"]], "=", 1],
+        ]
+        assert get_filter("release:\\\\\\*").conditions == [
+            [["match", ["release", "'(?i)^\\\\\\*$'"]], "=", 1]
+        ]
+        assert get_filter("release:\\\\*").conditions == [
+            [["match", ["release", "'(?i)^\\\\.*$'"]], "=", 1]
+        ]
 
     def test_has(self):
-        assert get_snuba_query_args("has:release") == {
-            "filter_keys": {},
-            "conditions": [[["isNull", ["tags[sentry:release]"]], "!=", 1]],
-        }
+        assert get_filter("has:release").conditions == [[["isNull", ["release"]], "!=", 1]]
 
     def test_not_has(self):
-        assert get_snuba_query_args("!has:release") == {
-            "filter_keys": {},
-            "conditions": [[["isNull", ["tags[sentry:release]"]], "=", 1]],
-        }
+        assert get_filter("!has:release").conditions == [[["isNull", ["release"]], "=", 1]]
 
     def test_message_negative(self):
-        assert get_snuba_query_args('!message:"post_process.process_error HTTPError 403"') == {
-            "filter_keys": {},
-            "conditions": [
+        assert get_filter('!message:"post_process.process_error HTTPError 403"').conditions == [
+            [
                 [
-                    [
-                        "positionCaseInsensitive",
-                        ["message", "'post_process.process_error HTTPError 403'"],
-                    ],
-                    "=",
-                    0,
-                ]
-            ],
-        }
+                    "positionCaseInsensitive",
+                    ["message", "'post_process.process_error HTTPError 403'"],
+                ],
+                "=",
+                0,
+            ]
+        ]
 
     def test_malformed_groups(self):
         with pytest.raises(InvalidSearchQuery):
-            get_snuba_query_args("(user.email:foo@example.com OR user.email:bar@example.com")
-
-    def test_boolean_term_simple(self):
-        assert get_snuba_query_args(
-            "user.email:foo@example.com AND user.email:bar@example.com"
-        ) == {
-            "conditions": [
-                ["and", [["email", "=", "foo@example.com"], ["email", "=", "bar@example.com"]]]
-            ],
-            "filter_keys": {},
-            "has_boolean_terms": True,
-        }
-        assert get_snuba_query_args("user.email:foo@example.com OR user.email:bar@example.com") == {
-            "conditions": [
-                ["or", [["email", "=", "foo@example.com"], ["email", "=", "bar@example.com"]]]
-            ],
-            "filter_keys": {},
-            "has_boolean_terms": True,
-        }
-        assert get_snuba_query_args(
-            "user.email:foo@example.com AND user.email:bar@example.com OR user.email:foobar@example.com AND user.email:hello@example.com AND user.email:hi@example.com OR user.email:foo@example.com AND user.email:bar@example.com OR user.email:foobar@example.com AND user.email:hello@example.com AND user.email:hi@example.com"
-        ) == {
-            "conditions": [
-                [
-                    "or",
-                    [
-                        [
-                            "and",
-                            [["email", "=", "foo@example.com"], ["email", "=", "bar@example.com"]],
-                        ],
-                        [
-                            "or",
-                            [
-                                [
-                                    "and",
-                                    [
-                                        ["email", "=", "foobar@example.com"],
-                                        [
-                                            "and",
-                                            [
-                                                ["email", "=", "hello@example.com"],
-                                                ["email", "=", "hi@example.com"],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                                [
-                                    "or",
-                                    [
-                                        [
-                                            "and",
-                                            [
-                                                ["email", "=", "foo@example.com"],
-                                                ["email", "=", "bar@example.com"],
-                                            ],
-                                        ],
-                                        [
-                                            "and",
-                                            [
-                                                ["email", "=", "foobar@example.com"],
-                                                [
-                                                    "and",
-                                                    [
-                                                        ["email", "=", "hello@example.com"],
-                                                        ["email", "=", "hi@example.com"],
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ]
-            ],
-            "filter_keys": {},
-            "has_boolean_terms": True,
-        }
+            get_filter("(user.email:foo@example.com OR user.email:bar@example.com")
 
     def test_issue_filter(self):
-        assert get_snuba_query_args("issue.id:1") == {
-            "conditions": [],
-            "filter_keys": {"issue": [1]},
-        }
+        filter = get_filter("issue.id:1")
+        assert not filter.conditions
+        assert filter.filter_keys == {"issue": [1]}
+        assert filter.group_ids == [1]
 
-        assert get_snuba_query_args("issue.id:1 issue.id:2 issue.id:3") == {
-            "conditions": [],
-            "filter_keys": {"issue": [1, 2, 3]},
-        }
+        filter = get_filter("issue.id:1 issue.id:2 issue.id:3")
+        assert not filter.conditions
+        assert filter.filter_keys == {"issue": [1, 2, 3]}
+        assert filter.group_ids == [1, 2, 3]
 
-        assert get_snuba_query_args("issue.id:1 user.email:foo@example.com") == {
-            "conditions": [["email", "=", "foo@example.com"]],
-            "filter_keys": {"issue": [1]},
-        }
+        filter = get_filter("issue.id:1 user.email:foo@example.com")
+        assert filter.conditions == [["user.email", "=", "foo@example.com"]]
+        assert filter.filter_keys == {"issue": [1]}
+        assert filter.group_ids == [1]
 
     def test_project_name(self):
         p1 = self.create_project(organization=self.organization)
         p2 = self.create_project(organization=self.organization)
 
         params = {"project_id": [p1.id, p2.id]}
-        assert get_snuba_query_args("project.name:{}".format(p1.slug), params) == {
-            "conditions": [["project_id", "=", p1.id]],
-            "filter_keys": {"project_id": [p1.id, p2.id]},
-        }
+        filter = get_filter("project.name:{}".format(p1.slug), params)
+        filter.conditions == [["project_id", "=", p1.id]]
+        filter.filter_keys == {"project_id": [p1.id, p2.id]}
+        filter.project_ids == [p1.id, p2.id]
 
 
 class ConvertEndpointParamsTests(unittest.TestCase):
@@ -1097,10 +1034,23 @@ class ResolveFieldListTest(unittest.TestCase):
         assert result["selected_columns"] == ["title"]
         assert result["aggregations"] == [
             ["max", "timestamp", "last_seen"],
-            ["argMax(event_id, timestamp)", "", "latest_event"],
-            ["argMax(project_id, timestamp)", "", "projectid"],
+            ["argMax", ["id", "timestamp"], "latest_event"],
+            ["argMax", ["project_id", "timestamp"], "projectid"],
         ]
         assert result["groupby"] == ["title"]
+
+    def test_field_alias_duration_expansion(self):
+        fields = ["avg(transaction.duration)", "p95", "p75"]
+        result = resolve_field_list(fields, {})
+        assert result["selected_columns"] == []
+        assert result["aggregations"] == [
+            ["avg", "transaction.duration", "avg_transaction_duration"],
+            ["quantileTiming(0.95)(duration)", "", "p95"],
+            ["quantileTiming(0.75)(duration)", "", "p75"],
+            ["argMax", ["id", "timestamp"], "latest_event"],
+            ["argMax", ["project_id", "timestamp"], "projectid"],
+        ]
+        assert result["groupby"] == []
 
     def test_field_alias_expansion(self):
         fields = ["title", "last_seen", "latest_event", "project", "user", "message"]
@@ -1117,7 +1067,7 @@ class ResolveFieldListTest(unittest.TestCase):
         ]
         assert result["aggregations"] == [
             ["max", "timestamp", "last_seen"],
-            ["argMax(event_id, timestamp)", "", "latest_event"],
+            ["argMax", ["id", "timestamp"], "latest_event"],
         ]
         assert result["groupby"] == [
             "title",
@@ -1139,8 +1089,8 @@ class ResolveFieldListTest(unittest.TestCase):
             ["uniq", "user", "count_unique_user"],
             ["count", "id", "count_id"],
             ["min", "timestamp", "min_timestamp"],
-            ["argMax(event_id, timestamp)", "", "latest_event"],
-            ["argMax(project_id, timestamp)", "", "projectid"],
+            ["argMax", ["id", "timestamp"], "latest_event"],
+            ["argMax", ["project_id", "timestamp"], "projectid"],
         ]
         assert result["groupby"] == []
 
@@ -1149,8 +1099,8 @@ class ResolveFieldListTest(unittest.TestCase):
         result = resolve_field_list(fields, {})
         assert result["aggregations"] == [
             ["uniq", "user.id", "count_unique_user_id"],
-            ["argMax(event_id, timestamp)", "", "latest_event"],
-            ["argMax(project_id, timestamp)", "", "projectid"],
+            ["argMax", ["id", "timestamp"], "latest_event"],
+            ["argMax", ["project_id", "timestamp"], "projectid"],
         ]
 
     def test_aggregate_function_invalid_name(self):
@@ -1167,7 +1117,7 @@ class ResolveFieldListTest(unittest.TestCase):
 
     def test_aggregate_function_invalid_column(self):
         with pytest.raises(InvalidSearchQuery) as err:
-            fields = ["p75(message)"]
+            fields = ["min(message)"]
             resolve_field_list(fields, {})
         assert "Invalid column" in six.text_type(err)
 
@@ -1217,8 +1167,8 @@ class ResolveFieldListTest(unittest.TestCase):
         assert result["selected_columns"] == []
         assert result["aggregations"] == [
             ["max", "timestamp", "last_seen"],
-            ["argMax(event_id, timestamp)", "", "latest_event"],
-            ["argMax(project_id, timestamp)", "", "projectid"],
+            ["argMax", ["id", "timestamp"], "latest_event"],
+            ["argMax", ["project_id", "timestamp"], "projectid"],
         ]
         assert result["groupby"] == []
 
@@ -1230,8 +1180,8 @@ class ResolveFieldListTest(unittest.TestCase):
         assert result["aggregations"] == [
             ["count", "id", "count_id"],
             ["uniq", "user", "count_unique_user"],
-            ["argMax(event_id, timestamp)", "", "latest_event"],
-            ["argMax(project_id, timestamp)", "", "projectid"],
+            ["argMax", ["id", "timestamp"], "latest_event"],
+            ["argMax", ["project_id", "timestamp"], "projectid"],
         ]
         assert result["groupby"] == []
 
@@ -1308,9 +1258,9 @@ class GetReferenceEventConditionsTest(SnubaTestCase, TestCase):
         slug = "{}:{}".format(self.project.slug, event.event_id)
         result = get_reference_event_conditions(self.conditions, slug)
         assert result == [
-            ["geo_city", "=", "San Francisco"],
-            ["geo_region", "=", "CA"],
-            ["geo_country_code", "=", "US"],
+            ["geo.city", "=", "San Francisco"],
+            ["geo.region", "=", "CA"],
+            ["geo.country_code", "=", "US"],
         ]
 
     def test_sdk_field(self):
@@ -1326,7 +1276,7 @@ class GetReferenceEventConditionsTest(SnubaTestCase, TestCase):
         self.conditions["groupby"] = ["sdk.version", "sdk.name"]
         slug = "{}:{}".format(self.project.slug, event.event_id)
         result = get_reference_event_conditions(self.conditions, slug)
-        assert result == [["sdk_version", "=", "5.0.12"], ["sdk_name", "=", "sentry-python"]]
+        assert result == [["sdk.version", "=", "5.0.12"], ["sdk.name", "=", "sentry-python"]]
 
     def test_error_field(self):
         data = load_data("php")
@@ -1336,9 +1286,8 @@ class GetReferenceEventConditionsTest(SnubaTestCase, TestCase):
         slug = "{}:{}".format(self.project.slug, event.event_id)
         result = get_reference_event_conditions(self.conditions, slug)
         assert result == [
-            ["exception_stacks.value", "=", ["This is a test exception sent from the Raven CLI."]],
-            ["exception_stacks.type", "=", ["Exception"]],
-            ["exception_stacks.mechanism_handled", "=", [None]],
+            ["error.value", "=", "This is a test exception sent from the Raven CLI."],
+            ["error.type", "=", "Exception"],
         ]
 
     def test_stack_field(self):
@@ -1349,17 +1298,8 @@ class GetReferenceEventConditionsTest(SnubaTestCase, TestCase):
         slug = "{}:{}".format(self.project.slug, event.event_id)
         result = get_reference_event_conditions(self.conditions, slug)
         assert result == [
-            [
-                "exception_frames.filename",
-                "=",
-                [
-                    "/Users/example/Development/raven-php/bin/raven",
-                    "/Users/example/Development/raven-php/bin/raven",
-                    "/Users/example/Development/raven-php/bin/raven",
-                    "/Users/example/Development/raven-php/bin/raven",
-                ],
-            ],
-            ["exception_frames.function", "=", ["null", "main", "cmd_test", "raven_cli_test"]],
+            ["stack.filename", "=", "/Users/example/Development/raven-php/bin/raven"],
+            ["stack.function", "=", "raven_cli_test"],
         ]
 
     def test_tag_value(self):
@@ -1374,7 +1314,7 @@ class GetReferenceEventConditionsTest(SnubaTestCase, TestCase):
         self.conditions["groupby"] = ["nope", "color", "customer_id"]
         slug = "{}:{}".format(self.project.slug, event.event_id)
         result = get_reference_event_conditions(self.conditions, slug)
-        assert result == [["tags[color]", "=", "red"], ["tags[customer_id]", "=", "1"]]
+        assert result == [["color", "=", "red"], ["customer_id", "=", "1"]]
 
     def test_context_value(self):
         event = self.store_event(
@@ -1393,6 +1333,33 @@ class GetReferenceEventConditionsTest(SnubaTestCase, TestCase):
         slug = "{}:{}".format(self.project.slug, event.event_id)
         result = get_reference_event_conditions(self.conditions, slug)
         assert result == [
-            ["tags[gpu.name]", "=", "nvidia 8600"],
-            ["tags[browser.name]", "=", "Firefox"],
+            ["gpu.name", "=", "nvidia 8600"],
+            ["browser.name", "=", "Firefox"],
         ]
+
+    def test_issue_field(self):
+        event = self.store_event(
+            data={
+                "message": "oh no!",
+                "timestamp": iso_format(before_now(seconds=1)),
+                "contexts": {
+                    "os": {"version": "10.14.6", "type": "os", "name": "Mac OS X"},
+                    "browser": {"type": "browser", "name": "Firefox", "version": "69"},
+                    "gpu": {"type": "gpu", "name": "nvidia 8600", "vendor": "nvidia"},
+                },
+            },
+            project_id=self.project.id,
+        )
+        self.conditions["groupby"] = ["issue.id"]
+        slug = "{}:{}".format(self.project.slug, event.event_id)
+        result = get_reference_event_conditions(self.conditions, slug)
+        assert result == [["issue.id", "=", event.group_id]]
+
+    @pytest.mark.xfail(reason="This requires eventstore.get_event_by_id to work with transactions")
+    def test_transcation_field(self):
+        data = load_data("transaction")
+        event = self.store_event(data=data, project_id=self.project.id)
+        self.conditions["groupby"] = ["transaction.op", "transaction.duration"]
+        slug = "{}:{}".format(self.project.slug, event.event_id)
+        result = get_reference_event_conditions(self.conditions, slug)
+        assert result == [["transaction.op", "=", "db"], ["transaction.duration", "=", 2]]

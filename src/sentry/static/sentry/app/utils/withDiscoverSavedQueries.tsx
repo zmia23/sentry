@@ -2,9 +2,10 @@ import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 
-import DiscoverSavedQueriesStore from 'app/stores/discoverSavedQueriesStore';
+import DiscoverSavedQueriesStore, {
+  SavedQuery,
+} from 'app/stores/discoverSavedQueriesStore';
 import getDisplayName from 'app/utils/getDisplayName';
-import {SavedQuery} from 'app/views/discover/types';
 
 type InjectedDiscoverSavedQueriesProps = {
   savedQueries: SavedQuery[];
@@ -27,7 +28,7 @@ const withDiscoverSavedQueries = <P extends InjectedDiscoverSavedQueriesProps>(
     State
   >({
     displayName: `withDiscoverSavedQuery(${getDisplayName(WrappedComponent)})`,
-    mixins: [Reflux.listenTo(DiscoverSavedQueriesStore, 'onUpdate')],
+    mixins: [Reflux.listenTo(DiscoverSavedQueriesStore, 'onUpdate') as any],
 
     getInitialState() {
       return {
@@ -44,11 +45,10 @@ const withDiscoverSavedQueries = <P extends InjectedDiscoverSavedQueriesProps>(
     },
 
     updateQueries() {
-      const state = DiscoverSavedQueriesStore.get();
-
-      if (this.state.savedQueries !== state.savedQueries) {
-        this.setState({savedQueries: state.savedQueries});
-      }
+      const queries = DiscoverSavedQueriesStore.get().savedQueries.filter(
+        (item: SavedQuery) => item.version === 2
+      );
+      this.setState({savedQueries: queries});
     },
 
     render() {

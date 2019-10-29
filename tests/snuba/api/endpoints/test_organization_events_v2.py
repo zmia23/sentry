@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 
 from sentry.testutils import APITestCase, SnubaTestCase
 from sentry.testutils.helpers.datetime import before_now, iso_format
+from sentry.utils.samples import load_data
 import pytest
 
 
@@ -480,7 +481,7 @@ class OrganizationEventsV2EndpointTest(APITestCase, SnubaTestCase):
         assert response.status_code == 400, response.content
         assert response.data["detail"] == "No fields provided"
 
-    def test_condition_on_aggregate_fails(self):
+    def test_condition_on_aggregate_misses(self):
         self.login_as(user=self.user)
         project = self.create_project()
         self.store_event(
@@ -549,3 +550,24 @@ class OrganizationEventsV2EndpointTest(APITestCase, SnubaTestCase):
         data = response.data["data"]
         assert data[0]["transaction"] == "/example"
         assert data[0]["latest_event"] == "b" * 32
+
+    def test_transaction_event_type(self):
+        self.login_as(user=self.user)
+
+        project = self.create_project()
+        data = load_data("transaction")
+        data["timestamp"] = iso_format(before_now(minutes=1, seconds=5))
+        data["start_timestamp"] = iso_format(before_now(minutes=1))
+        self.store_event(data=data, project_id=project.id)
+
+        with self.feature("organizations:events-v2"):
+            response = self.client.get(
+                self.url,
+                format="json",
+                data={
+                    "field": ["transaction", "transaction.duration"],
+                    "query": "event.type:transaction",
+                },
+            )
+        assert response.status_code == 200, response.content
+        assert len(response.data["data"]) == 1

@@ -1,5 +1,5 @@
 import React from 'react';
-import {mount} from 'enzyme';
+import {mountWithTheme} from 'sentry-test/enzyme';
 
 import DropdownAutoCompleteMenu from 'app/components/dropdownAutoCompleteMenu';
 
@@ -20,8 +20,8 @@ describe('DropdownAutoCompleteMenu', function() {
     },
   ];
   it('renders without a group', function() {
-    const wrapper = mount(
-      <DropdownAutoCompleteMenu isOpen={true} items={items}>
+    const wrapper = mountWithTheme(
+      <DropdownAutoCompleteMenu isOpen items={items}>
         {() => 'Click Me!'}
       </DropdownAutoCompleteMenu>,
       routerContext
@@ -30,9 +30,9 @@ describe('DropdownAutoCompleteMenu', function() {
   });
 
   it('renders with a group', function() {
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <DropdownAutoCompleteMenu
-        isOpen={true}
+        isOpen
         items={[
           {
             id: 'countries',
@@ -61,9 +61,9 @@ describe('DropdownAutoCompleteMenu', function() {
   it('selects', function() {
     const mock = jest.fn();
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <DropdownAutoCompleteMenu
-        isOpen={true}
+        isOpen
         items={[
           {
             id: 'countries',
@@ -95,10 +95,10 @@ describe('DropdownAutoCompleteMenu', function() {
   });
 
   it('shows empty message when there are no items', function() {
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <DropdownAutoCompleteMenu
         emptyHidesInput
-        isOpen={true}
+        isOpen
         items={[]}
         emptyMessage="No items!"
       >
@@ -115,8 +115,8 @@ describe('DropdownAutoCompleteMenu', function() {
   });
 
   it('shows default empty results message when there are no items found in search', function() {
-    const wrapper = mount(
-      <DropdownAutoCompleteMenu isOpen={true} items={items} emptyMessage="No items!">
+    const wrapper = mountWithTheme(
+      <DropdownAutoCompleteMenu isOpen items={items} emptyMessage="No items!">
         {({selectedItem}) => (selectedItem ? selectedItem.label : 'Click me!')}
       </DropdownAutoCompleteMenu>,
       routerContext
@@ -128,9 +128,9 @@ describe('DropdownAutoCompleteMenu', function() {
   });
 
   it('overrides default empty results message', function() {
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <DropdownAutoCompleteMenu
-        isOpen={true}
+        isOpen
         items={items}
         emptyMessage="No items!"
         noResultsMessage="No search results"
@@ -145,8 +145,8 @@ describe('DropdownAutoCompleteMenu', function() {
   });
 
   it('hides filter with `hideInput` prop', function() {
-    const wrapper = mount(
-      <DropdownAutoCompleteMenu isOpen={true} items={items} hideInput>
+    const wrapper = mountWithTheme(
+      <DropdownAutoCompleteMenu isOpen items={items} hideInput>
         {() => 'Click Me!'}
       </DropdownAutoCompleteMenu>,
       routerContext
@@ -156,8 +156,8 @@ describe('DropdownAutoCompleteMenu', function() {
   });
 
   it('filters using a value from prop instead of input', function() {
-    const wrapper = mount(
-      <DropdownAutoCompleteMenu isOpen={true} items={items} filterValue="Apple">
+    const wrapper = mountWithTheme(
+      <DropdownAutoCompleteMenu isOpen items={items} filterValue="Apple">
         {() => 'Click Me!'}
       </DropdownAutoCompleteMenu>,
       routerContext

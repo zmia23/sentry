@@ -2,7 +2,7 @@
 
 exports[`ProjectTeamsSettings render() renders 1`] = `
 <SideEffect(DocumentTitle)
-  title="Ownership - Sentry"
+  title="Issue Owners - project-slug - Sentry"
 >
   <div>
     <StyledSettingsPageHeading
@@ -161,8 +161,6 @@ exports[`ProjectTeamsSettings render() renders 1`] = `
           "fallthrough": "false",
         }
       }
-      onSubmitError={[Function]}
-      onSubmitSuccess={[Function]}
       requireChanges={false}
       saveOnBlur={true}
       submitDisabled={false}
@@ -201,8 +199,6 @@ exports[`ProjectTeamsSettings render() renders 1`] = `
           "autoAssignment": "false",
         }
       }
-      onSubmitError={[Function]}
-      onSubmitSuccess={[Function]}
       requireChanges={false}
       saveOnBlur={true}
       submitDisabled={false}

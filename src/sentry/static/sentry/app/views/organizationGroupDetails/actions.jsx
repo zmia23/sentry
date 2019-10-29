@@ -43,7 +43,7 @@ class DeleteActions extends React.Component {
   renderDiscardModal = ({Body, closeModal}) => (
     <Feature
       features={['projects:discard-groups']}
-      hookName="discard-groups"
+      hookName="feature-disabled:discard-groups"
       organization={this.props.organization}
       project={this.props.project}
       renderDisabled={this.renderDiscardDisabled}
@@ -96,7 +96,7 @@ class DeleteActions extends React.Component {
         >
           <span className="icon-trash" />
         </LinkWithConfirmation>
-        <DropdownLink caret={true} className="group-delete btn btn-default btn-sm">
+        <DropdownLink caret className="group-delete btn btn-default btn-sm">
           <MenuItem onClick={this.openDiscardModal}>
             <span>{t('Delete and discard future events')}</span>
           </MenuItem>

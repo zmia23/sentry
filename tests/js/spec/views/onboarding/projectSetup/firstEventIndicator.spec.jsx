@@ -1,13 +1,13 @@
 import React from 'react';
 
 import {Indicator} from 'app/views/onboarding/projectSetup/firstEventIndicator';
-import {mount} from 'enzyme';
+import {mountWithTheme} from 'sentry-test/enzyme';
 
 describe('FirstEventIndicator', function() {
   it('renders waiting status', async function() {
     const org = TestStubs.Organization();
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <Indicator organization={org} firstIssue={null} />,
       TestStubs.routerContext()
     );
@@ -15,11 +15,11 @@ describe('FirstEventIndicator', function() {
     expect(wrapper.find('WaitingIndicator').exists()).toBe(true);
   });
 
-  describe('recieved first event', function() {
+  describe('received first event', function() {
     it('renders', function() {
       const org = TestStubs.Organization();
 
-      const wrapper = mount(
+      const wrapper = mountWithTheme(
         <Indicator organization={org} firstIssue={{id: 1}} />,
         TestStubs.routerContext()
       );
@@ -34,8 +34,8 @@ describe('FirstEventIndicator', function() {
       const org = TestStubs.Organization();
       const project = TestStubs.ProjectDetails({});
 
-      const wrapper = mount(
-        <Indicator organization={org} project={project} firstIssue={true} />,
+      const wrapper = mountWithTheme(
+        <Indicator organization={org} project={project} firstIssue />,
         TestStubs.routerContext()
       );
 

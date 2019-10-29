@@ -21,7 +21,7 @@ from sentry.utils.data_filters import FilterStatKeys
 from sentry.utils.canonical import CanonicalKeyDict, CANONICAL_TYPES
 from sentry.utils.dates import to_datetime
 from sentry.utils.sdk import configure_scope
-from sentry.models import EventAttachment, File, ProjectOption, Activity, Project
+from sentry.models import EventAttachment, File, ProjectOption, Activity, Organization, Project
 
 error_logger = logging.getLogger("sentry.errors.events")
 info_logger = logging.getLogger("sentry.store")
@@ -44,7 +44,7 @@ class RetrySymbolication(Exception):
 
 def should_process(data):
     """Quick check if processing is needed at all."""
-    from sentry.plugins import plugins
+    from sentry.plugins.base import plugins
 
     for plugin in plugins.all(version=2):
         processors = safe_execute(
@@ -156,7 +156,7 @@ def retry_process_event(process_task_name, task_kwargs, **kwargs):
 
 
 def _do_process_event(cache_key, start_time, event_id, process_task, data=None):
-    from sentry.plugins import plugins
+    from sentry.plugins.base import plugins
 
     if data is None:
         data = default_cache.get(cache_key)
@@ -196,21 +196,23 @@ def _do_process_event(cache_key, start_time, event_id, process_task, data=None):
             data = new_data
     except RetrySymbolication as e:
         if start_time and (time() - start_time) > 3600:
-            raise RuntimeError("Event spent one hour in processing")
-
-        retry_process_event.apply_async(
-            args=(),
-            kwargs={
-                "process_task_name": process_task.__name__,
-                "task_kwargs": {
-                    "cache_key": cache_key,
-                    "event_id": event_id,
-                    "start_time": start_time,
+            # Do not drop event but actually continue with rest of pipeline
+            # (persisting unsymbolicated event)
+            error_logger.exception("process.failed.infinite_retry")
+        else:
+            retry_process_event.apply_async(
+                args=(),
+                kwargs={
+                    "process_task_name": process_task.__name__,
+                    "task_kwargs": {
+                        "cache_key": cache_key,
+                        "event_id": event_id,
+                        "start_time": start_time,
+                    },
                 },
-            },
-            countdown=e.retry_after,
-        )
-        return
+                countdown=e.retry_after,
+            )
+            return
 
     # TODO(dcramer): ideally we would know if data changed by default
     # Default event processors.
@@ -247,6 +249,7 @@ def _do_process_event(cache_key, start_time, event_id, process_task, data=None):
         try:
             if issues and create_failed_event(
                 cache_key,
+                data,
                 project_id,
                 list(issues.values()),
                 event_id=event_id,
@@ -320,11 +323,16 @@ def delete_raw_event(project_id, event_id, allow_hint_clear=False):
 
 
 def create_failed_event(
-    cache_key, project_id, issues, event_id, start_time=None, reprocessing_rev=None
+    cache_key, data, project_id, issues, event_id, start_time=None, reprocessing_rev=None
 ):
     """If processing failed we put the original data from the cache into a
     raw event.  Returns `True` if a failed event was inserted
     """
+    # We can only create failed events for events that can potentially
+    # create failed events.
+    if not reprocessing.event_supports_reprocessing(data):
+        return False
+
     reprocessing_active = ProjectOption.objects.get_value(
         project_id, "sentry:reprocessing_active", REPROCESSING_DEFAULT
     )
@@ -403,10 +411,11 @@ def save_attachment(event, attachment):
     # store_crash_reports setting. Otherwise, we assume that the client has
     # already verified PII and just store the attachment.
     if attachment.type in CRASH_REPORT_TYPES:
-        if not event.project.get_option(
-            "sentry:store_crash_reports"
-        ) and not event.project.organization.get_option("sentry:store_crash_reports"):
-            return
+        project = Project.objects.get_from_cache(id=event.project_id)
+        if not project.get_option("sentry:store_crash_reports"):
+            organization = Organization.objects.get_from_cache(id=project.organization_id)
+            if not organization.get_option("sentry:store_crash_reports"):
+                return
 
     file = File.objects.create(
         name=attachment.name,
@@ -430,6 +439,7 @@ def _do_save_event(
     from sentry import quotas
     from sentry.models import ProjectKey
     from sentry.utils.outcomes import Outcome, track_outcome
+    from sentry.ingest.outcomes_consumer import mark_signal_sent
 
     if cache_key and data is None:
         data = default_cache.get(cache_key)
@@ -450,7 +460,11 @@ def _do_save_event(
         key_id = int(key_id)
     timestamp = to_datetime(start_time) if start_time is not None else None
 
-    delete_raw_event(project_id, event_id, allow_hint_clear=True)
+    # We only need to delete raw events for events that support
+    # reprocessing.  If the data cannot be found we want to assume
+    # that we need to delete the raw event.
+    if not data or reprocessing.event_supports_reprocessing(data):
+        delete_raw_event(project_id, event_id, allow_hint_clear=True)
 
     # This covers two cases: where data is None because we did not manage
     # to fetch it from the default cache or the empty dictionary was
@@ -474,6 +488,7 @@ def _do_save_event(
     event = None
     try:
         manager = EventManager(data)
+        # event.project.organization is populated after this statement.
         event = manager.save(project_id, assume_normalized=True)
 
         # Always load attachments from the cache so we can later prune them.
@@ -505,6 +520,12 @@ def _do_save_event(
             pass
 
         quotas.refund(project, key=project_key, timestamp=start_time)
+        # There is no signal supposed to be sent for this particular
+        # outcome-reason combination. Prevent the outcome consumer from
+        # emitting it for now.
+        #
+        # XXX(markus): Revisit decision about signals once outcomes consumer is stable.
+        mark_signal_sent(project_id, event_id)
         track_outcome(
             project.organization_id,
             project_id,

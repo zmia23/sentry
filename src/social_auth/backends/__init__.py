@@ -247,9 +247,10 @@ class BaseAuth(object):
 
     def __init__(self, request, redirect):
         self.request = request
-        # Use request because some auth providers use POST urls with needed
-        # GET parameters on it
-        self.data = request.REQUEST
+        # TODO(python3): use {**x, **y} syntax once 2.7 support is dropped
+        data = request.GET.copy()
+        data.update(request.POST)
+        self.data = data
         self.redirect = redirect
 
     def auth_url(self):
@@ -303,7 +304,7 @@ class BaseAuth(object):
         """Return extra arguments needed on auth process, setting is per
         backend and defined by:
             <backend name in uppercase>_AUTH_EXTRA_ARGUMENTS.
-        The defaults can be overriden by GET parameters.
+        The defaults can be overridden by GET parameters.
         """
         backend_name = self.AUTH_BACKEND.name.upper().replace("-", "_")
         extra_arguments = setting(backend_name + "_AUTH_EXTRA_ARGUMENTS", {})

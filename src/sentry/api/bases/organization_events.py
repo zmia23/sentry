@@ -2,29 +2,31 @@ from __future__ import absolute_import
 
 from rest_framework.exceptions import PermissionDenied
 
-from sentry import eventstore, features
 from sentry.api.bases import OrganizationEndpoint, OrganizationEventsError
 from sentry.api.event_search import (
-    get_snuba_query_args,
+    get_filter,
     resolve_field_list,
     InvalidSearchQuery,
     get_reference_event_conditions,
 )
 from sentry.models.project import Project
-
-
-class Direction(object):
-    NEXT = 0
-    PREV = 1
+from sentry.utils import snuba
 
 
 class OrganizationEventsEndpointBase(OrganizationEndpoint):
     def get_snuba_query_args(self, request, organization, params):
         query = request.GET.get("query")
         try:
-            snuba_args = get_snuba_query_args(query=query, params=params)
+            filter = get_filter(query, params)
         except InvalidSearchQuery as exc:
             raise OrganizationEventsError(exc.message)
+
+        snuba_args = {
+            "start": filter.start,
+            "end": filter.end,
+            "conditions": filter.conditions,
+            "filter_keys": filter.filter_keys,
+        }
 
         sort = request.GET.getlist("sort")
         if sort:
@@ -55,14 +57,6 @@ class OrganizationEventsEndpointBase(OrganizationEndpoint):
                 snuba_args, reference_event_id
             )
 
-        # TODO(lb): remove once boolean search is fully functional
-        has_boolean_op_flag = features.has(
-            "organizations:boolean-search", organization, actor=request.user
-        )
-        if snuba_args.pop("has_boolean_terms", False) and not has_boolean_op_flag:
-            raise OrganizationEventsError(
-                "Boolean search operator OR and AND not allowed in this search."
-            )
         return snuba_args
 
     def get_snuba_query_args_legacy(self, request, organization):
@@ -88,73 +82,23 @@ class OrganizationEventsEndpointBase(OrganizationEndpoint):
 
         query = request.GET.get("query")
         try:
-            snuba_args = get_snuba_query_args(query=query, params=params)
+            _filter = get_filter(query, params)
         except InvalidSearchQuery as exc:
             raise OrganizationEventsError(exc.message)
 
-        # TODO(lb): remove once boolean search is fully functional
-        has_boolean_op_flag = features.has(
-            "organizations:boolean-search", organization, actor=request.user
-        )
-        if snuba_args.pop("has_boolean_terms", False) and not has_boolean_op_flag:
+        snuba_args = {
+            "start": _filter.start,
+            "end": _filter.end,
+            "conditions": _filter.conditions,
+            "filter_keys": _filter.filter_keys,
+        }
+
+        # 'legacy' endpoints cannot access transactions dataset.
+        # as they often have assumptions about which columns are returned.
+        dataset = snuba.detect_dataset(snuba_args)
+        if dataset != snuba.Dataset.Events:
             raise OrganizationEventsError(
-                "Boolean search operator OR and AND not allowed in this search."
+                "Invalid query. You cannot reference non-events data in this endpoint."
             )
+
         return snuba_args
-
-    def next_event_id(self, request, organization, snuba_args, event):
-        """
-        Returns the next event ID if there is a subsequent event matching the
-        conditions provided. Ignores the project_id.
-        """
-        next_event = eventstore.get_next_event_id(
-            event, conditions=snuba_args["conditions"], filter_keys=snuba_args["filter_keys"]
-        )
-
-        if next_event:
-            return next_event[1]
-
-    def prev_event_id(self, request, organization, snuba_args, event):
-        """
-        Returns the previous event ID if there is a previous event matching the
-        conditions provided. Ignores the project_id.
-        """
-        prev_event = eventstore.get_prev_event_id(
-            event, conditions=snuba_args["conditions"], filter_keys=snuba_args["filter_keys"]
-        )
-
-        if prev_event:
-            return prev_event[1]
-
-    def oldest_event_id(self, snuba_args, event):
-        """
-        Returns the oldest event ID if there is a subsequent event matching the
-        conditions provided
-        """
-        return self._get_terminal_event_id(Direction.PREV, snuba_args, event)
-
-    def latest_event_id(self, snuba_args, event):
-        """
-        Returns the latest event ID if there is a newer event matching the
-        conditions provided
-        """
-        return self._get_terminal_event_id(Direction.NEXT, snuba_args, event)
-
-    def _get_terminal_event_id(self, direction, snuba_args, event):
-        if direction == Direction.NEXT:
-            time_condition = [["timestamp", ">", event.timestamp]]
-            orderby = ["-timestamp", "-event_id"]
-        else:
-            time_condition = [["timestamp", "<", event.timestamp]]
-            orderby = ["timestamp", "event_id"]
-
-        conditions = snuba_args["conditions"][:]
-        conditions.extend(time_condition)
-
-        result = eventstore.get_events(
-            conditions=conditions, filter_keys=snuba_args["filter_keys"], orderby=orderby, limit=1
-        )
-        if not result:
-            return None
-
-        return result[0].event_id

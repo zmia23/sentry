@@ -1,5 +1,5 @@
 import React from 'react';
-import {mount, shallow} from 'enzyme';
+import {mount, shallow} from 'sentry-test/enzyme';
 
 import RadioGroup from 'app/views/settings/components/forms/controls/radioGroup';
 
@@ -25,7 +25,7 @@ describe('RadioGroup', function() {
         <RadioGroup
           name="radio"
           value="choice_one"
-          disabled={true}
+          disabled
           choices={[['choice_one', 'Choice One']]}
         />
       );

@@ -1,8 +1,8 @@
 import React from 'react';
 import {browserHistory} from 'react-router';
+import {mountWithTheme} from 'sentry-test/enzyme';
 
 import {Client} from 'app/api';
-import {mount} from 'enzyme';
 import ConfigStore from 'app/stores/configStore';
 import OrganizationMembers from 'app/views/settings/organizationMembers';
 import OrganizationsStore from 'app/stores/organizationsStore';
@@ -30,7 +30,7 @@ describe('OrganizationMembers', function() {
     location: {query: {}},
   };
   const organization = TestStubs.Organization({
-    access: ['member:admin', 'org:admin'],
+    access: ['member:admin', 'org:admin', 'member:write'],
     status: {
       id: 'active',
     },
@@ -93,7 +93,7 @@ describe('OrganizationMembers', function() {
       method: 'DELETE',
     });
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationMembers
         {...defaultProps}
         params={{
@@ -128,7 +128,7 @@ describe('OrganizationMembers', function() {
       statusCode: 500,
     });
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationMembers
         {...defaultProps}
         params={{
@@ -162,7 +162,7 @@ describe('OrganizationMembers', function() {
       method: 'DELETE',
     });
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationMembers
         {...defaultProps}
         params={{
@@ -203,7 +203,7 @@ describe('OrganizationMembers', function() {
     });
     OrganizationsStore.add(secondOrg);
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationMembers
         {...defaultProps}
         params={{
@@ -239,7 +239,7 @@ describe('OrganizationMembers', function() {
       statusCode: 500,
     });
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationMembers
         {...defaultProps}
         params={{
@@ -275,14 +275,14 @@ describe('OrganizationMembers', function() {
         id: '1234',
       },
     });
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationMembers
         {...defaultProps}
         params={{
           orgId: 'org-id',
         }}
       />,
-      TestStubs.routerContext()
+      TestStubs.routerContext([{organization}])
     );
 
     expect(inviteMock).not.toHaveBeenCalled();
@@ -296,80 +296,13 @@ describe('OrganizationMembers', function() {
     expect(inviteMock).toHaveBeenCalled();
   });
 
-  it('can approve pending access request', async function() {
-    const approveMock = MockApiClient.addMockResponse({
-      url: '/organizations/org-id/access-requests/pending-id/',
-      method: 'PUT',
-    });
-    const wrapper = mount(
-      <OrganizationMembers
-        {...defaultProps}
-        params={{
-          orgId: 'org-id',
-        }}
-      />,
-      TestStubs.routerContext()
-    );
-
-    expect(approveMock).not.toHaveBeenCalled();
-
-    wrapper
-      .find('OrganizationAccessRequests Button[priority="primary"]')
-      .simulate('click');
-
-    await tick();
-
-    expect(approveMock).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        data: {
-          isApproved: true,
-        },
-      })
-    );
-  });
-
-  it('can deny pending access request', async function() {
-    const denyMock = MockApiClient.addMockResponse({
-      url: '/organizations/org-id/access-requests/pending-id/',
-      method: 'PUT',
-    });
-    const wrapper = mount(
-      <OrganizationMembers
-        {...defaultProps}
-        params={{
-          orgId: 'org-id',
-        }}
-      />,
-      TestStubs.routerContext()
-    );
-
-    expect(denyMock).not.toHaveBeenCalled();
-
-    wrapper
-      .find('OrganizationAccessRequests Button')
-      .at(1)
-      .simulate('click');
-
-    await tick();
-
-    expect(denyMock).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        data: {
-          isApproved: false,
-        },
-      })
-    );
-  });
-
   it('can search organization members', async function() {
     const searchMock = MockApiClient.addMockResponse({
       url: '/organizations/org-id/members/',
       body: [],
     });
     const routerContext = TestStubs.routerContext();
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationMembers
         {...defaultProps}
         params={{

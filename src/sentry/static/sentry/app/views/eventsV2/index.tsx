@@ -21,8 +21,9 @@ import withOrganization from 'app/utils/withOrganization';
 
 import Events from './events';
 import EventDetails from './eventDetails';
+import EventsSaveQueryButton from './saveQueryButton';
 import {getFirstQueryString} from './utils';
-import {ALL_VIEWS} from './data';
+import {ALL_VIEWS, TRANSACTION_VIEWS} from './data';
 import EventView from './eventView';
 
 type Props = {
@@ -40,9 +41,13 @@ class EventsV2 extends React.Component<Props> {
   };
 
   renderQueryList() {
-    const {location} = this.props;
+    const {location, organization} = this.props;
+    let views = ALL_VIEWS;
+    if (organization.features.includes('transaction-events')) {
+      views = [...ALL_VIEWS, ...TRANSACTION_VIEWS];
+    }
 
-    const list = ALL_VIEWS.map((eventViewv1, index) => {
+    const list = views.map((eventViewv1, index) => {
       const eventView = EventView.fromEventViewv1(eventViewv1);
       const to = {
         pathname: location.pathname,
@@ -68,10 +73,10 @@ class EventsV2 extends React.Component<Props> {
     const name = getFirstQueryString(location.query, 'name');
 
     if (typeof name === 'string' && String(name).trim().length > 0) {
-      return [t('Events'), String(name).trim()];
+      return [t('Discover'), String(name).trim()];
     }
 
-    return [t('Events')];
+    return [t('Discover')];
   };
 
   render() {
@@ -87,7 +92,6 @@ class EventsV2 extends React.Component<Props> {
       .reverse()
       .join(' - ');
     const pageTitle = this.getEventViewName().join(' \u2014 ');
-
     return (
       <Feature features={['events-v2']} organization={organization} renderDisabled>
         <DocumentTitle title={`${documentTitle} - ${organization.slug} - Sentry`}>
@@ -99,6 +103,14 @@ class EventsV2 extends React.Component<Props> {
                   <PageHeading>
                     {pageTitle} <BetaTag />
                   </PageHeading>
+                  {hasQuery && (
+                    <EventsSaveQueryButton
+                      isEditing={!!location.query.edit}
+                      location={location}
+                      organization={organization}
+                      eventView={eventView}
+                    />
+                  )}
                 </PageHeader>
                 {!hasQuery && this.renderQueryList()}
                 {hasQuery && (

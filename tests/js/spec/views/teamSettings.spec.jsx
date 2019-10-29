@@ -1,5 +1,5 @@
 import React from 'react';
-import {mount} from 'enzyme';
+import {mountWithTheme} from 'sentry-test/enzyme';
 
 import TeamStore from 'app/stores/teamStore';
 import TeamSettings from 'app/views/settings/organizationTeams/teamSettings';
@@ -14,7 +14,7 @@ describe('TeamSettings', function() {
     window.location.assign.mockRestore();
   });
 
-  it('can change name and slug', async function() {
+  it('can change slug', async function() {
     const team = TestStubs.Team();
     const putMock = MockApiClient.addMockResponse({
       url: `/teams/org/${team.slug}/`,
@@ -23,7 +23,7 @@ describe('TeamSettings', function() {
     const mountOptions = TestStubs.routerContext();
     const {router} = mountOptions.context;
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <TeamSettings
         routes={[]}
         router={router}
@@ -32,20 +32,6 @@ describe('TeamSettings', function() {
         onTeamChange={() => {}}
       />,
       mountOptions
-    );
-
-    wrapper
-      .find('input[name="name"]')
-      .simulate('change', {target: {value: 'New Name'}})
-      .simulate('blur');
-
-    expect(putMock).toHaveBeenCalledWith(
-      `/teams/org/${team.slug}/`,
-      expect.objectContaining({
-        data: {
-          name: 'New Name',
-        },
-      })
     );
 
     wrapper
@@ -71,7 +57,7 @@ describe('TeamSettings', function() {
   it('needs team:admin in order to see an enabled Remove Team button', function() {
     const team = TestStubs.Team();
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <TeamSettings
         routes={[]}
         params={{orgId: 'org', teamId: team.slug}}
@@ -104,7 +90,7 @@ describe('TeamSettings', function() {
       },
     ]);
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <TeamSettings
         router={{replace: routerPushMock}}
         routes={[]}

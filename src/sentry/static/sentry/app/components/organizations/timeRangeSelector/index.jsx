@@ -315,11 +315,12 @@ class TimeRangeSelector extends React.PureComponent {
         isOpen={this.state.isOpen}
         onOpen={() => this.setState({isOpen: true})}
         onClose={this.handleCloseMenu}
-        keepMenuOpen={true}
+        keepMenuOpen
       >
         {({isOpen, getRootProps, getActorProps, getMenuProps}) => (
           <TimeRangeRoot {...getRootProps()}>
             <StyledHeaderItem
+              data-test-id="global-header-timerange-selector"
               icon={<StyledInlineSvg src="icon-calendar" />}
               isOpen={isOpen}
               hasSelected={
@@ -328,7 +329,7 @@ class TimeRangeSelector extends React.PureComponent {
               }
               hasChanges={this.state.hasChanges}
               onClear={this.handleClear}
-              allowClear={true}
+              allowClear
               {...getActorProps({isStyled: true})}
             >
               {getDynamicText({value: summary, fixed: 'start to end'})}
@@ -405,7 +406,7 @@ const Menu = styled('div')`
   border: 1px solid ${p => p.theme.borderDark};
   position: absolute;
   top: 100%;
-  min-width: 120%;
+  min-width: 100%;
   z-index: ${p => p.theme.zIndex.dropdown};
   box-shadow: ${p => p.theme.dropShadowLight};
   border-radius: ${p => p.theme.borderRadiusBottom};

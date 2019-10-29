@@ -37,6 +37,13 @@ class InviteStatus(Enum):
     REQUESTED_TO_JOIN = 2
 
 
+invite_status_names = {
+    InviteStatus.APPROVED.value: "approved",
+    InviteStatus.REQUESTED_TO_BE_INVITED.value: "requested_to_be_invited",
+    InviteStatus.REQUESTED_TO_JOIN.value: "requested_to_join",
+}
+
+
 class OrganizationMemberTeam(BaseModel):
     """
     Identifies relationships between organization members and the teams they are on.
@@ -149,6 +156,27 @@ class OrganizationMember(Model):
         now = timezone.now()
         self.token_expires_at = now + timedelta(days=INVITE_DAYS_VALID)
 
+    def approve_invite(self):
+        self.invite_status = InviteStatus.APPROVED.value
+        self.regenerate_token()
+
+    def get_invite_status_name(self):
+        if self.invite_status is None:
+            return
+        return invite_status_names[self.invite_status]
+
+    @property
+    def invite_approved(self):
+        return self.invite_status == InviteStatus.APPROVED.value
+
+    @property
+    def requested_to_join(self):
+        return self.invite_status == InviteStatus.REQUESTED_TO_JOIN.value
+
+    @property
+    def requested_to_be_invited(self):
+        return self.invite_status == InviteStatus.REQUESTED_TO_BE_INVITED.value
+
     @property
     def is_pending(self):
         return self.user_id is None
@@ -175,7 +203,7 @@ class OrganizationMember(Model):
         return uuid4().hex + uuid4().hex
 
     def get_invite_link(self):
-        if not self.is_pending:
+        if not self.is_pending or not self.invite_approved:
             return None
         return absolute_uri(
             reverse(
@@ -206,6 +234,57 @@ class OrganizationMember(Model):
         except Exception as e:
             logger = get_logger(name="sentry.mail")
             logger.exception(e)
+
+    def send_request_notification_email(self):
+        from sentry.utils.email import MessageBuilder
+
+        link_args = {"organization_slug": self.organization.slug}
+
+        context = {
+            "email": self.email,
+            "inviter": self.inviter,
+            "organization": self.organization,
+            "organization_link": absolute_uri(
+                reverse("sentry-organization-index", args=[self.organization.slug])
+            ),
+            "pending_requests_link": absolute_uri(
+                reverse("sentry-organization-members-requests", kwargs=link_args)
+            ),
+        }
+
+        if self.requested_to_join:
+            email_args = {
+                "template": "sentry/emails/organization-join-request.txt",
+                "html_template": "sentry/emails/organization-join-request.html",
+            }
+        elif self.requested_to_be_invited:
+            email_args = {
+                "template": "sentry/emails/organization-invite-request.txt",
+                "html_template": "sentry/emails/organization-invite-request.html",
+            }
+        else:
+            raise RuntimeError("This member is not pending invitation")
+
+        recipients = OrganizationMember.objects.select_related("user").filter(
+            organization_id=self.organization_id,
+            user__isnull=False,
+            invite_status=InviteStatus.APPROVED.value,
+            role__in=(r.id for r in roles.get_all() if r.has_scope("member:write")),
+        )
+
+        msg = MessageBuilder(
+            subject="Access request to %s" % (self.organization.name,),
+            type="organization.invite-request",
+            context=context,
+            **email_args
+        )
+
+        for recipient in recipients:
+            try:
+                msg.send_async([recipient.get_email()])
+            except Exception as e:
+                logger = get_logger(name="sentry.mail")
+                logger.exception(e)
 
     def send_sso_link_email(self, actor, provider):
         from sentry.utils.email import MessageBuilder
@@ -302,6 +381,7 @@ class OrganizationMember(Model):
             "teams_slugs": [t["slug"] for t in teams],
             "has_global_access": self.has_global_access,
             "role": self.role,
+            "invite_status": invite_status_names[self.invite_status],
         }
 
     def get_teams(self):

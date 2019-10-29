@@ -3,9 +3,11 @@ import styled from 'react-emotion';
 
 import placeholder from 'app/../images/integrations/integration-default.png';
 import sentry from 'app/../images/integrations/integration-sentry.png';
+import amixr from 'app/../images/integrations/amixr-logo.png';
 import asana from 'app/../images/integrations/asana-logo.png';
 import bitbucket from 'app/../images/integrations/bitbucket-logo.png';
 import campfire from 'app/../images/integrations/campfire-logo.png';
+import clickup from 'app/../images/integrations/clickup-logo.png';
 import clubhouse from 'app/../images/integrations/clubhouse-logo.png';
 import flowdock from 'app/../images/integrations/flowdock-logo.png';
 import github from 'app/../images/integrations/github-logo.png';
@@ -23,6 +25,7 @@ import pushover from 'app/../images/integrations/pushover-logo.png';
 import redmine from 'app/../images/integrations/redmine-logo.png';
 import rookout from 'app/../images/integrations/rookout-logo.png';
 import slack from 'app/../images/integrations/slack-logo.png';
+import split from 'app/../images/integrations/split-logo.png';
 import taiga from 'app/../images/integrations/taiga-logo.png';
 import teamwork from 'app/../images/integrations/teamwork-logo.png';
 import trello from 'app/../images/integrations/trello-logo.png';
@@ -42,9 +45,11 @@ export const ICON_PATHS = {
   urls: sentry,
   webhooks: sentry,
 
+  amixr,
   asana,
   bitbucket,
   campfire,
+  clickup,
   clubhouse,
   flowdock,
   github,
@@ -64,6 +69,7 @@ export const ICON_PATHS = {
   redmine,
   rookout,
   slack,
+  split,
   taiga,
   teamwork,
   trello,

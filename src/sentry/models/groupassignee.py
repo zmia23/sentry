@@ -221,6 +221,7 @@ class GroupAssignee(Model):
     class Meta:
         app_label = "sentry"
         db_table = "sentry_groupasignee"
+        unique_together = [("project", "group")]
 
     __repr__ = sane_repr("group_id", "user_id", "team_id")
 
@@ -237,7 +238,7 @@ class GroupAssignee(Model):
         if self.team:
             return u"team:{}".format(self.team_id)
 
-        raise NotImplementedError("Unkown Assignee")
+        raise NotImplementedError("Unknown Assignee")
 
     def assigned_actor(self):
         from sentry.api.fields.actor import Actor

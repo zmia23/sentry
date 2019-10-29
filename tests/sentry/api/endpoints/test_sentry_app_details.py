@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from django.core.urlresolvers import reverse
 from sentry.constants import SentryAppStatus
-from sentry.models import SentryApp
+from sentry.models import SentryApp, OrganizationMember
 from sentry.testutils import APITestCase
 from sentry.testutils.helpers import with_feature
 from sentry.utils import json
@@ -119,6 +119,7 @@ class UpdateSentryAppDetailsTest(SentryAppDetailsTest):
             "clientId": self.published_app.application.client_id,
             "clientSecret": self.published_app.application.client_secret,
             "overview": self.published_app.overview,
+            "allowedOrigins": [],
             "schema": {},
             "owner": {"id": self.org.id, "slug": self.org.slug},
         }
@@ -202,10 +203,13 @@ class UpdateSentryAppDetailsTest(SentryAppDetailsTest):
     def test_superusers_can_publish_apps(self):
         self.login_as(user=self.superuser, superuser=True)
         app = self.create_sentry_app(name="SampleApp", organization=self.org)
+        assert not app.date_published
         url = reverse("sentry-api-0-sentry-app-details", args=[app.slug])
         response = self.client.put(url, data={"status": "published"}, format="json")
         assert response.status_code == 200
-        assert SentryApp.objects.get(id=app.id).status == SentryAppStatus.PUBLISHED
+        app = SentryApp.objects.get(id=app.id)
+        assert app.status == SentryAppStatus.PUBLISHED
+        assert app.date_published
 
     def test_nonsuperusers_cannot_publish_apps(self):
         self.login_as(user=self.user)
@@ -301,6 +305,40 @@ class UpdateSentryAppDetailsTest(SentryAppDetailsTest):
         assert response.status_code == 400
         assert response.data == {
             "webhookUrl": ["webhookUrl required if alert rule action is enabled"]
+        }
+
+    def test_set_allowed_origins(self):
+        self.login_as(user=self.user)
+        response = self.client.put(
+            self.url, data={"allowedOrigins": ["google.com", "sentry.io"]}, format="json"
+        )
+        assert response.status_code == 200
+        assert self.published_app.application.get_allowed_origins() == ["google.com", "sentry.io"]
+
+    def test_allowed_origins_with_star(self):
+        self.login_as(user=self.user)
+        response = self.client.put(
+            self.url, data={"allowedOrigins": ["*.google.com"]}, format="json"
+        )
+        assert response.status_code == 400
+        assert response.data == {"allowedOrigins": ["'*' not allowed in origin"]}
+
+    def test_create_integration_exceeding_scopes(self):
+        member_om = OrganizationMember.objects.get(user=self.user, organization=self.org)
+        member_om.role = "member"
+        member_om.save()
+        self.login_as(user=self.user)
+        url = reverse("sentry-api-0-sentry-app-details", args=[self.unpublished_app.slug])
+        response = self.client.put(
+            url, data={"scopes": ["member:read", "member:write", "member:admin"]}
+        )
+
+        assert response.status_code == 400
+        assert response.data == {
+            "scopes": [
+                "Requested permission of member:write exceeds requester's permission. Please contact an administrator to make the requested change.",
+                "Requested permission of member:admin exceeds requester's permission. Please contact an administrator to make the requested change.",
+            ]
         }
 
 

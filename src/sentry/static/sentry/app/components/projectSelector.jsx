@@ -256,8 +256,8 @@ class ProjectSelector extends React.Component {
     return (
       <DropdownAutoComplete
         alignMenu="left"
-        allowActorToggle={true}
-        closeOnSelect={true}
+        allowActorToggle
+        closeOnSelect
         blendCorner={false}
         searchPlaceholder={t('Filter projects')}
         onSelect={this.handleSelect}
@@ -391,7 +391,7 @@ class ProjectSelectorItem extends React.PureComponent {
           renderCheckbox={({checkbox}) => (
             <Feature
               features={['organizations:global-views']}
-              hookName="project-selector-checkbox"
+              hookName="feature-disabled:project-selector-checkbox"
               renderDisabled={renderDisabledCheckbox}
             >
               {checkbox}

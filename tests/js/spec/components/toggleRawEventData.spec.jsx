@@ -1,5 +1,5 @@
 import React from 'react';
-import {shallow} from 'enzyme';
+import {shallow} from 'sentry-test/enzyme';
 import EventDataSection from 'app/components/events/eventDataSection';
 import KeyValueList from 'app/components/events/interfaces/keyValueList';
 
@@ -49,7 +49,7 @@ describe('EventDataSection', function() {
         event={eventData}
         type="extra"
         title="Additional Data"
-        raw={true}
+        raw
       />
     );
     expect(component).toMatchSnapshot();
@@ -66,16 +66,14 @@ describe('KeyValueList', function() {
 
   it('renders formatted', function() {
     const component = shallow(
-      <KeyValueList data={extraDataArray} isContextData={true} raw={false} />
+      <KeyValueList data={extraDataArray} isContextData raw={false} />
     );
 
     expect(component).toMatchSnapshot();
   });
 
   it('renders raw', function() {
-    const component = shallow(
-      <KeyValueList data={extraDataArray} isContextData={true} raw={true} />
-    );
+    const component = shallow(<KeyValueList data={extraDataArray} isContextData raw />);
 
     expect(component).toMatchSnapshot();
   });

@@ -137,7 +137,6 @@ const ActivityFooter = styled(HeaderAndFooter)`
 
 const ActivityBody = styled('div')`
   padding: ${space(2)} ${space(2)};
-
   ${textStyles}
 `;
 

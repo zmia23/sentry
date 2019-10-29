@@ -11,73 +11,119 @@ import UserBadge from 'app/components/idBadge/userBadge';
 import getDynamicText from 'app/utils/getDynamicText';
 import overflowEllipsis from 'app/styles/overflowEllipsis';
 import pinIcon from 'app/../images/location-pin.png';
-import space from 'app/styles/space';
 import {EventViewv1, Organization} from 'app/types';
 
 import {QueryLink} from './styles';
 
 export const MODAL_QUERY_KEYS = ['eventSlug'] as const;
 export const PIN_ICON = `image://${pinIcon}`;
-export const AGGREGATE_ALIASES = ['last_seen', 'latest_event'] as const;
+export const AGGREGATE_ALIASES = ['p95', 'p75', 'last_seen', 'latest_event'] as const;
 
 export const DEFAULT_EVENT_VIEW_V1: Readonly<EventViewv1> = {
   name: t('All Events'),
   data: {
     fields: ['title', 'event.type', 'project', 'user', 'timestamp'],
-    columnNames: ['title', 'type', 'project', 'user', 'time'],
+    fieldnames: ['title', 'type', 'project', 'user', 'time'],
     sort: ['-timestamp'],
   },
   tags: ['event.type', 'release', 'project.name', 'user.email', 'user.ip', 'environment'],
 };
+
+export const TRANSACTION_VIEWS: Readonly<Array<EventViewv1>> = [
+  {
+    name: t('Transactions'),
+    data: {
+      fields: [
+        'transaction',
+        'project',
+        'count(id)',
+        'avg(transaction.duration)',
+        'p75',
+        'p95',
+      ],
+      fieldnames: ['transaction', 'project', 'volume', 'avg', '75th', '95th'],
+      sort: ['-count_id'],
+      query: 'event.type:transaction',
+    },
+    tags: ['release', 'project.name', 'user.email', 'user.ip', 'environment'],
+  },
+  {
+    name: t('Transactions by User'),
+    data: {
+      fields: [
+        'user',
+        'count(id)',
+        'count_unique(transaction)',
+        'avg(transaction.duration)',
+        'p75',
+        'p95',
+      ],
+      fieldnames: ['user', 'events', 'unique transactions', 'avg', '75th', '95th'],
+      sort: ['-count_id'],
+      query: 'event.type:transaction',
+    },
+    tags: ['release', 'project.name', 'user.email', 'user.ip', 'environment'],
+  },
+  {
+    name: t('Transactions by Region'),
+    data: {
+      fields: ['geo.region', 'count(id)', 'avg(transaction.duration)', 'p75', 'p95'],
+      fieldnames: ['Region', 'events', 'avg', '75th', '95th'],
+      sort: ['-count_id'],
+      query: 'event.type:transaction',
+    },
+    tags: ['release', 'project.name', 'user.email', 'user.ip', 'environment'],
+  },
+];
 
 export const ALL_VIEWS: Readonly<Array<EventViewv1>> = [
   DEFAULT_EVENT_VIEW_V1,
   {
     name: t('Project Summary'),
     data: {
-      fields: ['project', 'count()', 'count_unique(issue.id)'],
-      columnNames: ['project', 'events', 'unique errors'],
-      sort: ['-count'],
+      fields: ['project', 'count(id)', 'count_unique(issue.id)'],
+      fieldnames: ['project', 'events', 'unique errors'],
+      sort: ['-count_id'],
       query: 'event.type:error',
     },
-    tags: ['error.type', 'project.name'],
+    tags: ['error.type', 'project.name', 'release', 'environment'],
   },
   {
     name: t('Errors'),
     data: {
-      fields: ['title', 'count()', 'count_unique(user)', 'project', 'last_seen'],
-      columnNames: ['error', 'events', 'users', 'project', 'last seen'],
-      sort: ['-count', '-title'],
+      fields: ['title', 'count(id)', 'count_unique(user)', 'project', 'last_seen'],
+      fieldnames: ['error', 'events', 'users', 'project', 'last seen'],
+      sort: ['-count_id', '-title'],
       query: 'event.type:error',
     },
-    tags: ['project.name'],
+    tags: ['project.name', 'release', 'environment'],
   },
   {
     name: t('Errors by URL'),
     data: {
-      fields: ['url', 'count()', 'count_unique(issue.id)'],
-      columnNames: ['URL', 'events', 'unique errors'],
-      sort: ['-count'],
+      fields: ['url', 'count(id)', 'count_unique(issue.id)'],
+      fieldnames: ['URL', 'events', 'unique errors'],
+      sort: ['-count_id'],
       query: 'event.type:error',
     },
-    tags: ['error.type', 'project.name', 'url'],
+    tags: ['error.type', 'project.name', 'url', 'release', 'environment'],
   },
   {
     name: t('Errors by User'),
     data: {
-      fields: ['user', 'count()', 'count_unique(issue.id)'],
-      columnNames: ['User', 'events', 'unique errors'],
-      sort: ['-count'],
+      fields: ['user', 'count(id)', 'count_unique(issue.id)'],
+      fieldnames: ['User', 'events', 'unique errors'],
+      sort: ['-count_id'],
       query: 'event.type:error',
     },
-    tags: ['user.id', 'project.name', 'url'],
+    tags: ['user.id', 'project.name', 'url', 'release', 'environment'],
   },
   {
-    name: t('CSP'),
+    name: t('Content Security Policy (CSP)'),
     data: {
-      fields: ['title', 'count()', 'count_unique(user)', 'project', 'last_seen'],
-      columnNames: ['csp', 'events', 'users', 'project', 'last seen'],
-      sort: ['-count', '-title'],
+      fields: ['title', 'count(id)', 'count_unique(user)', 'project', 'last_seen'],
+      fieldnames: ['csp', 'events', 'users', 'project', 'last seen'],
+      sort: ['-count_id', '-title'],
       query: 'event.type:csp',
     },
     tags: [
@@ -86,67 +132,60 @@ export const ALL_VIEWS: Readonly<Array<EventViewv1>> = [
       'browser.name',
       'os.name',
       'effective-directive',
+      'release',
+      'environment',
     ],
   },
   {
-    name: t('CSP Report by Directive'),
+    name: t('Content Security Policy (CSP) Report by Directive'),
     data: {
-      fields: ['effective-directive', 'count()', 'count_unique(title)'],
-      columnNames: ['directive', 'events', 'reports'],
-      sort: ['-count'],
+      fields: ['effective-directive', 'count(id)', 'count_unique(title)'],
+      fieldnames: ['directive', 'events', 'reports'],
+      sort: ['-count_id'],
       query: 'event.type:csp',
     },
-    tags: ['project.name', 'blocked-uri', 'browser.name', 'os.name'],
+    tags: [
+      'project.name',
+      'blocked-uri',
+      'browser.name',
+      'os.name',
+      'release',
+      'environment',
+    ],
   },
   {
-    name: t('CSP Report by Blocked URI'),
+    name: t('Content Security Policy (CSP) Report by Blocked URI'),
     data: {
-      fields: ['blocked-uri', 'count()'],
-      columnNames: ['URI', 'events'],
-      sort: ['-count'],
+      fields: ['blocked-uri', 'count(id)'],
+      fieldnames: ['URI', 'events'],
+      sort: ['-count_id'],
       query: 'event.type:csp',
     },
-    tags: ['project.name', 'blocked-uri', 'browser.name', 'os.name'],
+    tags: [
+      'project.name',
+      'blocked-uri',
+      'browser.name',
+      'os.name',
+      'release',
+      'environment',
+    ],
   },
   {
-    name: t('CSP Report by User'),
+    name: t('Content Security Policy (CSP) Report by User'),
     data: {
-      fields: ['user', 'count()', 'count_unique(title)'],
-      columnNames: ['User', 'events', 'reports'],
-      sort: ['-count'],
+      fields: ['user', 'count(id)', 'count_unique(title)'],
+      fieldnames: ['User', 'events', 'reports'],
+      sort: ['-count_id'],
       query: 'event.type:csp',
     },
-    tags: ['project.name', 'blocked-uri', 'browser.name', 'os.name'],
-  },
-  {
-    name: t('Transactions'),
-    data: {
-      fields: ['transaction', 'project', 'count()'],
-      columnNames: ['transaction', 'project', 'volume'],
-      sort: ['-count'],
-      query: 'event.type:transaction',
-    },
-    tags: ['release', 'project.name', 'user.email', 'user.ip', 'environment'],
-  },
-  {
-    name: t('Transactions by User'),
-    data: {
-      fields: ['user', 'count()', 'count_unique(transaction)'],
-      columnNames: ['user', 'events', 'unique transactions'],
-      sort: ['-count'],
-      query: 'event.type:transaction',
-    },
-    tags: ['release', 'project.name', 'user.email', 'user.ip', 'environment'],
-  },
-  {
-    name: t('Transactions by Region'),
-    data: {
-      fields: ['geo.region', 'count()'],
-      columnNames: ['Region', 'events'],
-      sort: ['-count'],
-      query: 'event.type:transaction',
-    },
-    tags: ['release', 'project.name', 'user.email', 'user.ip'],
+    tags: [
+      'project.name',
+      'blocked-uri',
+      'browser.name',
+      'os.name',
+      'release',
+      'environment',
+    ],
   },
 ];
 
@@ -245,7 +284,9 @@ export const FIELD_FORMATTERS: FieldFormatters = {
           query: `${field}:${data[field]}`,
         },
       };
-      return <QueryLink to={target}>{data[field]}</QueryLink>;
+      // Some fields have long arrays in them, only show the tail of the data.
+      const value = Array.isArray(data[field]) ? data[field].slice(-1) : data[field];
+      return <QueryLink to={target}>{value}</QueryLink>;
     },
   },
 };
@@ -330,6 +371,7 @@ type SpecialFields = {
   project: SpecialField;
   user: SpecialField;
   last_seen: SpecialField;
+  'issue.id': SpecialField;
 };
 
 /**
@@ -338,6 +380,19 @@ type SpecialFields = {
  * displays with a custom render function.
  */
 export const SPECIAL_FIELDS: SpecialFields = {
+  'issue.id': {
+    sortField: 'issue.id',
+    renderFunc: (data, {organization}) => {
+      const target = `/organizations/${organization.slug}/issues/${data['issue.id']}/`;
+      return (
+        <Container>
+          <OverflowLink to={target} aria-label={data['issue.id']}>
+            {data['issue.id']}
+          </OverflowLink>
+        </Container>
+      );
+    },
+  },
   transaction: {
     sortField: 'transaction',
     renderFunc: (data, {location}) => {
@@ -416,7 +471,7 @@ export const SPECIAL_FIELDS: SpecialFields = {
       };
 
       const badge = (
-        <UserBadge useLink={false} user={userObj} hideEmail={true} avatarSize={16} />
+        <UserBadge useLink={false} user={userObj} hideEmail avatarSize={16} />
       );
 
       if (!data.user) {
@@ -457,12 +512,10 @@ export const SPECIAL_FIELDS: SpecialFields = {
 export const AUTOLINK_FIELDS: string[] = ['transaction', 'title'];
 
 const Container = styled('div')`
-  padding: ${space(1)};
   ${overflowEllipsis};
 `;
 
 const NumberContainer = styled('div')`
-  padding: ${space(1)};
   text-align: right;
   ${overflowEllipsis};
 `;

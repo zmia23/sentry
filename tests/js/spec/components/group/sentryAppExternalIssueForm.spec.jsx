@@ -1,5 +1,5 @@
 import React from 'react';
-import {mount} from 'enzyme';
+import {mountWithTheme} from 'sentry-test/enzyme';
 import {Client} from 'app/api';
 
 import {addQueryParamsToExistingUrl} from 'app/utils/queryString';
@@ -25,10 +25,11 @@ describe('SentryAppExternalIssueForm', () => {
 
   describe('create', () => {
     beforeEach(() => {
-      wrapper = mount(
+      wrapper = mountWithTheme(
         <SentryAppExternalIssueForm
           group={group}
           sentryAppInstallation={sentryAppInstallation}
+          appName={sentryApp.name}
           config={component.schema}
           action="create"
           api={new Client()}
@@ -38,15 +39,19 @@ describe('SentryAppExternalIssueForm', () => {
     });
 
     it('specifies the action', () => {
-      expect(wrapper.find('HiddenField[name="action"]').prop('value')).toEqual('create');
+      expect(wrapper.find('HiddenField[name="action"]').prop('defaultValue')).toEqual(
+        'create'
+      );
     });
 
     it('specifies the group', () => {
-      expect(wrapper.find('HiddenField[name="groupId"]').prop('value')).toEqual(group.id);
+      expect(wrapper.find('HiddenField[name="groupId"]').prop('defaultValue')).toEqual(
+        group.id
+      );
     });
 
     it('specifies the uri', () => {
-      expect(wrapper.find('HiddenField[name="uri"]').prop('value')).toEqual(
+      expect(wrapper.find('HiddenField[name="uri"]').prop('defaultValue')).toEqual(
         component.schema.create.uri
       );
     });
@@ -83,10 +88,11 @@ describe('SentryAppExternalIssueForm', () => {
 
   describe('link', () => {
     beforeEach(() => {
-      wrapper = mount(
+      wrapper = mountWithTheme(
         <SentryAppExternalIssueForm
           group={group}
           sentryAppInstallation={sentryAppInstallation}
+          appName={sentryApp.name}
           config={component.schema}
           action="link"
           api={new Client()}
@@ -96,15 +102,19 @@ describe('SentryAppExternalIssueForm', () => {
     });
 
     it('specifies the action', () => {
-      expect(wrapper.find('HiddenField[name="action"]').prop('value')).toEqual('link');
+      expect(wrapper.find('HiddenField[name="action"]').prop('defaultValue')).toEqual(
+        'link'
+      );
     });
 
     it('specifies the group', () => {
-      expect(wrapper.find('HiddenField[name="groupId"]').prop('value')).toEqual(group.id);
+      expect(wrapper.find('HiddenField[name="groupId"]').prop('defaultValue')).toEqual(
+        group.id
+      );
     });
 
     it('specifies the uri', () => {
-      expect(wrapper.find('HiddenField[name="uri"]').prop('value')).toEqual(
+      expect(wrapper.find('HiddenField[name="uri"]').prop('defaultValue')).toEqual(
         component.schema.link.uri
       );
     });
@@ -188,10 +198,11 @@ describe('SentryAppExternalIssueForm Async Field', () => {
         },
       });
 
-      wrapper = mount(
+      wrapper = mountWithTheme(
         <SentryAppExternalIssueForm
           group={group}
           sentryAppInstallation={sentryAppInstallation}
+          appName={sentryApp.name}
           config={component.schema}
           action="create"
           api={new Client()}

@@ -6,16 +6,14 @@ import {Panel, PanelBody, PanelHeader} from 'app/components/panels';
 import {addErrorMessage, addSuccessMessage} from 'app/actionCreators/indicator';
 import {t, tct} from 'app/locale';
 import AsyncView from 'app/views/asyncView';
-import Button from 'app/components/button';
 import EmptyMessage from 'app/views/settings/components/emptyMessage';
 import ConfigStore from 'app/stores/configStore';
 import Pagination from 'app/components/pagination';
+import routeTitleGen from 'app/utils/routeTitle';
 import SentryTypes from 'app/sentryTypes';
-import SettingsPageHeader from 'app/views/settings/components/settingsPageHeader';
-import recreateRoute from 'app/utils/recreateRoute';
 import {redirectToRemainingOrganization} from 'app/actionCreators/organizations';
+import withOrganization from 'app/utils/withOrganization';
 
-import OrganizationAccessRequests from './organizationAccessRequests';
 import OrganizationMemberRow from './organizationMemberRow';
 
 class OrganizationMembersView extends AsyncView {
@@ -44,7 +42,6 @@ class OrganizationMembersView extends AsyncView {
       ...state,
       members: [],
       invited: new Map(),
-      accessRequestBusy: new Map(),
       searchQuery: this.props.location.query.query || '',
     };
   }
@@ -72,13 +69,12 @@ class OrganizationMembersView extends AsyncView {
           },
         },
       ],
-      ['requestList', `/organizations/${this.props.params.orgId}/access-requests/`],
     ];
   }
 
   getTitle() {
-    const org = this.context.organization;
-    return `${org.name} Members`;
+    const orgId = this.props.organization.slug;
+    return routeTitleGen(t('Members'), orgId, false);
   }
 
   removeMember = id => {
@@ -100,41 +96,8 @@ class OrganizationMembersView extends AsyncView {
     });
   };
 
-  approveOrDeny = (isApproved, id) => {
-    const {params} = this.props;
-    const {orgId} = params || {};
-
-    this.setState(state => ({
-      accessRequestBusy: state.accessRequestBusy.set(id, true),
-    }));
-
-    return new Promise((resolve, reject) => {
-      this.api.request(`/organizations/${orgId}/access-requests/${id}/`, {
-        method: 'PUT',
-        data: {isApproved},
-        success: data => {
-          this.setState(state => ({
-            requestList: state.requestList.filter(
-              ({id: existingId}) => existingId !== id
-            ),
-          }));
-          resolve(data);
-        },
-        error: err => reject(err),
-        complete: () =>
-          this.setState(state => ({
-            accessRequestBusy: state.accessRequestBusy.set(id, false),
-          })),
-      });
-    });
-  };
-
-  handleApprove = id => this.approveOrDeny(true, id);
-
-  handleDeny = id => this.approveOrDeny(false, id);
-
-  handleRemove = ({id, name}, e) => {
-    const {organization} = this.context;
+  handleRemove = ({id, name}) => {
+    const {organization} = this.props;
     const {slug: orgName} = organization;
 
     this.removeMember(id).then(
@@ -155,8 +118,8 @@ class OrganizationMembersView extends AsyncView {
     );
   };
 
-  handleLeave = ({id}, e) => {
-    const {organization} = this.context;
+  handleLeave = ({id}) => {
+    const {organization} = this.props;
     const {slug: orgName} = organization;
 
     this.removeMember(id).then(
@@ -186,7 +149,7 @@ class OrganizationMembersView extends AsyncView {
     this.api.request(`/organizations/${this.props.params.orgId}/members/${id}/`, {
       method: 'PUT',
       data: {reinvite: 1},
-      success: data =>
+      success: () =>
         this.setState(state => ({
           invited: state.invited.set(id, 'success'),
         })),
@@ -218,12 +181,11 @@ class OrganizationMembersView extends AsyncView {
   }, 200);
 
   renderBody() {
-    const {params, routes} = this.props;
-    const {membersPageLinks, members, requestList} = this.state;
-    const {organization} = this.context;
+    const {params, routes, organization} = this.props;
+    const {membersPageLinks, members} = this.state;
     const {orgId} = params || {};
     const {name: orgName, access} = organization;
-    const canAddMembers = access.indexOf('org:write') > -1;
+    const canAddMembers = access.indexOf('member:write') > -1;
     const canRemove = access.indexOf('member:admin') > -1;
     const currentUser = ConfigStore.get('user');
     // Find out if current user is the only owner
@@ -234,38 +196,10 @@ class OrganizationMembersView extends AsyncView {
     const requireLink = !!this.state.authProvider && this.state.authProvider.require_link;
 
     return (
-      <div>
-        <SettingsPageHeader
-          title="Members"
-          action={
-            <Button
-              priority="primary"
-              size="small"
-              disabled={!canAddMembers}
-              title={
-                !canAddMembers
-                  ? t('You do not have enough permission to add new members')
-                  : undefined
-              }
-              to={recreateRoute('new/', {routes, params})}
-              icon="icon-circle-add"
-              data-test-id="invite-member"
-            >
-              {t('Invite Member')}
-            </Button>
-          }
-        />
-
-        <OrganizationAccessRequests
-          onApprove={this.handleApprove}
-          onDeny={this.handleDeny}
-          accessRequestBusy={this.state.accessRequestBusy}
-          requestList={requestList}
-        />
-
+      <React.Fragment>
         <Panel data-test-id="org-member-list">
           <PanelHeader hasButtons>
-            {t('Member')}
+            {t('Members')}
 
             {this.renderSearchInput({
               updateRoute: true,
@@ -303,9 +237,9 @@ class OrganizationMembersView extends AsyncView {
         </Panel>
 
         <Pagination pageLinks={membersPageLinks} />
-      </div>
+      </React.Fragment>
     );
   }
 }
 
-export default OrganizationMembersView;
+export default withOrganization(OrganizationMembersView);

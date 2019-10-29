@@ -75,7 +75,7 @@ class SeenInfo extends React.Component {
             </Tooltip>
             <br />
             <small>
-              <DateTime date={date} seconds={true} />
+              <DateTime date={date} seconds />
             </small>
           </dd>
         ) : dateGlobal && environment === '' ? (
@@ -85,7 +85,7 @@ class SeenInfo extends React.Component {
             </Tooltip>
             <br />
             <small>
-              <DateTime date={dateGlobal} seconds={true} />
+              <DateTime date={dateGlobal} seconds />
             </small>
           </dd>
         ) : (
@@ -99,12 +99,7 @@ class SeenInfo extends React.Component {
               projectId={projectId}
               version={release.version}
             >
-              <Version
-                orgId={orgId}
-                projectId={projectId}
-                version={release.version}
-                className="truncate"
-              />
+              <Version orgId={orgId} version={release.version} className="truncate" />
             </VersionHoverCard>
           </dd>
         ) : !this.props.hasRelease ? (

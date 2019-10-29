@@ -155,7 +155,7 @@ class StacktraceProcessor(object):
         """
 
     def preprocess_step(self, processing_task):
-        """After frames are preprocesed but before frame processing kicks in
+        """After frames are preprocessed but before frame processing kicks in
         the preprocessing step is run.  This already has access to the cache
         values on the frames.
         """
@@ -276,7 +276,7 @@ def normalize_stacktraces_for_grouping(data, grouping_config=None):
 
 
 def should_process_for_stacktraces(data):
-    from sentry.plugins import plugins
+    from sentry.plugins.base import plugins
 
     infos = find_stacktraces_in_data(data)
     platforms = set()
@@ -296,7 +296,7 @@ def should_process_for_stacktraces(data):
 
 
 def get_processors_for_stacktraces(data, infos):
-    from sentry.plugins import plugins
+    from sentry.plugins.base import plugins
 
     platforms = set()
     for info in infos:
@@ -394,10 +394,12 @@ def get_crash_frame_from_event_data(data, frame_filter=None):
     if not frames:
         threads = get_path(data, "threads", "values")
         if threads and len(threads) == 1:
-            frames = get_path(threads, 0)
+            frames = get_path(threads, 0, "stacktrace", "frames")
 
     default = None
     for frame in reversed(frames or ()):
+        if frame is None:
+            continue
         if frame_filter is not None:
             if not frame_filter(frame):
                 continue

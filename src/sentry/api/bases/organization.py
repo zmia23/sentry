@@ -2,6 +2,8 @@ from __future__ import absolute_import
 
 from rest_framework.exceptions import PermissionDenied, ParseError
 
+from django.core.cache import cache
+
 from sentry.api.base import Endpoint
 from sentry.api.exceptions import ResourceDoesNotExist
 from sentry.api.helpers.environments import get_environments
@@ -17,6 +19,7 @@ from sentry.models import (
     ReleaseProject,
 )
 from sentry.utils import auth
+from sentry.utils.hashlib import hash_values
 from sentry.utils.sdk import configure_scope
 
 
@@ -26,6 +29,9 @@ class OrganizationEventsError(Exception):
 
 class NoProjects(Exception):
     pass
+
+
+ALL_ACCESS_PROJECTS = {-1}
 
 
 class OrganizationPermission(SentryPermission):
@@ -167,13 +173,28 @@ class OrganizationEndpoint(Endpoint):
             project_ids = set(map(int, request.GET.getlist("project")))
         except ValueError:
             raise ParseError(detail="Invalid project parameter. Values must be numbers.")
+        return self._get_projects_by_id(
+            project_ids, request, organization, force_global_perms, include_all_accessible
+        )
 
-        requested_projects = project_ids.copy()
-
+    def _get_projects_by_id(
+        self,
+        project_ids,
+        request,
+        organization,
+        force_global_perms=False,
+        include_all_accessible=False,
+    ):
+        qs = Project.objects.filter(organization=organization, status=ProjectStatus.VISIBLE)
         user = getattr(request, "user", None)
 
-        qs = Project.objects.filter(organization=organization, status=ProjectStatus.VISIBLE)
+        # A project_id of -1 means 'all projects I have access to'
+        # While no project_ids means 'all projects I am a member of'.
+        if project_ids == ALL_ACCESS_PROJECTS:
+            include_all_accessible = True
+            project_ids = set()
 
+        requested_projects = project_ids.copy()
         if project_ids:
             qs = qs.filter(id__in=project_ids)
 
@@ -293,7 +314,24 @@ class OrganizationReleasesBaseEndpoint(OrganizationEndpoint):
         """
         Does the given request have permission to access this release, based
         on the projects to which the release is attached?
+
+        If the given request has an actor (user or ApiKey), cache the results
+        for a minute on the unique combination of actor,org,release.
         """
-        return ReleaseProject.objects.filter(
-            release=release, project__in=self.get_projects(request, organization)
-        ).exists()
+        actor_id = None
+        has_perms = None
+        if getattr(request, "user", None) and request.user.id:
+            actor_id = "user:%s" % request.user.id
+        if getattr(request, "auth", None) and request.auth.id:
+            actor_id = "apikey:%s" % request.auth.id
+        if actor_id is not None:
+            key = "release_perms:1:%s" % hash_values([actor_id, organization.id, release.id])
+            has_perms = cache.get(key)
+        if has_perms is None:
+            has_perms = ReleaseProject.objects.filter(
+                release=release, project__in=self.get_projects(request, organization)
+            ).exists()
+            if actor_id is not None:
+                cache.set(key, has_perms, 60)
+
+        return has_perms

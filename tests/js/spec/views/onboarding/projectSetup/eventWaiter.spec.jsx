@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {mount} from 'enzyme';
+import {mount} from 'sentry-test/enzyme';
 import EventWaiter from 'app/views/onboarding/projectSetup/eventWaiter';
 
 jest.useFakeTimers();
@@ -74,7 +74,7 @@ describe('EventWaiter', function() {
     expect(projectApiMock).not.toHaveBeenCalled();
   });
 
-  it('recieves a first event of `true` when first even has expired', async function() {
+  it('receives a first event of `true` when first even has expired', async function() {
     const org = TestStubs.Organization();
     const project = TestStubs.ProjectDetails({
       firstEvent: '2019-05-01T00:00:00.000Z',

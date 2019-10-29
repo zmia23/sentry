@@ -6,8 +6,9 @@ from celery import Task
 from collections import namedtuple
 from django.core.urlresolvers import reverse
 from mock import patch
+from requests.exceptions import RequestException
 
-from sentry.models import Rule, SentryApp, SentryAppInstallation
+from sentry.models import Rule, SentryApp, SentryAppInstallation, SentryAppWebhookError
 from sentry.testutils import TestCase
 from sentry.testutils.helpers import with_feature
 from sentry.testutils.helpers.faux import faux
@@ -16,6 +17,7 @@ from sentry.utils.http import absolute_uri
 from sentry.receivers.sentry_apps import *  # NOQA
 from sentry.utils import json
 from sentry.tasks.post_process import post_process_group
+from sentry.api.serializers import serialize
 from sentry.tasks.sentry_apps import (
     send_alert_event,
     notify_sentry_app,
@@ -23,9 +25,14 @@ from sentry.tasks.sentry_apps import (
     process_resource_change_bound,
     installation_webhook,
     workflow_notification,
+    send_webhooks,
 )
 
 RuleFuture = namedtuple("RuleFuture", ["rule", "kwargs"])
+
+MockResponse = namedtuple("MockResponse", ["headers", "content", "ok", "status_code"])
+MockResponseInstance = MockResponse({}, {}, True, 200)
+MockFailureResponseInstance = MockResponse({}, {}, False, 400)
 
 
 class DictContaining(object):
@@ -143,7 +150,7 @@ class TestSendAlertEvent(TestCase):
         )
 
 
-@patch("sentry.tasks.sentry_apps.safe_urlopen")
+@patch("sentry.tasks.sentry_apps.safe_urlopen", return_value=MockResponseInstance)
 class TestProcessResourceChange(TestCase):
     def setUp(self):
         self.project = self.create_project()
@@ -162,11 +169,7 @@ class TestProcessResourceChange(TestCase):
 
         with self.tasks():
             post_process_group(
-                event=event,
-                is_new=True,
-                is_regression=False,
-                is_sample=False,
-                is_new_group_environment=False,
+                event=event, is_new=True, is_regression=False, is_new_group_environment=False
             )
 
         data = json.loads(faux(safe_urlopen).kwargs["data"])
@@ -227,11 +230,7 @@ class TestProcessResourceChange(TestCase):
 
         with self.tasks():
             post_process_group(
-                event=event,
-                is_new=False,
-                is_regression=False,
-                is_sample=False,
-                is_new_group_environment=False,
+                event=event, is_new=False, is_regression=False, is_new_group_environment=False
             )
 
         data = json.loads(faux(safe_urlopen).kwargs["data"])
@@ -272,7 +271,7 @@ class TestInstallationWebhook(TestCase):
         assert len(run.mock_calls) == 0
 
 
-@patch("sentry.tasks.sentry_apps.safe_urlopen")
+@patch("sentry.tasks.sentry_apps.safe_urlopen", return_value=MockResponseInstance)
 class TestWorkflowNotification(TestCase):
     def setUp(self):
         self.project = self.create_project()
@@ -327,3 +326,78 @@ class TestWorkflowNotification(TestCase):
         )
         workflow_notification(install.id, self.issue.id, "assigned", self.user.id)
         assert not safe_urlopen.called
+
+
+class TestWebhookErrors(TestCase):
+    def setUp(self):
+        self.project = self.create_project()
+        self.user = self.create_user()
+
+        self.sentry_app = self.create_sentry_app(
+            name="Test App",
+            organization=self.project.organization,
+            events=["issue.resolved", "issue.ignored", "issue.assigned"],
+        )
+
+        self.install = self.create_sentry_app_installation(
+            organization=self.project.organization, slug=self.sentry_app.slug
+        )
+
+        self.issue = self.create_group(project=self.project)
+
+    @patch("sentry.tasks.sentry_apps.safe_urlopen", return_value=MockFailureResponseInstance)
+    def test_saves_error_if_workflow_webhook_request_fails(self, safe_urlopen):
+        data = {"issue": serialize(self.issue)}
+        send_webhooks(installation=self.install, event="issue.assigned", data=data, actor=self.user)
+
+        error_count = SentryAppWebhookError.objects.count()
+        error = SentryAppWebhookError.objects.first()
+
+        assert safe_urlopen.called
+        assert error_count == 1
+        assert error.sentry_app.id == self.install.sentry_app.id
+        assert error.organization.id == self.install.organization.id
+        assert error.response_body == "{}"
+
+    @patch("sentry.tasks.sentry_apps.safe_urlopen", return_value=MockFailureResponseInstance)
+    def test_does_not_save_error_if_nonworkflow_request_fails(self, safe_urlopen):
+        sentry_app = self.create_sentry_app(
+            name="Test App 2",
+            organization=self.project.organization,
+            events=[
+                "issue.resolved",
+                "issue.ignored",
+                "issue.assigned",
+                "issue.created",
+                "error.created",
+            ],
+        )
+        install = self.create_sentry_app_installation(
+            organization=self.project.organization, slug=sentry_app.slug
+        )
+        data = {"issue": serialize(self.issue)}
+        send_webhooks(installation=install, event="issue.created", data=data)
+        send_webhooks(installation=install, event="error.created", data=data)
+
+        error_count = SentryAppWebhookError.objects.count()
+
+        assert safe_urlopen.called
+        assert error_count == 0
+
+    @patch("sentry.tasks.sentry_apps.safe_urlopen", side_effect=RequestException("Timeout"))
+    def test_saves_error_for_request_timeout(self, safe_urlopen):
+        data = {"issue": serialize(self.issue)}
+
+        with self.assertRaises(RequestException):
+            send_webhooks(
+                installation=self.install, event="issue.assigned", data=data, actor=self.user
+            )
+
+        error_count = SentryAppWebhookError.objects.count()
+        error = SentryAppWebhookError.objects.first()
+
+        assert safe_urlopen.called
+        assert error_count == 1
+        assert error.sentry_app.id == self.install.sentry_app.id
+        assert error.organization.id == self.install.organization.id
+        assert error.response_body == "RequestException('Timeout',)"

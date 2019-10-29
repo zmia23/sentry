@@ -11,11 +11,15 @@ from django.db import transaction
 from django.utils import timezone
 
 from sentry import analytics
-from sentry.api.event_search import get_snuba_query_args
+from sentry.api.event_search import get_filter
 from sentry.incidents.models import (
     AlertRule,
+    AlertRuleExcludedProjects,
     AlertRuleQuerySubscription,
     AlertRuleStatus,
+    AlertRuleTrigger,
+    AlertRuleTriggerAction,
+    AlertRuleTriggerExclusion,
     Incident,
     IncidentActivity,
     IncidentActivityType,
@@ -29,7 +33,7 @@ from sentry.incidents.models import (
     TimeSeriesSnapshot,
 )
 from sentry.snuba.models import QueryAggregations, QueryDatasets
-from sentry.models import Commit, Release
+from sentry.models import Commit, Project, Release
 from sentry.incidents import tasks
 from sentry.snuba.subscriptions import (
     bulk_create_snuba_subscriptions,
@@ -139,7 +143,7 @@ def calculate_incident_start(query, projects, groups):
     if projects:
         params["project_id"] = [p.id for p in projects]
 
-    query_args = get_snuba_query_args(query, params)
+    filter = get_filter(query, params)
     rollup = int(INCIDENT_START_ROLLUP.total_seconds())
 
     result = raw_query(
@@ -149,7 +153,10 @@ def calculate_incident_start(query, projects, groups):
         rollup=rollup,
         referrer="incidents.calculate_incident_start",
         limit=10000,
-        **query_args
+        start=filter.start,
+        end=filter.end,
+        conditions=filter.conditions,
+        filter_keys=filter.filter_keys,
     )["data"]
     # TODO: Start could be the period before the first period we find
     result = zerofill(result, params["start"], params["end"], rollup, "time")
@@ -420,7 +427,17 @@ def bulk_build_incident_query_params(incidents, start=None, end=None):
         project_ids = incident_projects[incident.id]
         if project_ids:
             params["project_id"] = project_ids
-        query_args_list.append(get_snuba_query_args(incident.query, params))
+
+        filter = get_filter(incident.query, params)
+
+        query_args_list.append(
+            {
+                "start": filter.start,
+                "end": filter.end,
+                "conditions": filter.conditions,
+                "filter_keys": filter.filter_keys,
+            }
+        )
 
     return query_args_list
 
@@ -572,24 +589,31 @@ def create_alert_rule(
     alert_threshold,
     resolve_threshold,
     threshold_period,
+    include_all_projects=False,
+    excluded_projects=None,
 ):
     """
     Creates an alert rule for an organization.
 
     :param organization:
-    :param projects:
+    :param projects: A list of projects to subscribe to the rule. This will be overriden
+    if `include_all_projects` is True
     :param name: Name for the alert rule. This will be used as part of the
-    incident name, and must be unique per project.
+    incident name, and must be unique per project
     :param threshold_type: An AlertRuleThresholdType
     :param query: An event search query to subscribe to and monitor for alerts
     :param aggregation: A QueryAggregation to fetch for this alert rule
-    :param time_window: Time period to aggregate over, in minutes.
+    :param time_window: Time period to aggregate over, in minutes
     :param alert_threshold: Value that the subscription needs to reach to
     trigger the alert
     :param resolve_threshold: Value that the subscription needs to reach to
     resolve the alert
     :param threshold_period: How many update periods the value of the
     subscription needs to exceed the threshold before triggering
+    :param include_all_projects: Whether to include all current and future projects
+    from this organization
+    :param excluded_projects: List of projects to exclude if we're using
+    `include_all_projects`.
     :return: The created `AlertRule`
     """
     dataset = QueryDatasets.EVENTS
@@ -610,21 +634,20 @@ def create_alert_rule(
             alert_threshold=alert_threshold,
             resolve_threshold=resolve_threshold,
             threshold_period=threshold_period,
+            include_all_projects=include_all_projects,
         )
-        subscriptions = bulk_create_snuba_subscriptions(
-            projects,
-            tasks.INCIDENTS_SNUBA_SUBSCRIPTION_TYPE,
-            dataset,
-            query,
-            aggregation,
-            time_window,
-            resolution,
-        )
-        subscription_links = [
-            AlertRuleQuerySubscription(query_subscription=subscription, alert_rule=alert_rule)
-            for subscription in subscriptions
-        ]
-        AlertRuleQuerySubscription.objects.bulk_create(subscription_links)
+        if include_all_projects:
+            excluded_projects = excluded_projects if excluded_projects else []
+            projects = Project.objects.filter(organization=organization).exclude(
+                id__in=[p.id for p in excluded_projects]
+            )
+            exclusions = [
+                AlertRuleExcludedProjects(alert_rule=alert_rule, project=project)
+                for project in excluded_projects
+            ]
+            AlertRuleExcludedProjects.objects.bulk_create(exclusions)
+
+        subscribe_projects_to_alert_rule(alert_rule, projects)
     return alert_rule
 
 
@@ -639,11 +662,15 @@ def update_alert_rule(
     alert_threshold=None,
     resolve_threshold=None,
     threshold_period=None,
+    include_all_projects=None,
+    excluded_projects=None,
 ):
     """
     Updates an alert rule.
 
     :param alert_rule: The alert rule to update
+    :param excluded_projects: List of projects to subscribe to the rule. Ignored if
+    `include_all_projects` is True
     :param name: Name for the alert rule. This will be used as part of the
     incident name, and must be unique per project.
     :param threshold_type: An AlertRuleThresholdType
@@ -656,6 +683,10 @@ def update_alert_rule(
     resolve the alert
     :param threshold_period: How many update periods the value of the
     subscription needs to exceed the threshold before triggering
+    :param include_all_projects: Whether to include all current and future projects
+    from this organization
+    :param excluded_projects: List of projects to exclude if we're using
+    `include_all_projects`. Ignored otherwise.
     :return: The updated `AlertRule`
     """
     if (
@@ -683,6 +714,8 @@ def update_alert_rule(
         updated_fields["resolve_threshold"] = resolve_threshold
     if threshold_period:
         updated_fields["threshold_period"] = threshold_period
+    if include_all_projects is not None:
+        updated_fields["include_all_projects"] = include_all_projects
 
     with transaction.atomic():
         alert_rule.update(**updated_fields)
@@ -692,10 +725,46 @@ def update_alert_rule(
             or aggregation is not None
             or time_window is not None
             or projects is not None
+            or include_all_projects is not None
+            or excluded_projects is not None
         ):
             existing_subs = alert_rule.query_subscriptions.all().select_related("project")
 
-        if projects is not None:
+        new_projects = []
+        deleted_subs = []
+
+        if not alert_rule.include_all_projects:
+            # We don't want to have any exclusion rows present if we're not in
+            # `include_all_projects` mode
+            get_excluded_projects_for_alert_rule(alert_rule).delete()
+
+        if alert_rule.include_all_projects:
+            if include_all_projects or excluded_projects is not None:
+                # If we're in `include_all_projects` mode, we want to just fetch
+                # projects that aren't already subscribed, and haven't been excluded so
+                # we can add them.
+                excluded_project_ids = (
+                    {p.id for p in excluded_projects} if excluded_projects else set()
+                )
+                project_exclusions = get_excluded_projects_for_alert_rule(alert_rule)
+                project_exclusions.exclude(project_id__in=excluded_project_ids).delete()
+                existing_excluded_project_ids = {pe.project_id for pe in project_exclusions}
+                new_exclusions = [
+                    AlertRuleExcludedProjects(alert_rule=alert_rule, project_id=project_id)
+                    for project_id in excluded_project_ids
+                    if project_id not in existing_excluded_project_ids
+                ]
+                AlertRuleExcludedProjects.objects.bulk_create(new_exclusions)
+
+                new_projects = Project.objects.filter(organization=alert_rule.organization).exclude(
+                    id__in=set([sub.project_id for sub in existing_subs]) | excluded_project_ids
+                )
+                # If we're subscribed to any of the excluded projects then we want to
+                # remove those subscriptions
+                deleted_subs = [
+                    sub for sub in existing_subs if sub.project_id in excluded_project_ids
+                ]
+        elif projects is not None:
             existing_project_slugs = {sub.project.slug for sub in existing_subs}
             # Determine whether we've added any new projects as part of this update
             new_projects = [
@@ -706,27 +775,12 @@ def update_alert_rule(
             deleted_subs = [
                 sub for sub in existing_subs if sub.project.slug not in updated_project_slugs
             ]
-            if new_projects:
-                new_subscriptions = bulk_create_snuba_subscriptions(
-                    new_projects,
-                    tasks.INCIDENTS_SNUBA_SUBSCRIPTION_TYPE,
-                    QueryDatasets(alert_rule.dataset),
-                    alert_rule.query,
-                    QueryAggregations(alert_rule.aggregation),
-                    alert_rule.time_window,
-                    DEFAULT_ALERT_RULE_RESOLUTION,
-                )
-                subscription_links = [
-                    AlertRuleQuerySubscription(
-                        query_subscription=subscription, alert_rule=alert_rule
-                    )
-                    for subscription in new_subscriptions
-                ]
-                AlertRuleQuerySubscription.objects.bulk_create(subscription_links)
 
-            if deleted_subs:
-                bulk_delete_snuba_subscriptions(deleted_subs)
+        if new_projects:
+            subscribe_projects_to_alert_rule(alert_rule, new_projects)
 
+        if deleted_subs:
+            bulk_delete_snuba_subscriptions(deleted_subs)
             # Remove any deleted subscriptions from `existing_subscriptions`, so that
             # if we need to update any subscriptions we don't end up doing it twice. We
             # don't add new subscriptions here since they'll already have the updated
@@ -747,6 +801,28 @@ def update_alert_rule(
             )
 
     return alert_rule
+
+
+def subscribe_projects_to_alert_rule(alert_rule, projects):
+    """
+    Subscribes a list of projects to an alert rule
+    :return: The list of created subscriptions
+    """
+    subscriptions = bulk_create_snuba_subscriptions(
+        projects,
+        tasks.INCIDENTS_SNUBA_SUBSCRIPTION_TYPE,
+        QueryDatasets(alert_rule.dataset),
+        alert_rule.query,
+        QueryAggregations(alert_rule.aggregation),
+        alert_rule.time_window,
+        alert_rule.resolution,
+    )
+    subscription_links = [
+        AlertRuleQuerySubscription(query_subscription=subscription, alert_rule=alert_rule)
+        for subscription in subscriptions
+    ]
+    AlertRuleQuerySubscription.objects.bulk_create(subscription_links)
+    return subscriptions
 
 
 def delete_alert_rule(alert_rule):
@@ -775,4 +851,230 @@ def validate_alert_rule_query(query):
     # TODO: We should add more validation here to reject queries that include
     # fields that are invalid in alert rules. For now this will just make sure
     # the query parses correctly.
-    get_snuba_query_args(query)
+    get_filter(query)
+
+
+def get_excluded_projects_for_alert_rule(alert_rule):
+    return AlertRuleExcludedProjects.objects.filter(alert_rule=alert_rule)
+
+
+class AlertRuleTriggerLabelAlreadyUsedError(Exception):
+    pass
+
+
+class ProjectsNotAssociatedWithAlertRuleError(Exception):
+    def __init__(self, project_slugs):
+        self.project_slugs = project_slugs
+
+
+def create_alert_rule_trigger(
+    alert_rule,
+    label,
+    threshold_type,
+    alert_threshold,
+    resolve_threshold=None,
+    excluded_projects=None,
+):
+    """
+    Creates a new AlertRuleTrigger
+    :param alert_rule: The alert rule to create the trigger for
+    :param label: A description of the trigger
+    :param threshold_type: An AlertRuleThresholdType
+    :param alert_threshold: Value that the subscription needs to reach to trigger the
+    alert rule
+    :param resolve_threshold: Optional value that the subscription needs to reach to
+    resolve the alert
+    :param excluded_projects: A list of Projects that should be excluded from this
+    trigger. These projects must be associate with the alert rule already
+    :return: The created AlertRuleTrigger
+    """
+    if AlertRuleTrigger.objects.filter(alert_rule=alert_rule, label=label).exists():
+        raise AlertRuleTriggerLabelAlreadyUsedError()
+
+    excluded_subs = []
+    if excluded_projects:
+        excluded_subs = get_subscriptions_from_alert_rule(alert_rule, excluded_projects)
+
+    with transaction.atomic():
+        trigger = AlertRuleTrigger.objects.create(
+            alert_rule=alert_rule,
+            label=label,
+            threshold_type=threshold_type.value,
+            alert_threshold=alert_threshold,
+            resolve_threshold=resolve_threshold,
+        )
+        if excluded_subs:
+            new_exclusions = [
+                AlertRuleTriggerExclusion(alert_rule_trigger=trigger, query_subscription=sub)
+                for sub in excluded_subs
+            ]
+            AlertRuleTriggerExclusion.objects.bulk_create(new_exclusions)
+    return trigger
+
+
+def update_alert_rule_trigger(
+    trigger,
+    label=None,
+    threshold_type=None,
+    alert_threshold=None,
+    resolve_threshold=None,
+    excluded_projects=None,
+):
+    """
+    :param trigger: The AlertRuleTrigger to update
+    :param label: A description of the trigger
+    :param threshold_type: An AlertRuleThresholdType
+    :param alert_threshold: Value that the subscription needs to reach to trigger the
+    alert rule
+    :param resolve_threshold: Optional value that the subscription needs to reach to
+    resolve the alert
+    :param excluded_projects: A list of Projects that should be excluded from this
+    trigger. These projects must be associate with the alert rule already
+    :return: The updated AlertRuleTrigger
+    """
+
+    if (
+        AlertRuleTrigger.objects.filter(alert_rule=trigger.alert_rule, label=label)
+        .exclude(id=trigger.id)
+        .exists()
+    ):
+        raise AlertRuleTriggerLabelAlreadyUsedError()
+
+    updated_fields = {}
+    if label is not None:
+        updated_fields["label"] = label
+    if threshold_type is not None:
+        updated_fields["threshold_type"] = threshold_type.value
+    if alert_threshold is not None:
+        updated_fields["alert_threshold"] = alert_threshold
+    if resolve_threshold is not None:
+        updated_fields["resolve_threshold"] = resolve_threshold
+
+    deleted_exclusion_ids = []
+    new_subs = []
+
+    if excluded_projects:
+        # We link projects to exclusions via QuerySubscriptions. Calculate which
+        # exclusions need to be deleted, and which need to be created.
+        excluded_subs = get_subscriptions_from_alert_rule(trigger.alert_rule, excluded_projects)
+        existing_exclusions = AlertRuleTriggerExclusion.objects.filter(alert_rule_trigger=trigger)
+        new_sub_ids = {sub.id for sub in excluded_subs}
+        existing_sub_ids = {exclusion.query_subscription_id for exclusion in existing_exclusions}
+
+        deleted_exclusion_ids = [
+            e.id for e in existing_exclusions if e.query_subscription_id not in new_sub_ids
+        ]
+        new_subs = [sub for sub in excluded_subs if sub.id not in existing_sub_ids]
+
+    with transaction.atomic():
+        if updated_fields:
+            trigger.update(**updated_fields)
+
+        if deleted_exclusion_ids:
+            AlertRuleTriggerExclusion.objects.filter(id__in=deleted_exclusion_ids).delete()
+
+        if new_subs:
+            new_exclusions = [
+                AlertRuleTriggerExclusion(alert_rule_trigger=trigger, query_subscription=sub)
+                for sub in new_subs
+            ]
+            AlertRuleTriggerExclusion.objects.bulk_create(new_exclusions)
+
+    return trigger
+
+
+def delete_alert_rule_trigger(trigger):
+    """
+    Deletes an AlertRuleTrigger
+    """
+    trigger.delete()
+
+
+def get_triggers_for_alert_rule(alert_rule):
+    return AlertRuleTrigger.objects.filter(alert_rule=alert_rule)
+
+
+def get_subscriptions_from_alert_rule(alert_rule, projects):
+    """
+    Fetches subscriptions associated with an alert rule filtered by a list of projects.
+    Raises `ProjectsNotAssociatedWithAlertRuleError` if Projects aren't associated with
+    the AlertRule
+    :param alert_rule: The AlertRule to fetch subscriptions for
+    :param projects: The Project we want subscriptions for
+    :return: A list of QuerySubscriptions
+    """
+    excluded_subscriptions = alert_rule.query_subscriptions.filter(project__in=projects)
+    if len(excluded_subscriptions) != len(projects):
+        invalid_slugs = set([p.slug for p in projects]) - set(
+            [s.project.slug for s in excluded_subscriptions]
+        )
+        raise ProjectsNotAssociatedWithAlertRuleError(invalid_slugs)
+    return excluded_subscriptions
+
+
+def create_alert_rule_trigger_action(
+    trigger, type, target_type, target_identifier=None, target_display=None, integration=None
+):
+    """
+    Creates an AlertRuleTriggerAction
+    :param trigger: The trigger to create the action on
+    :param type: Which sort of action to take
+    :param target_type: Which type of target to send to
+    :param target_identifier: (Optional) The identifier of the target
+    :param target_display: (Optional) Human readable name for the target
+    :param integration: (Optional) The Integration related to this action.
+    :return: The created action
+    """
+    return AlertRuleTriggerAction.objects.create(
+        alert_rule_trigger=trigger,
+        type=type.value,
+        target_type=target_type.value,
+        target_identifier=target_identifier,
+        target_display=target_display,
+        integration=integration,
+    )
+
+
+def update_alert_rule_trigger_action(
+    trigger_action,
+    type=None,
+    target_type=None,
+    target_identifier=None,
+    target_display=None,
+    integration=None,
+):
+    """
+    Updates values on an AlertRuleTriggerAction
+    :param trigger_action: The trigger action to update
+    :param type: Which sort of action to take
+    :param target_type: Which type of target to send to
+    :param target_identifier: The identifier of the target
+    :param target_display: Human readable name for the target
+    :param integration: The Integration related to this action.
+    :return:
+    """
+    updated_fields = {}
+    if type is not None:
+        updated_fields["type"] = type.value
+    if target_type is not None:
+        updated_fields["target_type"] = target_type.value
+    if target_identifier is not None:
+        updated_fields["target_identifier"] = target_identifier
+    if target_display is not None:
+        updated_fields["target_display"] = target_display
+    if integration is not None:
+        updated_fields["integration"] = integration
+
+    trigger_action.update(**updated_fields)
+    return trigger_action
+
+
+def delete_alert_rule_trigger_action(trigger_action):
+    """
+    Deletes a AlertRuleTriggerAction
+    """
+    trigger_action.delete()
+
+
+def get_actions_for_trigger(trigger):
+    return AlertRuleTriggerAction.objects.filter(alert_rule_trigger=trigger)

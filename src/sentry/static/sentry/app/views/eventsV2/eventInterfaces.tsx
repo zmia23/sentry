@@ -61,9 +61,8 @@ const ActiveTab = (props: ActiveTabProps) => {
 
     return (
       <EventDataSection
-        event={event}
-        type={entry && entry.type}
-        title={entry && entry.type}
+        type={entry && entry.type ? entry.type : ''}
+        title={entry && entry.type ? entry.type : ''}
       >
         <p>{t('There was an error rendering this data.')}</p>
       </EventDataSection>
@@ -108,7 +107,7 @@ class EventInterfaces extends React.Component<
 
     return (
       <React.Fragment>
-        <NavTabs underlined={true}>
+        <NavTabs underlined>
           {event.entries.map(entry => {
             if (!INTERFACES.hasOwnProperty(entry.type)) {
               return null;

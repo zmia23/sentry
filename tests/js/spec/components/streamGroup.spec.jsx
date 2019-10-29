@@ -1,5 +1,5 @@
 import React from 'react';
-import {shallow} from 'enzyme';
+import {shallow} from 'sentry-test/enzyme';
 
 import GroupStore from 'app/stores/groupStore';
 import StreamGroup from 'app/components/stream/group';
@@ -31,7 +31,7 @@ describe('StreamGroup', function() {
         groupId="groupId"
         lastSeen="2017-07-25T22:56:12Z"
         firstSeen="2017-07-01T02:06:02Z"
-        hasGuideAnchor={true}
+        hasGuideAnchor
       />
     );
 

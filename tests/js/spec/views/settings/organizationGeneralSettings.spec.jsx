@@ -1,5 +1,5 @@
 import {browserHistory} from 'react-router';
-import {mount} from 'enzyme';
+import {mountWithTheme} from 'sentry-test/enzyme';
 import React from 'react';
 
 import OrganizationGeneralSettings from 'app/views/settings/organizationGeneralSettings';
@@ -35,7 +35,7 @@ describe('OrganizationGeneralSettings', function() {
       statusCode: 500,
       body: {},
     });
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationGeneralSettings params={{orgId: org.slug}} />,
       TestStubs.routerContext()
     );
@@ -47,7 +47,7 @@ describe('OrganizationGeneralSettings', function() {
   });
 
   it('can enable "early adopter"', async function() {
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationGeneralSettings params={{orgId: org.slug}} />,
       TestStubs.routerContext()
     );
@@ -69,7 +69,7 @@ describe('OrganizationGeneralSettings', function() {
   });
 
   it('changes org slug and redirects to new slug', async function() {
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationGeneralSettings params={{orgId: org.slug}} />,
       TestStubs.routerContext()
     );
@@ -108,7 +108,7 @@ describe('OrganizationGeneralSettings', function() {
       url: ENDPOINT,
       body: readOnlyOrg,
     });
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationGeneralSettings routes={[]} params={{orgId: readOnlyOrg.slug}} />,
       TestStubs.routerContext([{organization: readOnlyOrg}])
     );
@@ -137,7 +137,7 @@ describe('OrganizationGeneralSettings', function() {
         access: ['org:write'],
       }),
     });
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationGeneralSettings params={{orgId: org.slug}} />,
       TestStubs.routerContext()
     );
@@ -157,7 +157,7 @@ describe('OrganizationGeneralSettings', function() {
         access: ['org:admin'],
       }),
     });
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationGeneralSettings params={{orgId: org.slug}} />,
       TestStubs.routerContext()
     );
@@ -185,8 +185,8 @@ describe('OrganizationGeneralSettings', function() {
     );
   });
 
-  it('shows require2fa switch w/ feature flag', async function() {
-    const wrapper = mount(
+  it('shows require2fa switch', async function() {
+    const wrapper = mountWithTheme(
       <OrganizationGeneralSettings params={{orgId: org.slug}} />,
       TestStubs.routerContext()
     );
@@ -202,7 +202,7 @@ describe('OrganizationGeneralSettings', function() {
       url: '/organizations/org-slug/',
       method: 'PUT',
     });
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationGeneralSettings params={{orgId: org.slug}} />,
       TestStubs.routerContext()
     );
@@ -230,7 +230,7 @@ describe('OrganizationGeneralSettings', function() {
       method: 'PUT',
     });
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationGeneralSettings params={{orgId: org.slug}} />,
       TestStubs.routerContext()
     );
@@ -268,7 +268,7 @@ describe('OrganizationGeneralSettings', function() {
       statusCode: 500,
     });
 
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       <OrganizationGeneralSettings params={{orgId: org.slug}} />,
       TestStubs.routerContext()
     );
@@ -292,5 +292,62 @@ describe('OrganizationGeneralSettings', function() {
     expect(wrapper.find('Switch[name="require2FA"]').prop('isActive')).toBe(false);
     // eslint-disable-next-line no-console
     console.error.mockRestore();
+  });
+
+  it('renders join request switch with experiment', async function() {
+    const organization = TestStubs.Organization({
+      experiments: {JoinRequestExperiment: 1},
+    });
+    const wrapper = mountWithTheme(
+      <OrganizationGeneralSettings params={{orgId: organization.slug}} />,
+      TestStubs.routerContext([{organization}])
+    );
+
+    wrapper.setState({loading: false});
+    await tick();
+    wrapper.update();
+    expect(wrapper.find('Switch[name="allowJoinRequests"]').exists()).toBe(true);
+  });
+
+  it('does not render join request switch not in experiment', async function() {
+    const organization = TestStubs.Organization({
+      experiments: {JoinRequestExperiment: -1},
+    });
+    const wrapper = mountWithTheme(
+      <OrganizationGeneralSettings params={{orgId: organization.slug}} />,
+      TestStubs.routerContext([{organization}])
+    );
+
+    wrapper.setState({loading: false});
+    await tick();
+    wrapper.update();
+    expect(wrapper.find('Switch[name="allowJoinRequests"]').exists()).toBe(false);
+  });
+
+  it('does not render join request switch in experiment control', async function() {
+    const organization = TestStubs.Organization({
+      experiments: {JoinRequestExperiment: 0},
+    });
+    const wrapper = mountWithTheme(
+      <OrganizationGeneralSettings params={{orgId: organization.slug}} />,
+      TestStubs.routerContext([{organization}])
+    );
+
+    wrapper.setState({loading: false});
+    await tick();
+    wrapper.update();
+    expect(wrapper.find('Switch[name="allowJoinRequests"]').exists()).toBe(false);
+  });
+
+  it('does not render join request switch without experiments', async function() {
+    const wrapper = mountWithTheme(
+      <OrganizationGeneralSettings params={{orgId: org.slug}} />,
+      TestStubs.routerContext()
+    );
+
+    wrapper.setState({loading: false});
+    await tick();
+    wrapper.update();
+    expect(wrapper.find('Switch[name="allowJoinRequests"]').exists()).toBe(false);
   });
 });

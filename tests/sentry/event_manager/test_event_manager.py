@@ -74,27 +74,7 @@ class EventManagerTest(TestCase):
 
         assert event1.group_id != event2.group_id
 
-    @mock.patch("sentry.event_manager.should_sample")
-    def test_does_not_save_event_when_sampled(self, should_sample):
-        with self.feature("projects:sample-events"):
-            should_sample.return_value = True
-            event_id = "a" * 32
-
-            manager = EventManager(make_event(event_id=event_id))
-            manager.save(1)
-
-            # This is a brand new event, so it is actually saved.
-            assert Event.objects.filter(event_id=event_id).exists()
-
-            event_id = "b" * 32
-
-            manager = EventManager(make_event(event_id=event_id))
-            manager.save(1)
-
-            # This second is a dupe, so should be sampled
-            assert not Event.objects.filter(event_id=event_id).exists()
-
-    def test_ephemral_interfaces_removed_on_save(self):
+    def test_ephemeral_interfaces_removed_on_save(self):
         manager = EventManager(make_event(platform="python"))
         manager.normalize()
         event = manager.save(1)
@@ -794,7 +774,6 @@ class EventManagerTest(TestCase):
             group=event.group,
             event=event,
             is_new=True,
-            is_sample=False,
             is_regression=False,
             is_new_group_environment=True,
             primary_hash="acbd18db4cc2f85cedef654fccc4a4d8",
@@ -809,7 +788,6 @@ class EventManagerTest(TestCase):
             group=event.group,
             event=event,
             is_new=False,
-            is_sample=False,
             is_regression=None,  # XXX: wut
             is_new_group_environment=False,
             primary_hash="acbd18db4cc2f85cedef654fccc4a4d8",
@@ -916,6 +894,7 @@ class EventManagerTest(TestCase):
                     "contexts": {
                         "trace": {
                             "parent_span_id": "bce14471e0e9654d",
+                            "op": "foobar",
                             "trace_id": "a0fa8803753e40fd8124b21eeb2986b5",
                             "span_id": "bf5be759039ede9a",
                         }
@@ -1081,7 +1060,7 @@ class EventManagerTest(TestCase):
 
         data = {"exception": {"values": [item.value for item in items]}}
 
-        project_config = get_project_config(self.project.id, for_store=True)
+        project_config = get_project_config(self.project, for_store=True)
         manager = EventManager(data, project=self.project, project_config=project_config)
 
         mock_is_valid_error_message.side_effect = [item.result for item in items]
@@ -1122,6 +1101,7 @@ class EventManagerTest(TestCase):
                 contexts={
                     "trace": {
                         "parent_span_id": "bce14471e0e9654d",
+                        "op": "foobar",
                         "trace_id": "a0fa8803753e40fd8124b21eeb2986b5",
                         "span_id": "bf5be759039ede9a",
                     }
@@ -1155,6 +1135,7 @@ class EventManagerTest(TestCase):
                 contexts={
                     "trace": {
                         "parent_span_id": "bce14471e0e9654d",
+                        "op": "foobar",
                         "trace_id": "a0fa8803753e40fd8124b21eeb2986b5",
                         "span_id": "bf5be759039ede9a",
                     }
@@ -1182,27 +1163,6 @@ class EventManagerTest(TestCase):
             ]
             == 1
         )
-
-    def test_nodestore_sampling(self):
-        with self.options({"store.nodestore-sample-rate": 1.0}):
-            manager = EventManager(make_event(event_id="a" * 32))
-            manager.normalize()
-            manager.save(1)
-
-            assert Event.objects.count() == 1
-
-            manager = EventManager(make_event(event_id="b" * 32))
-            manager.normalize()
-            manager.save(1)
-
-            assert Event.objects.count() == 2
-
-            # Duplicate event
-            manager = EventManager(make_event(event_id="a" * 32))
-            manager.normalize()
-            manager.save(1)
-
-            assert Event.objects.count() == 2
 
 
 class ReleaseIssueTest(TestCase):

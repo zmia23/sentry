@@ -37,10 +37,10 @@ const lazyLoad = cb => m => cb(null, m.default);
 
 const hook = name => HookStore.get(name).map(cb => cb());
 
-const OrganizationMembersView = HookOrDefault({
+const OrganizationMembersWrapper = HookOrDefault({
   hookName: 'component:org-members-view',
   defaultComponentPromise: () =>
-    import(/* webpackChunkName: "OrganizationMembers" */ 'app/views/settings/organizationMembers'),
+    import(/* webpackChunkName: "OrganizationMembersWrapper" */ 'app/views/settings/organizationMembers/organizationMembersWrapper'),
 });
 
 function routes() {
@@ -249,38 +249,6 @@ function routes() {
             component={errorHandler(LazyLoad)}
           />
         </Route>
-      </Route>
-
-      <Route
-        name="Incident Rules"
-        path="incident-rules/"
-        componentPromise={() =>
-          import(/* webpackChunkName: "ProjectIncidentRules" */ 'app/views/settings/projectIncidentRules')
-        }
-        component={errorHandler(LazyLoad)}
-      >
-        <IndexRoute
-          componentPromise={() =>
-            import(/* webpackChunkName: "IncidentRulesList" */ 'app/views/settings/projectIncidentRules/list')
-          }
-          component={errorHandler(LazyLoad)}
-        />
-        <Route
-          name="New Incident Rule"
-          path="new/"
-          componentPromise={() =>
-            import(/* webpackChunkName: "IncidentRulesCreate" */ 'app/views/settings/projectIncidentRules/create')
-          }
-          component={errorHandler(LazyLoad)}
-        />
-        <Route
-          name="Edit Incident Rule"
-          path=":incidentRuleId/"
-          componentPromise={() =>
-            import(/* webpackChunkName: "IncidentRulesDetails" */ 'app/views/settings/projectIncidentRules/details')
-          }
-          component={errorHandler(LazyLoad)}
-        />
       </Route>
 
       <Route
@@ -529,7 +497,23 @@ function routes() {
       />
 
       <Route path="members/" name="Members">
-        <IndexRoute component={OrganizationMembersView} />
+        <Route component={OrganizationMembersWrapper}>
+          <IndexRoute
+            componentPromise={() =>
+              import(/* webpackChunkName: "OrganizationMembers" */ 'app/views/settings/organizationMembers')
+            }
+            component={errorHandler(LazyLoad)}
+          />
+
+          <Route
+            path="requests/"
+            name="Requests"
+            componentPromise={() =>
+              import(/* webpackChunkName: "OrganizationRequestsView" */ 'app/views/settings/organizationMembers/organizationRequestsView')
+            }
+            component={errorHandler(LazyLoad)}
+          />
+        </Route>
 
         <Route
           path="new/"
@@ -545,6 +529,38 @@ function routes() {
           name="Details"
           componentPromise={() =>
             import(/* webpackChunkName: "OrganizationMemberDetail" */ 'app/views/settings/organizationMembers/organizationMemberDetail')
+          }
+          component={errorHandler(LazyLoad)}
+        />
+      </Route>
+
+      <Route
+        name="Incident Rules"
+        path="incident-rules/"
+        componentPromise={() =>
+          import(/* webpackChunkName: "IncidentRules" */ 'app/views/settings/incidentRules')
+        }
+        component={errorHandler(LazyLoad)}
+      >
+        <IndexRoute
+          componentPromise={() =>
+            import(/* webpackChunkName: "IncidentRulesList" */ 'app/views/settings/incidentRules/list')
+          }
+          component={errorHandler(LazyLoad)}
+        />
+        <Route
+          name="New Incident Rule"
+          path="new/"
+          componentPromise={() =>
+            import(/* webpackChunkName: "IncidentRulesCreate" */ 'app/views/settings/incidentRules/create')
+          }
+          component={errorHandler(LazyLoad)}
+        />
+        <Route
+          name="Edit Incident Rule"
+          path=":incidentRuleId/"
+          componentPromise={() =>
+            import(/* webpackChunkName: "IncidentRulesDetails" */ 'app/views/settings/incidentRules/details')
           }
           component={errorHandler(LazyLoad)}
         />
@@ -665,6 +681,14 @@ function routes() {
           path=":appSlug/"
           componentPromise={() =>
             import(/* webpackChunkName: "sentryApplicationDetails" */ 'app/views/settings/organizationDeveloperSettings/sentryApplicationDetails')
+          }
+          component={errorHandler(LazyLoad)}
+        />
+        <Route
+          name="Integration Dashboard"
+          path=":appSlug/dashboard"
+          componentPromise={() =>
+            import(/* webpackChunkName: "SentryApplicationDashboard" */ 'app/views/settings/organizationDeveloperSettings/sentryApplicationDashboard')
           }
           component={errorHandler(LazyLoad)}
         />
@@ -846,6 +870,14 @@ function routes() {
         path="/organizations/new/"
         componentPromise={() =>
           import(/* webpackChunkName: "OrganizationCreate" */ 'app/views/organizationCreate')
+        }
+        component={errorHandler(LazyLoad)}
+      />
+
+      <Route
+        path="/join-request/:orgId/"
+        componentPromise={() =>
+          import(/* webpackChunkName: "OrganizationJoinRequest" */ 'app/views/organizationJoinRequest')
         }
         component={errorHandler(LazyLoad)}
       />

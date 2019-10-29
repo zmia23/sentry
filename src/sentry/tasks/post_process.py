@@ -6,13 +6,9 @@ import time
 from django.conf import settings
 
 from sentry import features
-from sentry.models import EventDict
-from sentry.utils import snuba
 from sentry.utils.cache import cache
 from sentry.exceptions import PluginError
-from sentry.plugins import plugins
 from sentry.signals import event_processed
-from sentry.tasks.sentry_apps import process_resource_change_bound
 from sentry.tasks.base import instrumented_task
 from sentry.utils import metrics
 from sentry.utils.redis import redis_clusters
@@ -104,7 +100,13 @@ def handle_owner_assignment(project, group, event):
     from sentry.models import GroupAssignee, ProjectOwnership
 
     # Is the issue already assigned to a team or user?
-    if group.assignee_set.exists():
+    key = "assignee_exists:1:%s" % (group.id)
+    assignee_exists = cache.get(key)
+    if assignee_exists is None:
+        assignee_exists = group.assignee_set.exists()
+        # Cache for an hour if it's assigned. We don't need to move that fast.
+        cache.set(key, assignee_exists, 3600 if assignee_exists else 60)
+    if assignee_exists:
         return
 
     owner = ProjectOwnership.get_autoassign_owner(group.project_id, event.data)
@@ -113,10 +115,12 @@ def handle_owner_assignment(project, group, event):
 
 
 @instrumented_task(name="sentry.tasks.post_process.post_process_group")
-def post_process_group(event, is_new, is_regression, is_sample, is_new_group_environment, **kwargs):
+def post_process_group(event, is_new, is_regression, is_new_group_environment, **kwargs):
     """
     Fires post processing hooks for a group.
     """
+    from sentry.utils import snuba
+
     with snuba.options_override({"consistent": True}):
         if check_event_already_post_processed(event):
             logger.info(
@@ -132,7 +136,7 @@ def post_process_group(event, is_new, is_regression, is_sample, is_new_group_env
         # NOTE: we must pass through the full Event object, and not an
         # event_id since the Event object may not actually have been stored
         # in the database due to sampling.
-        from sentry.models import Project
+        from sentry.models import Project, Organization, EventDict
         from sentry.models.group import get_group_with_redirect
         from sentry.rules.processor import RuleProcessor
         from sentry.tasks.servicehooks import process_service_hook
@@ -150,15 +154,19 @@ def post_process_group(event, is_new, is_regression, is_sample, is_new_group_env
         with configure_scope() as scope:
             scope.set_tag("project", event.project_id)
 
-        # Re-bind Project since we're pickling the whole Event object
-        # which may contain a stale Project.
+        # Re-bind Project and Org since we're pickling the whole Event object
+        # which may contain stale parent models.
         event.project = Project.objects.get_from_cache(id=event.project_id)
+        event.project._organization_cache = Organization.objects.get_from_cache(
+            id=event.project.organization_id
+        )
 
         _capture_stats(event, is_new)
 
         if event.group_id:
             # we process snoozes before rules as it might create a regression
-            has_reappeared = process_snoozes(event.group)
+            # but not if it's new because you can't immediately snooze a new group
+            has_reappeared = False if is_new else process_snoozes(event.group)
 
             handle_owner_assignment(event.project, event.group, event)
 
@@ -182,6 +190,8 @@ def post_process_group(event, is_new, is_regression, is_sample, is_new_group_env
                         if any(e in allowed_events for e in events):
                             process_service_hook.delay(servicehook_id=servicehook_id, event=event)
 
+            from sentry.tasks.sentry_apps import process_resource_change_bound
+
             if event.get_event_type() == "error" and _should_send_error_created_hooks(
                 event.project
             ):
@@ -193,13 +203,11 @@ def post_process_group(event, is_new, is_regression, is_sample, is_new_group_env
                     action="created", sender="Group", instance_id=event.group_id
                 )
 
+            from sentry.plugins.base import plugins
+
             for plugin in plugins.for_project(event.project):
                 plugin_post_process_group(
-                    plugin_slug=plugin.slug,
-                    event=event,
-                    is_new=is_new,
-                    is_regresion=is_regression,
-                    is_sample=is_sample,
+                    plugin_slug=plugin.slug, event=event, is_new=is_new, is_regresion=is_regression
                 )
 
         event_processed.send_robust(
@@ -217,9 +225,16 @@ def process_snoozes(group):
     """
     from sentry.models import GroupSnooze, GroupStatus
 
-    try:
-        snooze = GroupSnooze.objects.get_from_cache(group=group)
-    except GroupSnooze.DoesNotExist:
+    key = GroupSnooze.get_cache_key(group.id)
+    snooze = cache.get(key)
+    if snooze is None:
+        try:
+            snooze = GroupSnooze.objects.get(group=group)
+        except GroupSnooze.DoesNotExist:
+            snooze = False
+        # This cache is also set in post_save|delete.
+        cache.set(key, snooze, 3600)
+    if not snooze:
         return False
 
     if not snooze.is_valid(group, test_rates=True):
@@ -241,6 +256,8 @@ def plugin_post_process_group(plugin_slug, event, **kwargs):
     with configure_scope() as scope:
         scope.set_tag("project", event.project_id)
 
+    from sentry.plugins.base import plugins
+
     plugin = plugins.get(plugin_slug)
     safe_execute(
         plugin.post_process,
@@ -248,34 +265,4 @@ def plugin_post_process_group(plugin_slug, event, **kwargs):
         group=event.group,
         expected_errors=(PluginError,),
         **kwargs
-    )
-
-
-@instrumented_task(
-    name="sentry.tasks.index_event_tags",
-    queue="events.index_event_tags",
-    default_retry_delay=60 * 5,
-    max_retries=None,
-)
-def index_event_tags(
-    organization_id, project_id, event_id, tags, group_id, environment_id, date_added=None, **kwargs
-):
-    from sentry import tagstore
-
-    with configure_scope() as scope:
-        scope.set_tag("project", project_id)
-
-    create_event_tags_kwargs = {}
-    if date_added is not None:
-        create_event_tags_kwargs["date_added"] = date_added
-
-    metrics.timing("tagstore.tags_per_event", len(tags), tags={"organization_id": organization_id})
-
-    tagstore.create_event_tags(
-        project_id=project_id,
-        group_id=group_id,
-        environment_id=environment_id,
-        event_id=event_id,
-        tags=tags,
-        **create_event_tags_kwargs
     )

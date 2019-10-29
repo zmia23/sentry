@@ -4,7 +4,7 @@ import six
 
 from rest_framework.response import Response
 from sentry.api.bases import OrganizationEventsEndpointBase, OrganizationEventsError, NoProjects
-from sentry.utils.snuba import get_snuba_column_name, raw_query
+from sentry.utils.snuba import transform_aliases_and_query
 from sentry import features, tagstore
 from sentry.tagstore.base import TOP_VALUES_DEFAULT_LIMIT
 
@@ -36,10 +36,15 @@ class OrganizationEventsDistributionEndpoint(OrganizationEventsEndpointBase):
             colname = "project_id"
             conditions = snuba_args["conditions"]
         else:
-            colname = get_snuba_column_name(key)
-            conditions = snuba_args["conditions"] + [[colname, "IS NOT NULL", None]]
+            colname = key
+            additional_conditions = []
+            # the "no environment" environment is null in snuba
+            if not ("environment" in params and "" in params["environment"]):
+                additional_conditions = [[colname, "IS NOT NULL", None]]
 
-        top_values = raw_query(
+            conditions = snuba_args["conditions"] + additional_conditions
+
+        top_values = transform_aliases_and_query(
             start=snuba_args["start"],
             end=snuba_args["end"],
             conditions=conditions,

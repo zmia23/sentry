@@ -28,6 +28,7 @@ class Updater(Mediator):
     verify_install = Param(bool, required=False)
     schema = Param(dict, required=False)
     overview = Param(six.string_types, required=False)
+    allowed_origins = Param(Iterable, required=False)
     user = Param("sentry.models.User")
 
     def call(self):
@@ -41,6 +42,7 @@ class Updater(Mediator):
         self._update_is_alertable()
         self._update_verify_install()
         self._update_overview()
+        self._update_allowed_origins()
         self._update_schema()
         self._update_service_hooks()
         self.sentry_app.save()
@@ -59,6 +61,7 @@ class Updater(Mediator):
         if self.user.is_superuser:
             if self.status == SentryAppStatus.PUBLISHED_STR:
                 self.sentry_app.status = SentryAppStatus.PUBLISHED
+                self.sentry_app.date_published = timezone.now()
             if self.status == SentryAppStatus.UNPUBLISHED_STR:
                 self.sentry_app.status = SentryAppStatus.UNPUBLISHED
 
@@ -135,6 +138,11 @@ class Updater(Mediator):
     @if_param("overview")
     def _update_overview(self):
         self.sentry_app.overview = self.overview
+
+    @if_param("allowed_origins")
+    def _update_allowed_origins(self):
+        self.sentry_app.application.allowed_origins = "\n".join(self.allowed_origins)
+        self.sentry_app.application.save()
 
     @if_param("schema")
     def _update_schema(self):

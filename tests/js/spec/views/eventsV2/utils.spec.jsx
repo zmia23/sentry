@@ -1,10 +1,14 @@
-import {mount} from 'enzyme';
+import {mount, mountWithTheme} from 'sentry-test/enzyme';
+import {browserHistory} from 'react-router';
 
-import {initializeOrg} from 'app-test/helpers/initializeOrg';
+import {initializeOrg} from 'sentry-test/initializeOrg';
+import EventView from 'app/views/eventsV2/eventView';
 import {
   getFieldRenderer,
   getAggregateAlias,
   getEventTagSearchUrl,
+  decodeColumnOrder,
+  pushEventViewToLocation,
 } from 'app/views/eventsV2/utils';
 
 describe('eventTagSearchUrl()', function() {
@@ -173,7 +177,7 @@ describe('getFieldRenderer', function() {
   it('can render project as an avatar', function() {
     const renderer = getFieldRenderer('project', {'project.name': 'string'});
     expect(renderer).toBeInstanceOf(Function);
-    const wrapper = mount(
+    const wrapper = mountWithTheme(
       renderer(data, {location, organization}),
       context.routerContext
     );
@@ -238,5 +242,164 @@ describe('getFieldRenderer', function() {
       },
     });
     expect(link.find('StyledDateTime').props().date).toEqual(data.createdAt);
+  });
+});
+
+describe('decodeColumnOrder', function() {
+  it('can decode 0 elements', function() {
+    const results = decodeColumnOrder({
+      fieldnames: [],
+      field: [],
+    });
+
+    expect(Array.isArray(results)).toBeTruthy();
+    expect(results).toHaveLength(0);
+  });
+
+  it('can decode fields', function() {
+    const results = decodeColumnOrder({
+      field: ['title'],
+      fieldnames: ['Event title'],
+      fields: [{field: 'title', title: 'Event title'}],
+    });
+
+    expect(Array.isArray(results)).toBeTruthy();
+
+    expect(results[0]).toEqual({
+      key: 'title',
+      name: 'Event title',
+      aggregation: '',
+      field: 'title',
+      eventViewField: {field: 'title', title: 'Event title'},
+      isDragging: false,
+      isPrimary: true,
+      isSortable: false,
+      type: 'string',
+    });
+  });
+
+  it('can decode aggregate functions with no arguments', function() {
+    const results = decodeColumnOrder({
+      field: ['count()'],
+      fieldnames: ['projects'],
+      fields: [{field: 'count()', title: 'projects'}],
+    });
+
+    expect(Array.isArray(results)).toBeTruthy();
+
+    expect(results[0]).toEqual({
+      key: 'count()',
+      name: 'projects',
+      aggregation: 'count',
+      field: '',
+      eventViewField: {field: 'count()', title: 'projects'},
+      isDragging: false,
+      isPrimary: false,
+      isSortable: true,
+      type: 'never',
+    });
+  });
+
+  it('can decode elements with aggregate functions with arguments', function() {
+    const results = decodeColumnOrder({
+      field: ['avg(transaction.duration)'],
+      fieldnames: ['average'],
+      fields: [{field: 'avg(transaction.duration)', title: 'average'}],
+    });
+
+    expect(Array.isArray(results)).toBeTruthy();
+
+    expect(results[0]).toEqual({
+      key: 'avg(transaction.duration)',
+      name: 'average',
+      aggregation: 'avg',
+      field: 'transaction.duration',
+      eventViewField: {field: 'avg(transaction.duration)', title: 'average'},
+      isDragging: false,
+      isPrimary: false,
+      isSortable: true,
+      type: 'duration',
+    });
+  });
+});
+
+describe('pushEventViewToLocation', function() {
+  const state = {
+    id: '1234',
+    name: 'best query',
+    fields: [
+      {field: 'count()', title: 'events'},
+      {field: 'project.id', title: 'project'},
+    ],
+    sorts: [{field: 'count', kind: 'desc'}],
+    tags: ['foo', 'bar'],
+    query: 'event.type:error',
+    project: [42],
+    start: '2019-10-01T00:00:00',
+    end: '2019-10-02T00:00:00',
+    statsPeriod: '14d',
+    environment: ['staging'],
+  };
+
+  const location = {
+    query: {
+      bestCountry: 'canada',
+    },
+  };
+
+  it('correct query string objecet pushed to history', function() {
+    const eventView = new EventView(state);
+
+    pushEventViewToLocation({
+      location,
+      nextEventView: eventView,
+    });
+
+    expect(browserHistory.push).toHaveBeenCalledWith({
+      query: {
+        id: '1234',
+        name: 'best query',
+        field: ['count()', 'project.id'],
+        fieldnames: ['events', 'project'],
+        sort: ['-count'],
+        tag: ['foo', 'bar'],
+        query: 'event.type:error',
+        project: [42],
+        start: '2019-10-01T00:00:00',
+        end: '2019-10-02T00:00:00',
+        statsPeriod: '14d',
+        environment: ['staging'],
+      },
+    });
+  });
+
+  it('extra query params', function() {
+    const eventView = new EventView(state);
+
+    pushEventViewToLocation({
+      location,
+      nextEventView: eventView,
+      extraQuery: {
+        cursor: 'some cursor',
+      },
+    });
+
+    expect(browserHistory.push).toHaveBeenCalledWith({
+      query: {
+        id: '1234',
+        name: 'best query',
+        field: ['count()', 'project.id'],
+        fieldnames: ['events', 'project'],
+        sort: ['-count'],
+        tag: ['foo', 'bar'],
+        query: 'event.type:error',
+        project: [42],
+        start: '2019-10-01T00:00:00',
+        end: '2019-10-02T00:00:00',
+        statsPeriod: '14d',
+        environment: ['staging'],
+        cursor: 'some cursor',
+      },
+    });
   });
 });

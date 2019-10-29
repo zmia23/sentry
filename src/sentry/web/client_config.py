@@ -159,14 +159,25 @@ def get_client_config(request=None):
         "sentryConfig": {
             "dsn": _get_public_dsn(),
             "release": version_info["build"],
-            "whitelistUrls": list(settings.ALLOWED_HOSTS),
+            # By default `ALLOWED_HOSTS` is [*], however the JS SDK does not support globbing
+            "whitelistUrls": list(
+                "" if settings.ALLOWED_HOSTS == ["*"] else settings.ALLOWED_HOSTS
+            ),
         },
     }
     if user and user.is_authenticated():
         context.update(
             {"isAuthenticated": True, "user": serialize(user, user, DetailedUserSerializer())}
         )
-        context["user"]["isSuperuser"] = is_superuser
+
+        if request.user.is_superuser:
+            # Note: This intentionally does not use the "active" superuser flag as
+            # the frontend should only ever use this flag as a hint that the user can be a superuser
+            # the API will always need to check for active superuser.
+            #
+            # This is needed in the case where you access a different org and get denied, but the UI
+            # can open the sudo dialog if you are an "inactive" superuser
+            context["user"]["isSuperuser"] = request.user.is_superuser
     else:
         context.update({"isAuthenticated": False, "user": None})
 

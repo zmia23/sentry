@@ -1,9 +1,11 @@
 import {partial, pick} from 'lodash';
-import {Location} from 'history';
+import {Location, Query} from 'history';
+import {browserHistory} from 'react-router';
 
 import {Client} from 'app/api';
 import {URL_PARAM} from 'app/constants/globalSelectionHeader';
-import {appendTagCondition} from 'app/utils/queryString';
+import {generateQueryWithTag} from 'app/utils';
+
 import {
   AGGREGATE_ALIASES,
   SPECIAL_FIELDS,
@@ -12,7 +14,15 @@ import {
   FieldTypes,
   FieldFormatterRenderFunctionPartial,
 } from './data';
-import EventView from './eventView';
+import EventView, {Field as FieldType} from './eventView';
+import {
+  Aggregation,
+  Field,
+  AGGREGATIONS,
+  FIELDS,
+  ColumnValueType,
+} from './eventQueryParams';
+import {TableColumn} from './table/types';
 
 export type EventQuery = {
   field: Array<string>;
@@ -23,6 +33,7 @@ export type EventQuery = {
 };
 
 const AGGREGATE_PATTERN = /^([^\(]+)\(([a-z\._+]*)\)$/;
+const ROUND_BRACKETS_PATTERN = /[\(\)]/;
 
 /**
  * Takes a view and determines if there are any aggregate fields in it.
@@ -33,7 +44,7 @@ const AGGREGATE_PATTERN = /^([^\(]+)\(([a-z\._+]*)\)$/;
  */
 export function hasAggregateField(eventView: EventView): boolean {
   return eventView
-    .getFieldNames()
+    .getFields()
     .some(
       field => AGGREGATE_ALIASES.includes(field as any) || field.match(AGGREGATE_PATTERN)
     );
@@ -53,8 +64,7 @@ export function getEventTagSearchUrl(
   tagValue: string,
   location: Location
 ) {
-  const query = {...location.query};
-  query.query = appendTagCondition(query.query, tagKey, tagValue);
+  const query = generateQueryWithTag(location.query, {key: tagKey, value: tagValue});
 
   // Remove the event slug so the user sees new search results.
   delete query.eventSlug;
@@ -203,4 +213,88 @@ export function getFirstQueryString(
   }
 
   return defaultValue;
+}
+
+export type QueryWithColumnState =
+  | Query
+  | {
+      fieldnames: string | string[] | null | undefined;
+      field: string | string[] | null | undefined;
+      sort: string | string[] | null | undefined;
+    };
+
+const TEMPLATE_TABLE_COLUMN: TableColumn<React.ReactText> = {
+  key: '',
+  name: '',
+  aggregation: '',
+  field: '',
+  eventViewField: Object.freeze({field: '', title: ''}),
+  isDragging: false,
+
+  type: 'never',
+  isSortable: false,
+  isPrimary: false,
+};
+
+export function decodeColumnOrder(props: {
+  fieldnames: string[];
+  field: string[];
+  fields: Readonly<FieldType[]>;
+}): TableColumn<React.ReactText>[] {
+  const {fieldnames, field, fields} = props;
+
+  return field.map((f: string, index: number) => {
+    const col = {aggregationField: f, name: fieldnames[index]};
+
+    const column: TableColumn<React.ReactText> = {...TEMPLATE_TABLE_COLUMN};
+
+    // "field" will be split into ["field"]
+    // "agg()" will be split into ["agg", "", ""]
+    // "agg(field)" will be split to ["agg", "field", ""]
+    // Any column without brackets are assumed to be a field
+    const aggregationField = col.aggregationField.split(ROUND_BRACKETS_PATTERN);
+
+    if (aggregationField.length === 1) {
+      column.field = aggregationField[0] as Field;
+    } else {
+      column.aggregation = aggregationField[0] as Aggregation;
+      column.field = aggregationField[1] as Field;
+    }
+
+    column.key = col.aggregationField;
+    column.name = col.name;
+    column.type = (FIELDS[column.field] || 'never') as ColumnValueType;
+
+    column.isSortable = AGGREGATIONS[column.aggregation]
+      ? AGGREGATIONS[column.aggregation].isSortable
+      : false;
+    column.isPrimary = column.field === 'title';
+
+    column.eventViewField = {
+      title: fields[index].title,
+      field: fields[index].field,
+    };
+
+    return column;
+  });
+}
+
+export function pushEventViewToLocation(props: {
+  location: Location;
+  nextEventView: EventView;
+  extraQuery?: Query;
+}) {
+  const {location, nextEventView} = props;
+
+  const extraQuery = props.extraQuery || {};
+
+  const queryStringObject = nextEventView.generateQueryStringObject();
+
+  browserHistory.push({
+    ...location,
+    query: {
+      ...extraQuery,
+      ...queryStringObject,
+    },
+  });
 }

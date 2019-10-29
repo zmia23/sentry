@@ -73,7 +73,6 @@ def get_requirements(env):
 
 install_requires = get_requirements("base")
 dev_requires = get_requirements("dev")
-tests_require = get_requirements("test")
 optional_requires = get_requirements("optional")
 
 # override django version in requirements file if DJANGO_VERSION is set
@@ -136,12 +135,7 @@ setup(
     packages=find_packages("src"),
     zip_safe=False,
     install_requires=install_requires,
-    extras_require={
-        "dev": dev_requires,
-        "postgres": [],
-        "tests": tests_require,
-        "optional": optional_requires,
-    },
+    extras_require={"dev": dev_requires, "postgres": [], "optional": optional_requires},
     cmdclass=cmdclass,
     license="BSD",
     include_package_data=True,

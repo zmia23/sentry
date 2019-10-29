@@ -110,9 +110,6 @@ register("analytics.options", default={}, flags=FLAG_NOSTORE)
 
 register("cloudflare.secret-key", default="")
 
-# Tagstore
-register("tagstore.multi-sampling", default=0.0)
-
 # Slack Integration
 register("slack.client-id", flags=FLAG_PRIORITIZE_DISK)
 register("slack.client-secret", flags=FLAG_PRIORITIZE_DISK)
@@ -129,6 +126,9 @@ register("github-app.client-secret", flags=FLAG_PRIORITIZE_DISK)
 # VSTS Integration
 register("vsts.client-id", flags=FLAG_PRIORITIZE_DISK)
 register("vsts.client-secret", flags=FLAG_PRIORITIZE_DISK)
+
+# PagerDuty Integration
+register("pagerduty.app-id", default="")
 
 # Snuba
 register("snuba.search.pre-snuba-candidates-optimizer", type=Bool, default=False)
@@ -156,6 +156,10 @@ register("store.projects-normalize-in-rust-percent-opt-in", default=0.0)  # unus
 # From 0.0 to 1.0: Randomly disable normalization code in interfaces when loading from db
 register("store.empty-interface-sample-rate", default=0.0)
 
+# if this is turned to `True` sentry will behave like relay would do with
+# regards to filter responses.
+register("store.lie-about-filter-status", default=False)
+
 # Symbolicator refactors
 # - Disabling minidump stackwalking in endpoints
 register("symbolicator.minidump-refactor-projects-opt-in", type=Sequence, default=[])  # unused
@@ -167,8 +171,9 @@ register("symbolicator.minidump-refactor-random-sampling", default=0.0)  # unuse
 register("store.normalize-after-processing", default=0.0)  # unused
 register("store.disable-trim-in-renormalization", default=0.0)  # unused
 
-# Percent ingested events with duplicate checking from nodestore instead of events table
-register("store.nodestore-sample-rate", default=0.0, flags=FLAG_PRIORITIZE_DISK)
+# Data scrubbing in Rust
+register("store.sample-rust-data-scrubber", default=0.0)  # unused
+register("store.use-rust-data-scrubber", default=False)  # unused
 
 # Post Process Error Hook Sampling
 register("post-process.use-error-hook-sampling", default=False)  # unused
@@ -178,3 +183,7 @@ register("post-process.error-hook-sample-rate", default=0.0)  # unused
 # Transaction events
 # True => kill switch to disable ingestion of transaction events for internal project.
 register("transaction-events.force-disable-internal-project", default=False)
+
+# Moving signals and TSDB into outcomes consumer
+register("outcomes.signals-in-consumer-sample-rate", default=0.0)
+register("outcomes.tsdb-in-consumer-sample-rate", default=0.0)

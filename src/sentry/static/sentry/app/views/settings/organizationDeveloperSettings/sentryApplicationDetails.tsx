@@ -8,7 +8,7 @@ import {addSuccessMessage, addErrorMessage} from 'app/actionCreators/indicator';
 import {Panel, PanelItem, PanelBody, PanelHeader} from 'app/components/panels';
 import {t} from 'app/locale';
 import AsyncView from 'app/views/asyncView';
-import Form from 'app/views/settings/components/forms/form';
+import Form, {FieldValue} from 'app/views/settings/components/forms/form';
 import FormModel from 'app/views/settings/components/forms/model';
 import FormField from 'app/views/settings/components/forms/formField';
 import JsonForm from 'app/views/settings/components/forms/jsonForm';
@@ -20,6 +20,7 @@ import {
   internalIntegrationForms,
 } from 'app/data/forms/sentryApplication';
 import getDynamicText from 'app/utils/getDynamicText';
+import routeTitleGen from 'app/utils/routeTitle';
 
 import DateTime from 'app/components/dateTime';
 import Button from 'app/components/button';
@@ -30,7 +31,33 @@ import {
   addSentryAppToken,
   removeSentryAppToken,
 } from 'app/actionCreators/sentryAppTokens';
-import {SentryApp, InternalAppApiToken} from 'app/types';
+import {SentryApp, InternalAppApiToken, Scope} from 'app/types';
+import Tooltip from 'app/components/tooltip';
+import {SENTRY_APP_PERMISSIONS} from 'app/constants';
+
+type Resource = 'Project' | 'Team' | 'Release' | 'Event' | 'Organization' | 'Member';
+
+/**
+ * Finds the resource in SENTRY_APP_PERMISSIONS that contains a given scope
+ * We should always find a match unless there is a bug
+ * @param {Scope} scope
+ * @return {Resource | undefined}
+ */
+const getResourceFromScope = (scope: Scope): Resource | undefined => {
+  for (const permObj of SENTRY_APP_PERMISSIONS) {
+    const allChoices = Object.values(permObj.choices);
+
+    const allScopes = allChoices.reduce(
+      (_allScopes: string[], choice) => _allScopes.concat(_.get(choice, 'scopes', [])),
+      []
+    );
+
+    if (allScopes.includes(scope)) {
+      return permObj.resource as Resource;
+    }
+  }
+  return undefined;
+};
 
 class SentryAppFormModel extends FormModel {
   /**
@@ -53,6 +80,33 @@ class SentryAppFormModel extends FormModel {
       }
       return data;
     }, {});
+  }
+
+  /**
+   * We need to map the API response errors to the actual form fields.
+   * We do this by pulling out scopes and mapping each scope error to the correct input.
+   * @param {Object} responseJSON
+   */
+  mapFormErrors(responseJSON?: any) {
+    if (!responseJSON) {
+      return responseJSON;
+    }
+    const formErrors = _.omit(responseJSON, ['scopes']);
+    if (responseJSON.scopes) {
+      responseJSON.scopes.forEach((message: string) => {
+        //find the scope from the error message of a specific format
+        const matches = message.match(/Requested permission of (\w+:\w+)/);
+        if (matches) {
+          const scope = matches[1];
+          const resource = getResourceFromScope(scope as Scope);
+          //should always match but technically resource can be undefined
+          if (resource) {
+            formErrors[`${resource}--permission`] = [message];
+          }
+        }
+      });
+    }
+    return formErrors;
   }
 }
 
@@ -91,7 +145,8 @@ export default class SentryApplicationDetails extends AsyncView<Props, State> {
   }
 
   getTitle() {
-    return t('Sentry Integration Details');
+    const {orgId} = this.props.params;
+    return routeTitleGen(t('Sentry Integration Details'), orgId, false);
   }
 
   // Events may come from the API as "issue.created" when we just want "issue" here.
@@ -143,6 +198,14 @@ export default class SentryApplicationDetails extends AsyncView<Props, State> {
     return this.props.route.path === 'new-internal/';
   }
 
+  get showAuthInfo() {
+    const {app} = this.state;
+    if (app && app.clientSecret && app.clientSecret[0] === '*') {
+      return false;
+    }
+    return true;
+  }
+
   onAddToken = async (evt: React.MouseEvent): Promise<void> => {
     evt.preventDefault();
     const {app, tokens} = this.state;
@@ -178,9 +241,18 @@ export default class SentryApplicationDetails extends AsyncView<Props, State> {
         return (
           <StyledPanelItem key={token.token}>
             <TokenItem>
-              <TextCopyInput>
-                {getDynamicText({value: token.token, fixed: 'xxxxxx'})}
-              </TextCopyInput>
+              <Tooltip
+                disabled={this.showAuthInfo}
+                position="right"
+                containerDisplayMode="inline"
+                title={t(
+                  'You do not have access to view these credentials because the permissions for this integration exceed those of your role.'
+                )}
+              >
+                <TextCopyInput>
+                  {getDynamicText({value: token.token, fixed: 'xxxxxx'})}
+                </TextCopyInput>
+              </Tooltip>
             </TokenItem>
             <CreatedDate>
               <CreatedTitle>Created:</CreatedTitle>
@@ -196,6 +268,7 @@ export default class SentryApplicationDetails extends AsyncView<Props, State> {
               size="small"
               icon="icon-trash"
               data-test-id="token-delete"
+              type="button"
             >
               {t('Revoke')}
             </Button>
@@ -207,7 +280,7 @@ export default class SentryApplicationDetails extends AsyncView<Props, State> {
     }
   };
 
-  onFieldChange = (name: string, value: string | number): void => {
+  onFieldChange = (name: string, value: FieldValue): void => {
     if (name === 'webhookUrl' && !value && this.isInternal) {
       //if no webhook, then set isAlertable to false
       this.form.setValue('isAlertable', false);
@@ -285,6 +358,7 @@ export default class SentryApplicationDetails extends AsyncView<Props, State> {
                   icon="icon-circle-add"
                   onClick={evt => this.onAddToken(evt)}
                   data-test-id="token-add"
+                  type="button"
                 >
                   {t('New Token')}
                 </Button>
@@ -311,9 +385,18 @@ export default class SentryApplicationDetails extends AsyncView<Props, State> {
                 <FormField overflow name="clientSecret" label="Client Secret">
                   {({value}) => {
                     return value ? (
-                      <TextCopyInput>
-                        {getDynamicText({value, fixed: 'PERCY_CLIENT_SECRET'})}
-                      </TextCopyInput>
+                      <Tooltip
+                        disabled={this.showAuthInfo}
+                        position="right"
+                        containerDisplayMode="inline"
+                        title={t(
+                          'You do not have access to view these credentials because the permissions for this integration exceed those of your role.'
+                        )}
+                      >
+                        <TextCopyInput>
+                          {getDynamicText({value, fixed: 'PERCY_CLIENT_SECRET'})}
+                        </TextCopyInput>
+                      </Tooltip>
                     ) : (
                       <em>hidden</em>
                     );

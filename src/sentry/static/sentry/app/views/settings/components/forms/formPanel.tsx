@@ -20,6 +20,7 @@ type Props = {
   // TODO(ts): See if this is still in use
   access: any;
   features: any;
+  experiments: any;
 
   additionalFieldProps: {[key: string]: any};
 
@@ -59,7 +60,7 @@ export default class FormPanel extends React.Component<Props> {
 
     return (
       <Panel key={title} id={sanitizeQuerySelector(title)}>
-        <PanelHeader>{title}</PanelHeader>
+        {title && <PanelHeader>{title}</PanelHeader>}
         <PanelBody>
           {typeof renderHeader === 'function' && renderHeader({title, fields})}
 

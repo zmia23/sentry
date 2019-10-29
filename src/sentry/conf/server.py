@@ -315,28 +315,24 @@ INSTALLED_APPS = (
     "rest_framework",
     "sentry",
     "sentry.analytics",
-    "sentry.incidents",
+    "sentry.incidents.apps.Config",
     "sentry.discover",
     "sentry.analytics.events",
     "sentry.nodestore",
     "sentry.search",
     "sentry.snuba",
-    "sentry.lang.java",
-    "sentry.lang.javascript",
-    "sentry.lang.native",
-    "sentry.plugins.sentry_interface_types",
-    "sentry.plugins.sentry_mail",
-    "sentry.plugins.sentry_urls",
-    "sentry.plugins.sentry_useragents",
-    "sentry.plugins.sentry_webhooks",
+    "sentry.lang.java.apps.Config",
+    "sentry.lang.javascript.apps.Config",
+    "sentry.lang.native.apps.Config",
+    "sentry.plugins.sentry_interface_types.apps.Config",
+    "sentry.plugins.sentry_mail.apps.Config",
+    "sentry.plugins.sentry_urls.apps.Config",
+    "sentry.plugins.sentry_useragents.apps.Config",
+    "sentry.plugins.sentry_webhooks.apps.Config",
     "social_auth",
     "sudo",
-    "sentry.tagstore",
-    # we import the legacy tagstore to ensure models stay registered as they're still
-    # referenced in the core sentry migrations (tagstore migrations are not in their own app)
-    "sentry.tagstore.legacy",
     "sentry.eventstream",
-    "sentry.auth.providers.google",
+    "sentry.auth.providers.google.apps.Config",
     "django.contrib.staticfiles",
 )
 
@@ -348,11 +344,6 @@ SILENCED_SYSTEM_CHECKS = (
     # loading
     "fields.W342"
 )
-
-import django
-
-if django.VERSION < (1, 9):
-    INSTALLED_APPS += ("south",)
 
 STATIC_ROOT = os.path.realpath(os.path.join(PROJECT_ROOT, "static"))
 STATIC_URL = "/_static/{version}/"
@@ -529,6 +520,7 @@ CELERY_CREATE_MISSING_QUEUES = True
 CELERY_REDIRECT_STDOUTS = False
 CELERYD_HIJACK_ROOT_LOGGER = False
 CELERY_IMPORTS = (
+    "sentry.discover.tasks",
     "sentry.incidents.tasks",
     "sentry.tasks.auth",
     "sentry.tasks.auto_resolve_issues",
@@ -553,7 +545,6 @@ CELERY_IMPORTS = (
     "sentry.tasks.store",
     "sentry.tasks.unmerge",
     "sentry.tasks.servicehooks",
-    "sentry.tagstore.tasks",
     "sentry.tasks.assemble",
     "sentry.tasks.integrations",
     "sentry.tasks.files",
@@ -572,7 +563,6 @@ CELERY_QUEUES = [
     Queue("digests.delivery", routing_key="digests.delivery"),
     Queue("digests.scheduling", routing_key="digests.scheduling"),
     Queue("email", routing_key="email"),
-    Queue("events.index_event_tags", routing_key="events.index_event_tags"),
     Queue("events.preprocess_event", routing_key="events.preprocess_event"),
     Queue(
         "events.reprocessing.preprocess_event", routing_key="events.reprocessing.preprocess_event"
@@ -776,6 +766,12 @@ LOGGING = {
 # django-rest-framework
 
 REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.MultiPartParser",
+        "rest_framework.parsers.FormParser",
+    ],
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
     "DEFAULT_PERMISSION_CLASSES": ("sentry.api.permissions.NoPermission",),
     "EXCEPTION_HANDLER": "sentry.api.handlers.custom_exception_handler",
@@ -816,8 +812,6 @@ SENTRY_FEATURES = {
     "organizations:create": True,
     # Enable the 'discover' interface.
     "organizations:discover": False,
-    # Enable the Discover v2 query builder
-    "organizations:discover-v2-query-builder": False,
     # Enable attaching arbitrary files to events.
     "organizations:event-attachments": False,
     # Allow organizations to configure built-in symbol sources.
@@ -844,7 +838,7 @@ SENTRY_FEATURES = {
     # Enable interface functionality to synchronize groups between sentry and
     # issues on external services.
     "organizations:integrations-issue-sync": True,
-    # Enable interface functionality to recieve event hooks.
+    # Enable interface functionality to receive event hooks.
     "organizations:integrations-event-hooks": False,
     # Special feature flag primarily used on the sentry.io SAAS product for
     # easily enabling features while in early development.
@@ -856,8 +850,6 @@ SENTRY_FEATURES = {
     # Enable the relay functionality, for use with sentry semaphore. See
     # https://github.com/getsentry/semaphore.
     "organizations:relay": False,
-    # Sentry 10 - multi project interfaces.
-    "organizations:sentry10": True,
     # Enable basic SSO functionality, providing configurable single sign on
     # using services like GitHub / Google. This is *not* the same as the signup
     # and login with Github / Azure DevOps that sentry.io provides.
@@ -934,23 +926,6 @@ SENTRY_MONITOR_API_ROOT = None
 SENTRY_CELERYBEAT_MONITORS = {
     # 'scheduled-name': 'monitor_guid',
 }
-
-# Only store a portion of all messages per unique group.
-SENTRY_SAMPLE_DATA = False
-
-# The following values control the sampling rates
-SENTRY_SAMPLE_RATES = (
-    # up until N events, store 1 in M
-    (50, 1),
-    (1000, 2),
-    (10000, 10),
-    (100000, 50),
-    (1000000, 300),
-    (10000000, 2000),
-)
-SENTRY_MAX_SAMPLE_RATE = 10000
-SENTRY_SAMPLE_TIMES = ((3600, 1), (360, 10), (60, 60))
-SENTRY_MAX_SAMPLE_TIME = 10000
 
 # Web Service
 SENTRY_WEB_HOST = "localhost"
@@ -1071,19 +1046,8 @@ SENTRY_NODESTORE = "sentry.nodestore.django.DjangoNodeStorage"
 SENTRY_NODESTORE_OPTIONS = {}
 
 # Tag storage backend
-_SENTRY_TAGSTORE_DEFAULT_MULTI_OPTIONS = {
-    "backends": [
-        ("sentry.tagstore.legacy.LegacyTagStorage", {}),
-        ("sentry.tagstore.v2.V2TagStorage", {}),
-    ],
-    "runner": "ImmediateRunner",
-}
-SENTRY_TAGSTORE = os.environ.get("SENTRY_TAGSTORE", "sentry.tagstore.legacy.LegacyTagStorage")
-SENTRY_TAGSTORE_OPTIONS = (
-    _SENTRY_TAGSTORE_DEFAULT_MULTI_OPTIONS
-    if "SENTRY_TAGSTORE_DEFAULT_MULTI_OPTIONS" in os.environ
-    else {}
-)
+SENTRY_TAGSTORE = os.environ.get("SENTRY_TAGSTORE", "sentry.tagstore.snuba.SnubaTagStorage")
+SENTRY_TAGSTORE_OPTIONS = {}
 
 # Search backend
 SENTRY_SEARCH = os.environ.get("SENTRY_SEARCH", "sentry.search.snuba.SnubaSearchBackend")
@@ -1446,7 +1410,11 @@ SENTRY_DEFAULT_INTEGRATIONS = (
     "sentry.integrations.jira_server.JiraServerIntegrationProvider",
     "sentry.integrations.vsts.VstsIntegrationProvider",
     "sentry.integrations.vsts_extension.VstsExtensionIntegrationProvider",
+    "sentry.integrations.pagerduty.integration.PagerDutyIntegrationProvider",
 )
+
+
+SENTRY_INTERNAL_INTEGRATIONS = ["pagerduty"]
 
 
 def get_sentry_sdk_config():
@@ -1527,8 +1495,6 @@ DEPRECATED_SDKS = {
     "sentry-raven": "raven-ruby",
 }
 
-SOUTH_TESTS_MIGRATE = os.environ.get("SOUTH_TESTS_MIGRATE", "0") == "1"
-
 TERMS_URL = None
 PRIVACY_URL = None
 
@@ -1547,7 +1513,7 @@ SENTRY_BUILTIN_SOURCES = {
         "id": "sentry:microsoft",
         "name": "Microsoft",
         "layout": {"type": "symstore"},
-        "filters": {"filetypes": ["pdb", "pe"], "path_patterns": ["?:/windows/**"]},
+        "filters": {"filetypes": ["pdb", "pe"]},
         "url": "https://msdl.microsoft.com/download/symbols/",
         "is_public": True,
     },
@@ -1643,9 +1609,6 @@ SENTRY_RELAY_OPEN_REGISTRATION = False
 
 # GeoIP
 # Used for looking up IP addresses.
-# For example /usr/local/share/GeoIP/GeoIPCity.dat
-GEOIP_PATH = None
-# Same file but in the newer format. Both are required.
 # For example /usr/local/share/GeoIP/GeoIPCity.mmdb
 GEOIP_PATH_MMDB = None
 
@@ -1701,3 +1664,58 @@ KAFKA_TOPICS = {
 # never need to switch this unless you created a workspace app before slack
 # disabled them.
 SLACK_INTEGRATION_USE_WST = False
+
+"""
+Fields are:
+ - south_app_name: Which app to apply the conversion to
+ - south_migration: The south migration to map to the new name. If None, then always
+   apply
+ - django_app_name: The new app name to apply the conversion to
+ - django_migration: Which django migration to 'fake' as run.
+ - south_migration_required: Whether the south migration is required to proceed.
+ - south_migration_required_error: Error message explaining what is going wrong.
+"""
+SOUTH_MIGRATION_CONVERSIONS = (
+    (
+        "sentry",
+        "0472_auto__add_field_sentryapp_author",
+        "sentry",
+        "0001_initial",
+        True,
+        "Please upgrade to Sentry 9.1.2 before upgrading to any later versions.",
+    ),
+    (
+        "sentry",
+        "0516_auto__del_grouptagvalue__del_unique_grouptagvalue_group_id_key_value__",
+        "sentry",
+        "0002_912_to_recent",
+        False,
+        "",
+    ),
+    (
+        "sentry",
+        "0518_auto__chg_field_sentryappwebhookerror_response_code",
+        "sentry",
+        "0003_auto_20191022_0122",
+        False,
+        "",
+    ),
+    ("sentry.nodestore", "0001_initial", "nodestore", "0001_initial", False, None),
+    ("nodestore", "0001_initial", "nodestore", "0001_initial", False, None),
+    (
+        "social_auth",
+        "0004_auto__del_unique_usersocialauth_provider_uid__add_unique_usersocialaut",
+        "social_auth",
+        "0001_initial",
+        True,
+        "Please upgrade to Sentry 9.1.2 before upgrading to any later versions.",
+    ),
+    # From sentry-plugins
+    ("sentry_plugins.jira_ac", "0001_initial", "jira_ac", "0001_initial", False, ""),
+    ("jira_ac", "0001_initial", "jira_ac", "0001_initial", False, ""),
+)
+
+# Whether to use Django migrations to create the database, or just build it based off
+# of models, similar to how syncdb used to work. The former is more correct, the latter
+# is much faster.
+MIGRATIONS_TEST_MIGRATE = os.environ.get("MIGRATIONS_TEST_MIGRATE", "0") == "1"

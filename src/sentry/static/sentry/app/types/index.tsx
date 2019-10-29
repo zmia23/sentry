@@ -1,6 +1,8 @@
 import {SpanEntry} from 'app/components/events/interfaces/spans/types';
 import {API_SCOPES} from 'app/constants';
 import {Field} from 'app/views/settings/components/forms/type';
+import {Params} from 'react-router/lib/Router';
+import {Location} from 'history';
 
 export type ObjectStatus =
   | 'active'
@@ -14,6 +16,7 @@ export type Organization = {
   projects: Project[];
   access: string[];
   features: string[];
+  teams: Team[];
 };
 
 export type OrganizationDetailed = Organization & {
@@ -33,6 +36,8 @@ export type OrganizationDetailed = Organization & {
   scrubIPAddresses: boolean;
   scrapeJavaScript: boolean;
   trustedRelays: string[];
+  role?: string;
+  experiments: ActiveExperiments;
 };
 
 export type Project = {
@@ -44,6 +49,7 @@ export type Project = {
 
   isBookmarked: boolean;
   hasUserReports?: boolean;
+  hasAccess: boolean;
 };
 
 export type Team = {
@@ -188,7 +194,7 @@ export type User = {
   avatar: {avatarUuid: string | null; avatarType: 'letter_avatar' | 'upload'};
   ip_address: string;
   hasPasswordAuth: boolean;
-  permissions: string[];
+  permissions: Set<string>;
   email: string;
 };
 
@@ -198,7 +204,10 @@ export type CommitAuthor = {
 };
 
 // TODO(ts): This type is incomplete
-export type Environment = {};
+export type Environment = {
+  name: string;
+  id: string;
+};
 
 // TODO(ts): This type is incomplete
 export type SavedSearch = {};
@@ -248,7 +257,7 @@ type Authenticator = {
 export type Config = {
   languageCode: string;
   csrfCookieName: string;
-  features: string[];
+  features: Set<string>;
   singleOrganization: boolean;
   urlPrefix: string;
   needsUpgrade: boolean;
@@ -339,11 +348,34 @@ export type Group = {
   userReportCount: number;
 };
 
+export type Member = {
+  id: string;
+  user: User;
+  name: string;
+  email: string;
+  pending: boolean | undefined;
+  role: string;
+  roleName: string;
+  flags: {
+    'sso:linked': boolean;
+    'sso:invalid': boolean;
+  };
+  dateCreated: string;
+  inviteStatus: 'approved' | 'requested_to_be_invited' | 'requested_to_join';
+  inviterName: string | null;
+};
+
+export type AccessRequest = {
+  id: string;
+  team: Team;
+  member: Member;
+};
+
 export type EventViewv1 = {
   name: string;
   data: {
     fields: string[];
-    columnNames: string[];
+    fieldnames: string[];
     sort: string[];
     query?: string;
   };
@@ -370,6 +402,11 @@ export type IntegrationProvider = {
   aspects: any; //TODO(ts)
   setupDialog: object; //TODO(ts)
   metadata: any; //TODO(ts)
+};
+
+export type IntegrationFeature = {
+  description: React.ReactNode;
+  featureGate: string;
 };
 
 export type WebhookEvent = 'issue' | 'error';
@@ -428,6 +465,14 @@ export type GroupIntegration = Integration & {
   externalIssues: IntegrationExternalIssue[];
 };
 
+export type PlatformExternalIssue = {
+  id: string;
+  groupId: string;
+  serviceType: string;
+  displayName: string;
+  webUrl: string;
+};
+
 export type SentryAppInstallation = {
   app: {
     uuid: string;
@@ -439,6 +484,29 @@ export type SentryAppInstallation = {
   uuid: string;
   status: 'installed' | 'pending';
   code?: string;
+};
+
+export type SentryAppWebhookError = {
+  webhookUrl: string;
+  app: {
+    uuid: string;
+    slug: string;
+    name: string;
+  };
+  request: {
+    body: object;
+    headers: object;
+  };
+  eventType: string;
+  date: string;
+  organization: {
+    slug: string;
+    name: string;
+  };
+  response: {
+    body: string;
+    statusCode: number;
+  };
 };
 
 export type PermissionValue = 'no-access' | 'read' | 'write' | 'admin';
@@ -481,4 +549,34 @@ export type Commit = {
   dateCreated: string;
   repository?: Repository;
   author?: User;
+};
+
+export type MemberRole = {
+  id: string;
+  name: string;
+  desc: string;
+  allowed?: boolean;
+};
+
+export type SentryAppComponent = {
+  uuid: string;
+  type: 'issue-link' | 'alert-rule-action' | 'issue-media' | 'stacktrace-link';
+  schema: object;
+  sentryApp: {
+    uuid: string;
+    slug: string;
+    name: string;
+  };
+};
+
+export type RouterProps = {
+  params: Params;
+  location: Location;
+};
+
+export type ActiveExperiments = {
+  ImprovedInvitesExperiment: 'none' | 'all' | 'join_request' | 'invite_request';
+  TrialUpgradeV2Experiment: 'upgrade' | 'trial' | -1;
+  JoinRequestExperiment: 0 | 1 | -1;
+  InviteRequestExperiment: 0 | 1 | -1;
 };

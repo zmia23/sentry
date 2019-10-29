@@ -36,9 +36,7 @@ class GroupActivityItem extends React.Component {
         return data.version
           ? t('%(author)s marked this issue as resolved in %(version)s', {
               author,
-              version: (
-                <Version version={data.version} orgId={orgId} projectId={projectId} />
-              ),
+              version: <Version version={data.version} orgId={orgId} />,
             })
           : t('%s marked this issue as resolved in the upcoming release', author);
       case 'set_resolved_in_commit':
@@ -46,7 +44,7 @@ class GroupActivityItem extends React.Component {
           author,
           version: (
             <CommitLink
-              inline={true}
+              inline
               commitId={data.commit && data.commit.id}
               repository={data.commit && data.commit.repository}
             />
@@ -57,7 +55,7 @@ class GroupActivityItem extends React.Component {
           author,
           version: (
             <PullRequestLink
-              inline={true}
+              inline
               pullRequest={data.pullRequest}
               repository={data.pullRequest && data.pullRequest.repository}
             />

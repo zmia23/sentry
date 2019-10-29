@@ -1,12 +1,11 @@
-import {observable} from 'mobx';
 import React from 'react';
 
 import {Client} from 'app/api';
-import {mount} from 'enzyme';
+import {mountWithTheme} from 'sentry-test/enzyme';
 import SentryApplicationDetails from 'app/views/settings/organizationDeveloperSettings/sentryApplicationDetails';
 import JsonForm from 'app/views/settings/components/forms/jsonForm';
 import PermissionsObserver from 'app/views/settings/organizationDeveloperSettings/permissionsObserver';
-import {selectByValue} from '../../../../helpers/select';
+import {selectByValue} from 'sentry-test/select';
 
 describe('Sentry Application Details', function() {
   let org;
@@ -19,6 +18,7 @@ describe('Sentry Application Details', function() {
 
   const verifyInstallToggle = 'Switch[name="verifyInstall"]';
   const redirectUrlInput = 'Input[name="redirectUrl"]';
+  const maskedValue = '*'.repeat(64);
 
   beforeEach(() => {
     Client.clearMockResponses();
@@ -35,7 +35,7 @@ describe('Sentry Application Details', function() {
         body: [],
       });
 
-      wrapper = mount(
+      wrapper = mountWithTheme(
         <SentryApplicationDetails params={{orgId}} route={{path: 'new-public/'}} />,
         TestStubs.routerContext()
       );
@@ -91,11 +91,17 @@ describe('Sentry Application Details', function() {
         organization: org.slug,
         redirectUrl: 'https://webhook.com/setup',
         webhookUrl: 'https://webhook.com',
-        scopes: observable(['member:read', 'member:admin', 'event:read', 'event:admin']),
-        events: observable(['issue']),
+        scopes: expect.arrayContaining([
+          'member:read',
+          'member:admin',
+          'event:read',
+          'event:admin',
+        ]),
+        events: ['issue'],
         isInternal: false,
         verifyInstall: true,
         isAlertable: true,
+        allowedOrigins: [],
         schema: {},
       };
 
@@ -111,7 +117,7 @@ describe('Sentry Application Details', function() {
 
   describe('Creating a new internal Sentry App', () => {
     beforeEach(() => {
-      wrapper = mount(
+      wrapper = mountWithTheme(
         <SentryApplicationDetails params={{orgId}} route={{path: 'new-internal/'}} />,
         TestStubs.routerContext()
       );
@@ -137,7 +143,7 @@ describe('Sentry Application Details', function() {
         body: [],
       });
 
-      wrapper = mount(
+      wrapper = mountWithTheme(
         <SentryApplicationDetails params={{appSlug: sentryApp.slug, orgId}} />,
         TestStubs.routerContext()
       );
@@ -179,7 +185,7 @@ describe('Sentry Application Details', function() {
         body: [token],
       });
 
-      wrapper = mount(
+      wrapper = mountWithTheme(
         <SentryApplicationDetails params={{appSlug: sentryApp.slug, orgId}} />,
         TestStubs.routerContext()
       );
@@ -206,6 +212,45 @@ describe('Sentry Application Details', function() {
     });
   });
 
+  describe('Renders masked values', () => {
+    beforeEach(() => {
+      sentryApp = TestStubs.SentryApp({
+        status: 'internal',
+        clientSecret: maskedValue,
+      });
+      token = TestStubs.SentryAppToken({token: maskedValue, refreshToken: maskedValue});
+      sentryApp.events = ['issue'];
+
+      Client.addMockResponse({
+        url: `/sentry-apps/${sentryApp.slug}/`,
+        body: sentryApp,
+      });
+
+      Client.addMockResponse({
+        url: `/sentry-apps/${sentryApp.slug}/api-tokens/`,
+        body: [token],
+      });
+
+      wrapper = mountWithTheme(
+        <SentryApplicationDetails params={{appSlug: sentryApp.slug, orgId}} />,
+        TestStubs.routerContext()
+      );
+    });
+
+    it('shows masked tokens', function() {
+      expect(
+        wrapper
+          .find('TextCopyInput input')
+          .first()
+          .prop('value')
+      ).toBe(maskedValue);
+    });
+
+    it('shows masked clientSecret', function() {
+      expect(wrapper.find('#clientSecret input').prop('value')).toBe(maskedValue);
+    });
+  });
+
   describe('Editing internal app tokens', () => {
     beforeEach(() => {
       sentryApp = TestStubs.SentryApp({
@@ -225,7 +270,7 @@ describe('Sentry Application Details', function() {
         body: [token],
       });
 
-      wrapper = mount(
+      wrapper = mountWithTheme(
         <SentryApplicationDetails params={{appSlug: sentryApp.slug, orgId}} />,
         TestStubs.routerContext()
       );
@@ -295,7 +340,7 @@ describe('Sentry Application Details', function() {
         body: [],
       });
 
-      wrapper = mount(
+      wrapper = mountWithTheme(
         <SentryApplicationDetails params={{appSlug: sentryApp.slug, orgId}} />,
         TestStubs.routerContext()
       );
@@ -320,7 +365,7 @@ describe('Sentry Application Details', function() {
         expect.objectContaining({
           data: expect.objectContaining({
             redirectUrl: 'https://hello.com/',
-            events: observable.array([]),
+            events: [],
           }),
           method: 'PUT',
         })
@@ -343,10 +388,53 @@ describe('Sentry Application Details', function() {
         `/sentry-apps/${sentryApp.slug}/`,
         expect.objectContaining({
           data: expect.objectContaining({
-            events: observable.array([]),
+            events: [],
           }),
           method: 'PUT',
         })
+      );
+    });
+  });
+
+  describe('Editing an existing public Sentry App with a scope error', () => {
+    beforeEach(() => {
+      sentryApp = TestStubs.SentryApp();
+
+      editAppRequest = Client.addMockResponse({
+        url: `/sentry-apps/${sentryApp.slug}/`,
+        method: 'PUT',
+        statusCode: 400,
+        body: {
+          scopes: [
+            "Requested permission of member:write exceeds requester's permission. Please contact an administrator to make the requested change.",
+            "Requested permission of member:admin exceeds requester's permission. Please contact an administrator to make the requested change.",
+          ],
+        },
+      });
+
+      Client.addMockResponse({
+        url: `/sentry-apps/${sentryApp.slug}/`,
+        body: sentryApp,
+      });
+
+      Client.addMockResponse({
+        url: `/sentry-apps/${sentryApp.slug}/api-tokens/`,
+        body: [],
+      });
+
+      wrapper = mountWithTheme(
+        <SentryApplicationDetails params={{appSlug: sentryApp.slug, orgId}} />,
+        TestStubs.routerContext()
+      );
+    });
+
+    it('renders the error', async () => {
+      wrapper.find('form').simulate('submit');
+      await tick();
+      wrapper.update();
+
+      expect(wrapper.find('div FormFieldErrorReason').text()).toEqual(
+        "Requested permission of member:admin exceeds requester's permission. Please contact an administrator to make the requested change."
       );
     });
   });

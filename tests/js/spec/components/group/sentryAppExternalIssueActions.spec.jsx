@@ -1,8 +1,8 @@
 import React from 'react';
-import {mount} from 'enzyme';
+import {mountWithTheme} from 'sentry-test/enzyme';
+import {selectByValue} from 'sentry-test/select';
 
 import SentryAppExternalIssueActions from 'app/components/group/sentryAppExternalIssueActions';
-import {selectByValue} from '../../../helpers/select';
 
 describe('SentryAppExternalIssueActions', () => {
   let group;
@@ -14,18 +14,29 @@ describe('SentryAppExternalIssueActions', () => {
 
   beforeEach(() => {
     group = TestStubs.Group();
-    component = TestStubs.SentryAppComponent();
     sentryApp = TestStubs.SentryApp();
+    component = TestStubs.SentryAppComponent({
+      sentryApp: {
+        uuid: sentryApp.uuid,
+        slug: sentryApp.slug,
+        name: sentryApp.name,
+      },
+    });
     install = TestStubs.SentryAppInstallation({sentryApp});
     externalIssue = TestStubs.PlatformExternalIssue({
       groupId: group.id,
       serviceType: component.sentryApp.slug,
     });
+
+    MockApiClient.addMockResponse({
+      url: `/sentry-apps/${sentryApp.slug}/interaction/`,
+      method: 'POST',
+    });
   });
 
   describe('without an external issue linked', () => {
     beforeEach(() => {
-      wrapper = mount(
+      wrapper = mountWithTheme(
         <SentryAppExternalIssueActions
           group={group}
           sentryAppInstallation={install}
@@ -146,7 +157,7 @@ describe('SentryAppExternalIssueActions', () => {
 
   describe('with an external issue linked', () => {
     beforeEach(() => {
-      wrapper = mount(
+      wrapper = mountWithTheme(
         <SentryAppExternalIssueActions
           group={group}
           sentryAppComponent={component}

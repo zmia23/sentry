@@ -1,8 +1,8 @@
 import {browserHistory} from 'react-router';
-import {mount} from 'enzyme';
+import {mountWithTheme} from 'sentry-test/enzyme';
 import React from 'react';
 
-import {initializeOrg} from 'app-test/helpers/initializeOrg';
+import {initializeOrg} from 'sentry-test/initializeOrg';
 import CreateSampleEventButton from 'app/views/onboarding/createSampleEventButton';
 
 jest.useFakeTimers();
@@ -11,7 +11,7 @@ describe('CreateSampleEventButton', function() {
   const {org, project, routerContext} = initializeOrg();
   const groupID = '123';
 
-  const wrapper = mount(
+  const wrapper = mountWithTheme(
     <CreateSampleEventButton source="test" project={project} />,
     routerContext
   );
@@ -51,7 +51,7 @@ describe('CreateSampleEventButton', function() {
       body: {},
     });
 
-    // There is a timeout before we check for the existance of the latest
+    // There is a timeout before we check for the existence of the latest
     // event. Wait for it then wait for the request to complete
     jest.runAllTimers();
     await Promise.resolve();

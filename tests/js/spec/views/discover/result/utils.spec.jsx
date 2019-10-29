@@ -1,4 +1,4 @@
-import {mount} from 'enzyme';
+import {mount} from 'sentry-test/enzyme';
 
 import {
   getChartData,
@@ -283,7 +283,7 @@ describe('Utils', function() {
           [
             ...raw,
             ...[...new Array(10)].map(() => ({
-              'error.type': 'Exeption',
+              'error.type': 'Exception',
               platform: `${Math.random()}`,
               count: 10,
               time: 1532070000,
@@ -300,7 +300,7 @@ describe('Utils', function() {
           [
             ...raw,
             ...[...new Array(10)].map(() => ({
-              'error.type': 'Exeption',
+              'error.type': 'Exception',
               platform: `${Math.random()}`,
               count: 10,
               time: 1532070000,

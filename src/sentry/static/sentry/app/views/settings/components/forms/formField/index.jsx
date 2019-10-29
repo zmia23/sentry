@@ -28,7 +28,7 @@ const FormFieldErrorReason = styled('div')`
   font-size: 12px;
   border-radius: 3px;
   box-shadow: 0 0 0 1px rgba(64, 11, 54, 0.15), 0 4px 20px 0 rgba(64, 11, 54, 0.36);
-  z-index: 10000;
+  z-index: ${p => p.theme.zIndex.errorMessage};
   animation: ${slideInUp} 200ms ease-in-out forwards;
 
   &:before,
@@ -187,7 +187,7 @@ class MockModel {
  * form model, that will be called to determine the value of the prop upon an
  * observed change in the model.
  */
-const propsToObserver = ['inline', 'highlighted'];
+const propsToObserver = ['inline', 'highlighted', 'visible', 'disabled'];
 
 class FormField extends React.Component {
   static propTypes = {
@@ -500,7 +500,7 @@ class FormField extends React.Component {
 
     const observedProps = propsToObserver
       .filter(p => typeof this.props[p] === 'function')
-      .map(p => [p, () => this.props[p](model)]);
+      .map(p => [p, () => this.props[p]({...this.props, model})]);
 
     // This field has no properties that require observation to compute their
     // value, this field is static and will not be re-rendered.
