@@ -41,7 +41,7 @@ class PushoverPlugin(CorePluginMixin, NotifyPlugin):
             apikey_field,
             {
                 "name": "priority",
-                "label": "Message Priority",
+                "label": "____Message Priority____",
                 "type": "choice",
                 "required": True,
                 "choices": [
