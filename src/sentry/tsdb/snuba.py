@@ -30,10 +30,7 @@ class SnubaTSDB(BaseTSDB):
     will return empty results for unsupported models.
     """
 
-    # The ``model_query_settings`` and ``model_being_upgraded_query_settings`` are translations of
-    # TSDB models into required settings for querying snuba. Queries for ``model_columns``
-    # directly hit snuba, while queries for ``model_columns_being_upgraded`` hit
-    # redis in the main thread and snuba in a background thread.
+    # Contains translations of TSDB models into required settings for querying snuba
     model_query_settings = {
         TSDBModel.project: SnubaModelQuerySettings(snuba.Dataset.Events, "project_id", None, None),
         TSDBModel.group: SnubaModelQuerySettings(snuba.Dataset.Events, "issue", None, None),
@@ -55,17 +52,6 @@ class SnubaTSDB(BaseTSDB):
         TSDBModel.frequent_issues_by_project: SnubaModelQuerySettings(
             snuba.Dataset.Events, "project_id", "issue", None
         ),
-    }
-
-    # In getsentry/getsentry:tsdb.py, we check ``model_columns`` to see if a request
-    # should go to snuba. So, for now, for backwards compatibility, alias
-    # ``model_columns`` to ``model_query_settings``.
-    # TODO(manu): use model_query_settings instead of model_columns in getsentry
-    model_columns = model_query_settings
-
-    # ``model_columns_being_upgraded`` are models that currently use Redis but are being
-    # transitioned to use Snuba.
-    model_being_upgraded_query_settings = {
         TSDBModel.organization_total_received: SnubaModelQuerySettings(
             snuba.Dataset.Outcomes,
             "org_id",
@@ -139,10 +125,6 @@ class SnubaTSDB(BaseTSDB):
         ),
     }
 
-    all_model_query_settings = dict(
-        model_columns.items() + model_being_upgraded_query_settings.items()
-    )
-
     def __init__(self, **options):
         super(SnubaTSDB, self).__init__(**options)
 
@@ -168,7 +150,7 @@ class SnubaTSDB(BaseTSDB):
         if rollup and rollup == 10 and model in self.lower_rollup_query_settings.keys():
             model_query_settings = self.lower_rollup_query_settings.get(model)
         else:
-            model_query_settings = self.all_model_query_settings.get(model)
+            model_query_settings = self.model_query_settings.get(model)
 
         if model_query_settings is None:
             raise Exception(u"Unsupported TSDBModel: {}".format(model.name))
@@ -272,7 +254,7 @@ class SnubaTSDB(BaseTSDB):
         if rollup and rollup == 10 and model in self.lower_rollup_query_settings.keys():
             model_query_settings = self.lower_rollup_query_settings.get(model)
         else:
-            model_query_settings = self.all_model_query_settings.get(model)
+            model_query_settings = self.model_query_settings.get(model)
 
         assert model_query_settings is not None, u"Unsupported TSDBModel: {}".format(model.name)
 
