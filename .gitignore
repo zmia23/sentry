@@ -32,6 +32,8 @@ sentry-package.json
 /src/sentry/static/sentry/rest_framework/
 /src/sentry/integration-docs
 /src/sentry/loader/_registry.json
+/src/new_sentry_plugins/*/static/*/dist
+/src/new_sentry_plugins/assets.json
 /wheelhouse
 /test_cli/
 Gemfile.lock
