@@ -426,6 +426,11 @@ urlpatterns += patterns(
                 ),
                 url(r"^account/", generic_react_page_view),
                 url(
+                    r"^(?P<organization_slug>[\w_-]+)/$",
+                    react_page_view,
+                    name="sentry-organization-settings",
+                ),
+                url(
                     r"^(?P<organization_slug>[\w_-]+)/members/$",
                     react_page_view,
                     name="sentry-organization-members",
@@ -667,6 +672,11 @@ urlpatterns += patterns(
         r"^organizations/(?P<organization_slug>[\w_-]+)/incidents/(?P<incident_id>\d+)/$",
         react_page_view,
         name="sentry-incident",
+    ),
+    url(
+        r"^settings/(?P<organization_slug>[\w_-]+)/incident-rules/(?P<alert_rule_id>\d+)/$",
+        react_page_view,
+        name="sentry-alert-rule",
     ),
     url(
         r"^(?P<organization_slug>[\w_-]+)/(?P<project_slug>[\w_-]+)/issues/(?P<group_id>\d+)/tags/(?P<key>[^\/]+)/export/$",

@@ -10,14 +10,8 @@ import {getFormattedDate} from 'app/utils/dates';
 import EventsRequest from 'app/views/events/utils/eventsRequest';
 import LoadingMask from 'app/components/loadingMask';
 import Placeholder from 'app/components/placeholder';
-import SelectControl from 'app/components/forms/selectControl';
 
-import {
-  AlertRuleAggregations,
-  IncidentRule,
-  TimeWindow,
-  ProjectSelectOption,
-} from '../../types';
+import {AlertRuleAggregations, IncidentRule, TimeWindow} from '../../types';
 import DraggableChart from './draggableChart';
 
 type Props = {
@@ -25,31 +19,19 @@ type Props = {
   config: Config;
   organization: Organization;
   projects: Project[];
-  rule: IncidentRule;
-  isInverted: boolean;
-  timeWindow: number;
-  alertThreshold: number | null;
-  resolveThreshold: number | null;
-  onChangeIncidentThreshold: (alertThreshold: number) => void;
-  onChangeResolutionThreshold: (resolveThreshold: number) => void;
+
+  query: IncidentRule['query'];
+  timeWindow: IncidentRule['timeWindow'];
+  aggregations: IncidentRule['aggregations'];
+
+  isInverted?: boolean;
+  alertThreshold?: number | null;
+  resolveThreshold?: number | null;
+  onChangeIncidentThreshold?: (alertThreshold: number) => void;
+  onChangeResolutionThreshold?: (resolveThreshold: number) => void;
 };
 
-type State = {
-  // This is an array but we are only supporting a single project for now
-  selectedProjects: ProjectSelectOption[];
-};
-
-class TriggersChart extends React.Component<Props, State> {
-  state = {
-    selectedProjects: [],
-  };
-
-  handleSelectProjects = (selectedProjects: ProjectSelectOption) => {
-    this.setState({
-      selectedProjects: [selectedProjects],
-    });
-  };
-
+class TriggersChart extends React.Component<Props> {
   render() {
     const {
       api,
@@ -59,41 +41,21 @@ class TriggersChart extends React.Component<Props, State> {
       alertThreshold,
       resolveThreshold,
       isInverted,
-      rule,
+      timeWindow,
+      query,
+      aggregations,
     } = this.props;
-    const {timeWindow} = rule;
-    const {selectedProjects} = this.state;
-    const projectOptions = projects.map(({id, slug}) => ({
-      value: Number(id),
-      label: slug,
-    }));
 
-    // Show a placeholder with a message to select a project (as well as project selector)
-
-    if (selectedProjects.length === 0) {
-      return (
-        <SelectProjectPlaceholder height="200px" bottomGutter={1}>
-          <SelectProjectWrapper>
-            Select Project to see last 24 hours of data
-            <SelectControl
-              options={projectOptions}
-              onChange={this.handleSelectProjects}
-            />
-          </SelectProjectWrapper>
-        </SelectProjectPlaceholder>
-      );
-    }
     return (
       <EventsRequest
         api={api}
         organization={organization}
-        project={selectedProjects.map(({value}) => value)}
+        query={query}
+        project={projects.map(({id}) => Number(id))}
         interval={`${timeWindow}s`}
         period={getPeriodForTimeWindow(timeWindow)}
         yAxis={
-          rule.aggregations[0] === AlertRuleAggregations.TOTAL
-            ? 'event_count'
-            : 'user_count'
+          aggregations[0] === AlertRuleAggregations.TOTAL ? 'event_count' : 'user_count'
         }
         includePrevious={false}
       >
@@ -132,9 +94,6 @@ class TriggersChart extends React.Component<Props, State> {
                     resolveThreshold={resolveThreshold}
                     isInverted={isInverted}
                     data={timeseriesData}
-                    projectOptions={projectOptions}
-                    selectedProjects={selectedProjects}
-                    onChangeProjects={this.handleSelectProjects}
                   />
                 </React.Fragment>
               )}
@@ -176,14 +135,4 @@ const TransparentLoadingMask = styled(LoadingMask)<{visible: boolean}>`
   ${p => !p.visible && 'display: none;'};
   opacity: 0.4;
   z-index: 1;
-`;
-
-const SelectProjectPlaceholder = styled(Placeholder)`
-  background-color: white;
-  border-bottom: 1px solid ${p => p.theme.borderLight};
-  align-items: center;
-`;
-
-const SelectProjectWrapper = styled('div')`
-  width: 40%;
 `;

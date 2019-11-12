@@ -1,25 +1,7 @@
-import {Box} from 'grid-emotion';
 import {compact, groupBy, keyBy} from 'lodash';
 import React from 'react';
 import styled from 'react-emotion';
 
-import {Panel, PanelBody, PanelHeader} from 'app/components/panels';
-import {addErrorMessage} from 'app/actionCreators/indicator';
-import {analytics} from 'app/utils/analytics';
-import {sortArray} from 'app/utils';
-import {t} from 'app/locale';
-import AsyncComponent from 'app/components/asyncComponent';
-import LoadingIndicator from 'app/components/loadingIndicator';
-import SentryDocumentTitle from 'app/components/sentryDocumentTitle';
-import MigrationWarnings from 'app/views/organizationIntegrations/migrationWarnings';
-import PermissionAlert from 'app/views/settings/organization/permissionAlert';
-import ProviderRow from 'app/views/organizationIntegrations/providerRow';
-import {removeSentryApp} from 'app/actionCreators/sentryApps';
-import SentryAppInstallationDetail from 'app/views/organizationIntegrations/sentryAppInstallationDetail';
-import SentryApplicationRow from 'app/views/settings/organizationDeveloperSettings/sentryApplicationRow';
-import SentryTypes from 'app/sentryTypes';
-import SettingsPageHeader from 'app/views/settings/components/settingsPageHeader';
-import withOrganization from 'app/utils/withOrganization';
 import {
   Organization,
   Integration,
@@ -27,12 +9,31 @@ import {
   SentryApp,
   IntegrationProvider,
   SentryAppInstallation,
+  RouterProps,
 } from 'app/types';
+import {Panel, PanelBody, PanelHeader} from 'app/components/panels';
 import {RequestOptions} from 'app/api';
+import {addErrorMessage} from 'app/actionCreators/indicator';
+import {analytics} from 'app/utils/analytics';
+import {removeSentryApp} from 'app/actionCreators/sentryApps';
+import {sortArray} from 'app/utils';
+import {t} from 'app/locale';
+import AsyncComponent from 'app/components/asyncComponent';
+import LoadingIndicator from 'app/components/loadingIndicator';
+import MigrationWarnings from 'app/views/organizationIntegrations/migrationWarnings';
+import PermissionAlert from 'app/views/settings/organization/permissionAlert';
+import ProviderRow from 'app/views/organizationIntegrations/providerRow';
+import SentryAppInstallationDetail from 'app/views/organizationIntegrations/sentryAppInstallationDetail';
+import SentryApplicationRow from 'app/views/settings/organizationDeveloperSettings/sentryApplicationRow';
+import SentryDocumentTitle from 'app/components/sentryDocumentTitle';
+import SentryTypes from 'app/sentryTypes';
+import SettingsPageHeader from 'app/views/settings/components/settingsPageHeader';
+import space from 'app/styles/space';
+import withOrganization from 'app/utils/withOrganization';
 
 type AppOrProvider = SentryApp | IntegrationProvider;
 
-type Props = {
+type Props = RouterProps & {
   organization: Organization;
   hideHeader: boolean;
 };
@@ -45,6 +46,7 @@ type State = {
   orgOwnedApps: SentryApp[];
   publishedApps: SentryApp[];
   config: {providers: IntegrationProvider[]};
+  extraApp?: SentryApp;
 };
 
 function isSentryApp(integration: AppOrProvider): integration is SentryApp {
@@ -74,7 +76,7 @@ class OrganizationIntegrations extends AsyncComponent<
   getEndpoints(): ([string, string, any] | [string, string])[] {
     const {orgId} = this.props.params;
     const query = {plugins: ['vsts', 'github', 'bitbucket']};
-    return [
+    const baseEndpoints: ([string, string, any] | [string, string])[] = [
       ['config', `/organizations/${orgId}/config/integrations/`],
       ['integrations', `/organizations/${orgId}/integrations/`],
       ['plugins', `/organizations/${orgId}/plugins/`, {query}],
@@ -82,6 +84,17 @@ class OrganizationIntegrations extends AsyncComponent<
       ['publishedApps', '/sentry-apps/', {query: {status: 'published'}}],
       ['appInstalls', `/organizations/${orgId}/sentry-app-installations/`],
     ];
+    /**
+     * optional app to load for super users
+     * should only be done for unpublished integrations from another org
+     * but no checks are in place to ensure the above condition
+     */
+    const extraAppSlug = new URLSearchParams(this.props.location.search).get('extra_app');
+    if (extraAppSlug) {
+      baseEndpoints.push(['extraApp', `/sentry-apps/${extraAppSlug}/`]);
+    }
+
+    return baseEndpoints;
   }
 
   // State
@@ -257,8 +270,13 @@ class OrganizationIntegrations extends AsyncComponent<
 
   renderBody() {
     const {orgId} = this.props.params;
-    const {reloading, orgOwnedApps, publishedApps} = this.state;
+    const {reloading, orgOwnedApps, publishedApps, extraApp} = this.state;
     const published = publishedApps || [];
+    // If we have an extra app in state from query parameter, add it as org owned app
+    if (extraApp) {
+      orgOwnedApps.push(extraApp);
+    }
+
     // we dont want the app to render twice if its the org that created
     // the published app.
     const orgOwned = orgOwnedApps.filter(app => {
@@ -301,9 +319,7 @@ class OrganizationIntegrations extends AsyncComponent<
 
         <Panel>
           <PanelHeader disablePadding>
-            <Box px={2} flex="1">
-              {t('Integrations')}
-            </Box>
+            <Heading>{t('Integrations')}</Heading>
             {reloading && <StyledLoadingIndicator mini />}
           </PanelHeader>
           <PanelBody>{publicIntegrations.map(this.renderIntegration)}</PanelBody>
@@ -312,9 +328,7 @@ class OrganizationIntegrations extends AsyncComponent<
         {unpublishedApps.length > 0 && (
           <Panel>
             <PanelHeader disablePadding>
-              <Box px={2} flex="1">
-                {t('Unpublished Integrations')}
-              </Box>
+              <Heading>{t('Unpublished Integrations')}</Heading>
               {reloading && <StyledLoadingIndicator mini />}
             </PanelHeader>
             <PanelBody>{unpublishedApps.map(this.renderIntegration)}</PanelBody>
@@ -324,9 +338,7 @@ class OrganizationIntegrations extends AsyncComponent<
         {orgOwnedInternal.length > 0 && (
           <Panel>
             <PanelHeader disablePadding>
-              <Box px={2} flex="1">
-                {t('Internal Integrations')}
-              </Box>
+              <Heading>{t('Internal Integrations')}</Heading>
               {reloading && <StyledLoadingIndicator mini />}
             </PanelHeader>
             <PanelBody>{orgOwnedInternal.map(this.renderIntegration)}</PanelBody>
@@ -342,6 +354,12 @@ const StyledLoadingIndicator = styled(LoadingIndicator)`
   right: 7px;
   top: 50%;
   transform: translateY(-16px);
+`;
+
+const Heading = styled('div')`
+  flex: 1;
+  padding-left: ${space(2)};
+  padding-right: ${space(2)};
 `;
 
 export default withOrganization(OrganizationIntegrations);

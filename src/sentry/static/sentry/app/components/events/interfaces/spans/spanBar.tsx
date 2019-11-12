@@ -274,7 +274,17 @@ class SpanBar extends React.Component<SpanBarProps, SpanBarState> {
 
   renderSpanTreeConnector = ({hasToggler}: {hasToggler: boolean}) => {
     const {isLast, isRoot, treeDepth, continuingTreeDepths, span} = this.props;
+
     if (isRoot) {
+      if (hasToggler) {
+        return (
+          <ConnectorBar
+            style={{right: '11px', height: '10px', bottom: '-5px', top: 'auto'}}
+            key={`${span.span_id}-last`}
+          />
+        );
+      }
+
       return null;
     }
 
@@ -282,6 +292,15 @@ class SpanBar extends React.Component<SpanBarProps, SpanBarState> {
       const left = ((treeDepth - depth) * (TOGGLE_BORDER_BOX / 2) + 1) * -1;
       return <ConnectorBar style={{left}} key={`${span.span_id}-${depth}`} />;
     });
+
+    if (hasToggler) {
+      connectorBars.push(
+        <ConnectorBar
+          style={{right: '15px', height: '10px', bottom: '0', top: 'auto'}}
+          key={`${span.span_id}-last`}
+        />
+      );
+    }
 
     return (
       <SpanTreeConnector isLast={isLast} hasToggler={hasToggler}>
@@ -826,20 +845,21 @@ type TogglerTypes = OmitHtmlDivProps<{
 
 const SpanTreeTogglerContainer = styled('div')<TogglerTypes>`
   position: relative;
-  height: 15px;
-  width: ${p => (p.hasToggler ? '44px' : '16px')};
-  min-width: ${p => (p.hasToggler ? '44px' : '16px')}; /* annoying flex thing */
+  height: 16px;
+  width: ${p => (p.hasToggler ? '40px' : '16px')};
+  min-width: ${p => (p.hasToggler ? '40px' : '16px')}; /* annoying flex thing */
   margin-right: ${space(1)};
   z-index: ${zIndex.spanTreeToggler};
   display: flex;
   justify-content: flex-end;
 `;
 
-// one-off to get the perfect heirarchy
+// one-off to get the perfect hierarchy
 const spanTreeColor = '#D5CEDB';
 
 const SpanTreeConnector = styled('div')<TogglerTypes>`
   height: ${p => (p.isLast ? '85%' : '175%')};
+  width: 100%;
   border-left: 1px solid ${spanTreeColor};
   position: absolute;
   left: 4px;
@@ -847,7 +867,7 @@ const SpanTreeConnector = styled('div')<TogglerTypes>`
 
   &:before {
     content: '';
-    width: ${p => (p.hasToggler ? '3px' : '8px')};
+    width: ${p => (p.hasToggler ? '2px' : '8px')};
     position: absolute;
     height: 1px;
     top: ${p => (p.isLast ? '100%' : '50%')};
@@ -857,8 +877,8 @@ const SpanTreeConnector = styled('div')<TogglerTypes>`
 
   &:after {
     content: '';
-    width: 4px;
-    height: 4px;
+    width: 2px;
+    height: 2px;
     border-radius: 50%;
     /* border radius stops working at 3px */
     transform: scale(0.5) translateY(-100%);
@@ -899,8 +919,7 @@ type SpanTreeTogglerAndDivProps = OmitHtmlDivProps<{
 
 const SpanTreeToggler = styled('div')<SpanTreeTogglerAndDivProps>`
   white-space: nowrap;
-  height: 15px;
-  min-width: 25px;
+  min-width: 32px;
   padding: 0 4px;
   display: flex;
   align-items: center;
@@ -909,6 +928,7 @@ const SpanTreeToggler = styled('div')<SpanTreeTogglerAndDivProps>`
   transition: all 0.15s ease-in-out;
   font-size: ${p => p.theme.fontSizeExtraSmall};
   line-height: 0;
+  z-index: 1;
 
   ${p => getTogglerTheme(p)}
 `;

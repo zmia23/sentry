@@ -12,6 +12,8 @@ import six
 import warnings
 from importlib import import_module
 
+from django.contrib.auth.models import AnonymousUser
+from django.db import transaction
 from django.utils import timezone
 from django.utils.text import slugify
 from hashlib import sha1
@@ -20,9 +22,14 @@ from uuid import uuid4
 
 from sentry.event_manager import EventManager
 from sentry.constants import SentryAppStatus
-from sentry.incidents.logic import create_alert_rule
+from sentry.incidents.logic import (
+    create_alert_rule,
+    create_alert_rule_trigger,
+    create_alert_rule_trigger_action,
+)
 from sentry.incidents.models import (
     AlertRuleThresholdType,
+    AlertRuleTriggerAction,
     Incident,
     IncidentGroup,
     IncidentProject,
@@ -64,6 +71,7 @@ from sentry.models import (
     SentryAppWebhookError,
 )
 from sentry.models.integrationfeature import Feature, IntegrationFeature
+from sentry.signals import project_created
 from sentry.snuba.models import QueryAggregations
 from sentry.utils import json
 from sentry.utils.canonical import CanonicalKeyDict
@@ -270,7 +278,7 @@ class Factories(object):
         return env
 
     @staticmethod
-    def create_project(organization=None, teams=None, **kwargs):
+    def create_project(organization=None, teams=None, fire_project_created=False, **kwargs):
         if not kwargs.get("name"):
             kwargs["name"] = petname.Generate(2, " ", letters=10).title()
         if not kwargs.get("slug"):
@@ -278,10 +286,15 @@ class Factories(object):
         if not organization and teams:
             organization = teams[0].organization
 
-        project = Project.objects.create(organization=organization, **kwargs)
-        if teams:
-            for team in teams:
-                project.add_team(team)
+        with transaction.atomic():
+            project = Project.objects.create(organization=organization, **kwargs)
+            if teams:
+                for team in teams:
+                    project.add_team(team)
+            if fire_project_created:
+                project_created.send(
+                    project=project, user=AnonymousUser(), default_rules=True, sender=Factories
+                )
         return project
 
     @staticmethod
@@ -483,6 +496,7 @@ class Factories(object):
         # emulate EventManager refs
         event.data.bind_ref(event)
         event.save()
+        event.data.save()
         return event
 
     @staticmethod
@@ -863,7 +877,7 @@ class Factories(object):
             group=group,
             event_id=event_id or "a" * 32,
             project=project or group.project,
-            name="Jane Doe",
+            name="Jane Bloggs",
             email="jane@example.com",
             comments="the application crashed",
             **kwargs
@@ -933,12 +947,9 @@ class Factories(object):
         organization,
         projects,
         name=None,
-        threshold_type=AlertRuleThresholdType.ABOVE,
         query="level:error",
         aggregation=QueryAggregations.TOTAL,
         time_window=10,
-        alert_threshold=100,
-        resolve_threshold=10,
         threshold_period=1,
         include_all_projects=False,
         excluded_projects=None,
@@ -950,13 +961,38 @@ class Factories(object):
             organization,
             projects,
             name,
-            threshold_type,
             query,
             aggregation,
             time_window,
-            alert_threshold,
-            resolve_threshold,
             threshold_period,
             include_all_projects=include_all_projects,
             excluded_projects=excluded_projects,
+        )
+
+    @staticmethod
+    def create_alert_rule_trigger(
+        alert_rule,
+        label=None,
+        threshold_type=AlertRuleThresholdType.ABOVE,
+        alert_threshold=100,
+        resolve_threshold=10,
+    ):
+        if not label:
+            label = petname.Generate(2, " ", letters=10).title()
+
+        return create_alert_rule_trigger(
+            alert_rule, label, threshold_type, alert_threshold, resolve_threshold
+        )
+
+    @staticmethod
+    def create_alert_rule_trigger_action(
+        trigger,
+        type=AlertRuleTriggerAction.Type.EMAIL,
+        target_type=AlertRuleTriggerAction.TargetType.USER,
+        target_identifier=None,
+        target_display=None,
+        integration=None,
+    ):
+        return create_alert_rule_trigger_action(
+            trigger, type, target_type, target_identifier, target_display, integration
         )

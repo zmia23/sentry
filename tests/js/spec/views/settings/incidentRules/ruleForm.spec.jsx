@@ -2,19 +2,13 @@ import {mountWithTheme} from 'sentry-test/enzyme';
 import React from 'react';
 
 import {initializeOrg} from 'sentry-test/initializeOrg';
-import {selectByLabel} from 'sentry-test/select';
 import {RuleFormContainer} from 'app/views/settings/incidentRules/ruleForm';
 
 describe('Incident Rules Form', function() {
   const {organization, project, routerContext} = initializeOrg();
   const createWrapper = props =>
     mountWithTheme(
-      <RuleFormContainer
-        organization={organization}
-        orgId={organization.slug}
-        projects={[project, TestStubs.Project({slug: 'project-2', id: '3'})]}
-        {...props}
-      />,
+      <RuleFormContainer organization={organization} project={project} {...props} />,
       routerContext
     );
 
@@ -38,38 +32,16 @@ describe('Incident Rules Form', function() {
     /**
      * Note this isn't necessarily the desired behavior, as it is just documenting the behavior
      */
-    it('keeps state of projects and excluded projects when toggling "Include all projects"', async function() {
-      const wrapper = createWrapper();
-
-      selectByLabel(wrapper, 'project-slug', {name: 'projects'});
-
-      // Toggle include all projects to on
-      wrapper.find('button#includeAllProjects').simulate('click');
-
-      // Exclude 2nd project
-      selectByLabel(wrapper, 'project-2', {name: 'excludedProjects'});
-
-      // Toggle back to not include all projects
-      wrapper.find('button#includeAllProjects').simulate('click');
-
-      // Select field should have project-slug selected
-      expect(
-        wrapper
-          .find('SelectField[name="projects"] .Select-value-label')
-          .text()
-          .trim()
-      ).toBe('project-slug');
-
-      // Toggle back include all projects
-      wrapper.find('button#includeAllProjects').simulate('click');
-
-      // Select field should have project-slug selected
-      expect(
-        wrapper
-          .find('SelectField[name="excludedProjects"] .Select-value-label')
-          .text()
-          .trim()
-      ).toBe('project-2');
+    it('creates a rule', async function() {
+      const wrapper = createWrapper({
+        rule: {
+          aggregations: [0],
+          query: '',
+          projects: [project.slug],
+          timeWindow: 60,
+          triggers: [],
+        },
+      });
 
       // Enter in name so we can submit
       wrapper
@@ -82,11 +54,6 @@ describe('Incident Rules Form', function() {
         expect.objectContaining({
           data: expect.objectContaining({
             name: 'Incident Rule',
-
-            // Note, backend handles this when ideally `includeAllProjects: true` should only send excludedProjects,
-            // and `includeAllProjects: false` send `projects`
-            includeAllProjects: true,
-            excludedProjects: ['project-2'],
             projects: ['project-slug'],
           }),
         })
@@ -106,59 +73,27 @@ describe('Incident Rules Form', function() {
       });
     });
 
-    it('keeps state of projects and excluded projects when toggling "Include all projects"', async function() {
+    it('edits metric', async function() {
       const wrapper = createWrapper({
         incidentRuleId: rule.id,
-        initialData: rule,
-        saveOnBlur: true,
+        rule,
       });
 
-      selectByLabel(wrapper, 'project-slug', {name: 'projects'});
+      wrapper
+        .find('input[name="name"]')
+        .simulate('change', {target: {value: 'new name'}});
+
+      wrapper.find('form').simulate('submit');
 
       expect(editRule).toHaveBeenLastCalledWith(
         expect.anything(),
         expect.objectContaining({
-          data: {
-            projects: ['project-slug'],
-          },
+          data: expect.objectContaining({
+            name: 'new name',
+          }),
         })
       );
       editRule.mockReset();
-
-      // Toggle include all projects to on
-      wrapper.find('button#includeAllProjects').simulate('click');
-      expect(editRule).toHaveBeenLastCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          data: {
-            includeAllProjects: true,
-          },
-        })
-      );
-      editRule.mockReset();
-
-      // Exclude 2nd project
-      selectByLabel(wrapper, 'project-2', {name: 'excludedProjects'});
-      expect(editRule).toHaveBeenLastCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          data: {
-            excludedProjects: ['project-2'],
-          },
-        })
-      );
-      editRule.mockReset();
-
-      // Toggle back to not include all projects
-      wrapper.find('button#includeAllProjects').simulate('click');
-      expect(editRule).toHaveBeenLastCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          data: {
-            includeAllProjects: false,
-          },
-        })
-      );
     });
   });
 });

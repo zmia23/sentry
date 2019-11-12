@@ -16,6 +16,8 @@ export type NewQuery = {
   start?: string;
   end?: string;
   environment?: Readonly<string[]>;
+  tags?: Readonly<string[]>;
+  yAxis?: string;
 };
 
 export type SavedQuery = NewQuery & {
@@ -102,6 +104,7 @@ const DiscoverSavedQueriesStore = Reflux.createStore({
     this.state = {
       ...this.state,
       savedQueries: [...this.state.savedQueries, query],
+      isLoading: false,
     };
     this.trigger(this.state);
   },
@@ -118,6 +121,7 @@ const DiscoverSavedQueriesStore = Reflux.createStore({
     this.state = {
       ...this.state,
       savedQueries,
+      isLoading: false,
     };
     this.trigger(this.state);
   },
@@ -127,6 +131,7 @@ const DiscoverSavedQueriesStore = Reflux.createStore({
     this.state = {
       ...this.state,
       savedQueries,
+      isLoading: false,
     };
     this.trigger(this.state);
   },

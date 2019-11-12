@@ -58,6 +58,8 @@ export type Team = {
   isMember: boolean;
 };
 
+export type TeamWithProjects = Team & {projects: Project[]};
+
 // This type is incomplete
 export type EventMetadata = {
   value?: string;
@@ -163,8 +165,24 @@ export type EventsStats = {
   totals?: {count: number};
 };
 
-export type User = {
+// Avatars are a more primitive version of User.
+export type AvatarUser = {
+  id: string;
+  name: string;
   username: string;
+  email: string;
+  avatarUrl: string;
+  avatar: {
+    avatarUuid: string | null;
+    avatarType: 'letter_avatar' | 'upload';
+  };
+  ip_address: string;
+  options?: {
+    avatarType: string;
+  };
+};
+
+export type User = AvatarUser & {
   lastLogin: string;
   isSuperuser: boolean;
   emails: {
@@ -176,12 +194,9 @@ export type User = {
   lastActive: string;
   isStaff: boolean;
   identities: any[];
-  id: string;
   isActive: boolean;
   has2fa: boolean;
   canReset2fa: boolean;
-  name: string;
-  avatarUrl: string;
   authenticators: Authenticator[];
   dateJoined: string;
   options: {
@@ -189,13 +204,11 @@ export type User = {
     stacktraceOrder: number;
     language: string;
     clock24Hours: boolean;
+    avatarType: string;
   };
   flags: {newsletter_consent_prompt: boolean};
-  avatar: {avatarUuid: string | null; avatarType: 'letter_avatar' | 'upload'};
-  ip_address: string;
   hasPasswordAuth: boolean;
   permissions: Set<string>;
-  email: string;
 };
 
 export type CommitAuthor = {
@@ -239,8 +252,8 @@ export type GlobalSelection = {
   environments: string[];
   forceUrlSync?: boolean;
   datetime: {
-    start: string;
-    end: string;
+    start: Date | null;
+    end: Date | null;
     period: string;
     utc: boolean;
   };
@@ -363,6 +376,7 @@ export type Member = {
   dateCreated: string;
   inviteStatus: 'approved' | 'requested_to_be_invited' | 'requested_to_join';
   inviterName: string | null;
+  teams: string[];
 };
 
 export type AccessRequest = {
@@ -380,6 +394,7 @@ export type EventViewv1 = {
     query?: string;
   };
   tags: string[];
+  statsPeriod?: string;
 };
 
 export type Repository = {
@@ -486,27 +501,16 @@ export type SentryAppInstallation = {
   code?: string;
 };
 
-export type SentryAppWebhookError = {
+export type SentryAppWebhookRequest = {
   webhookUrl: string;
-  app: {
-    uuid: string;
-    slug: string;
-    name: string;
-  };
-  request: {
-    body: object;
-    headers: object;
-  };
+  sentryAppSlug: string;
   eventType: string;
   date: string;
-  organization: {
+  organization?: {
     slug: string;
     name: string;
   };
-  response: {
-    body: string;
-    statusCode: number;
-  };
+  responseCode: number;
 };
 
 export type PermissionValue = 'no-access' | 'read' | 'write' | 'admin';
@@ -534,6 +538,18 @@ export type InternalAppApiToken = BaseApiToken & {
   application: null;
   token: string;
   refreshToken: string;
+};
+
+export type ApiApplication = {
+  allowedOrigins: string[];
+  clientID: string;
+  clientSecret: string | null;
+  homepageUrl: string | null;
+  id: string;
+  name: string;
+  privacyUrl: string | null;
+  redirectUris: string[];
+  termsUrl: string | null;
 };
 
 export type UserReport = {
@@ -577,6 +593,4 @@ export type RouterProps = {
 export type ActiveExperiments = {
   ImprovedInvitesExperiment: 'none' | 'all' | 'join_request' | 'invite_request';
   TrialUpgradeV2Experiment: 'upgrade' | 'trial' | -1;
-  JoinRequestExperiment: 0 | 1 | -1;
-  InviteRequestExperiment: 0 | 1 | -1;
 };

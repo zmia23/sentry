@@ -14,6 +14,15 @@ PIP_OPTS := --no-use-pep517 --disable-pip-version-check
 WEBPACK := NODE_ENV=production ./bin/yarn webpack
 YARN := ./bin/yarn
 
+DROPDB := $(shell command -v dropdb 2> /dev/null)
+ifndef DROPDB
+	DROPDB = docker exec sentry_postgres dropdb
+endif
+CREATEDB := $(shell command -v createdb 2> /dev/null)
+ifndef CREATEDB
+	CREATEDB = docker exec sentry_postgres createdb
+endif
+
 bootstrap: develop init-config run-dependent-services create-db apply-migrations
 
 develop: ensure-venv setup-git develop-only
@@ -32,13 +41,11 @@ build: locale
 
 drop-db:
 	@echo "--> Dropping existing 'sentry' database"
-	docker exec $$(docker ps --filter 'name=sentry_postgres' --format '{{.ID}}') \
-		dropdb -U postgres sentry || true
+	$(DROPDB) -h 127.0.0.1 -U postgres sentry || true
 
 create-db:
 	@echo "--> Creating 'sentry' database"
-	docker exec $$(docker ps --filter 'name=sentry_postgres' --format '{{.ID}}') \
-		createdb -U postgres -E utf-8 sentry || true
+	$(CREATEDB) -h 127.0.0.1 -U postgres -E utf-8 sentry || true
 
 apply-migrations:
 	@echo "--> Applying migrations"
@@ -94,7 +101,7 @@ install-yarn-pkgs:
 
 install-sentry-dev:
 	@echo "--> Installing Sentry (for development)"
-	$(PIP) install -e ".[dev,optional]" $(PIP_OPTS)
+	$(PIP) install -e ".[dev]" $(PIP_OPTS)
 
 build-js-po: node-version-check
 	mkdir -p build
@@ -180,6 +187,13 @@ endif
 
 	@echo ""
 
+test-plugins:
+	@echo "--> Building static assets"
+	@$(WEBPACK) --display errors-only
+	@echo "--> Running plugin tests"
+	py.test tests/sentry_plugins -vv --cov . --cov-report="xml:.artifacts/plugins.coverage.xml" --junit-xml=".artifacts/plugins.junit.xml"
+	@echo ""
+
 lint: lint-python lint-js
 
 # configuration for flake8 can be found in setup.cfg
@@ -230,6 +244,7 @@ travis-test-snuba: test-snuba
 travis-test-symbolicator: test-symbolicator
 travis-test-js: test-js
 travis-test-cli: test-cli
+travis-test-plugins: test-plugins
 travis-test-dist:
 	# NOTE: We quiet down output here to workaround an issue in travis that
 	# causes the build to fail with a EAGAIN when writing a large amount of
@@ -253,3 +268,4 @@ travis-scan-js: travis-noop
 travis-scan-cli: travis-noop
 travis-scan-dist: travis-noop
 travis-scan-lint: scan-python
+travis-scan-plugins: travis-noop
