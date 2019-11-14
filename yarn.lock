@@ -2385,6 +2385,11 @@
   dependencies:
     "@types/react" "*"
 
+"@types/crypto-js@^3.1.43":
+  version "3.1.43"
+  resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-3.1.43.tgz#b859347d6289ba13e347c335a4c9efa63337a748"
+  integrity sha512-EHe/YKctU3IYNBsDmSOPX/7jLHPRlx8WaiDKSY9JCTnJ8XJeM4c0ZJvx+9Gxmr2s2ihI92R+3U/gNL1sq5oRuQ==
+
 "@types/echarts@^4.1.11":
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/@types/echarts/-/echarts-4.1.11.tgz#32e9ad4e390f28e44cb29121de07aa0e357e04c0"

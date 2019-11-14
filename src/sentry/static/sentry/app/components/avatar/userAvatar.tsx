@@ -15,7 +15,7 @@ function isRenderFunc(func: any): func is RenderTooltipFunc {
 
 const defaultProps = {
   // Default gravatar to false in order to support transparent avatars
-  // Avatar falls through to letjer avatars if a remote image fails to load,
+  // Avatar falls through to letter avatars if a remote image fails to load,
   // however gravatar sends back a transparent image when it does not find a gravatar,
   // so there's little we have to control whether we need to fallback to letter avatar
   gravatar: false,
@@ -29,57 +29,54 @@ type Props = {
 } & Partial<DefaultProps> &
   BaseAvatar['props'];
 
-class UserAvatar extends React.Component<Props> {
-  static propTypes: any = {
-    user: SentryTypes.User,
-    gravatar: PropTypes.bool,
-    renderTooltip: PropTypes.func,
-    ...BaseAvatar.propTypes,
-  };
-
-  static defaultProps = defaultProps;
-
-  getType = (user: AvatarUser, gravatar: boolean | undefined) => {
-    if (user.avatar) {
-      return user.avatar.avatarType;
-    }
-    if (user.options && user.options.avatarType) {
-      return user.options.avatarType;
-    }
-
-    return user.email && gravatar ? 'gravatar' : 'letter_avatar';
-  };
-
-  render() {
-    const {user, gravatar, renderTooltip, ...props} = this.props;
-
-    if (!user) {
-      return null;
-    }
-
-    const type = this.getType(user, gravatar);
-    let tooltip: React.ReactNode = null;
-    if (isRenderFunc(renderTooltip)) {
-      tooltip = renderTooltip(user);
-    } else if (props.tooltip) {
-      tooltip = props.tooltip;
-    } else {
-      tooltip = userDisplayName(user);
-    }
-
-    return (
-      <BaseAvatar
-        round
-        {...props}
-        type={type}
-        uploadPath="avatar"
-        uploadId={user.avatar ? user.avatar.avatarUuid || '' : ''}
-        gravatarId={user && user.email && user.email.toLowerCase()}
-        letterId={user.email || user.username || user.id || user.ip_address}
-        tooltip={tooltip}
-        title={user.name || user.email || user.username || ''}
-      />
-    );
+function getType(user: AvatarUser, gravatar: boolean | undefined) {
+  if (user.avatar) {
+    return user.avatar.avatarType;
   }
+  if (user.options && user.options.avatarType) {
+    return user.options.avatarType;
+  }
+
+  return user.email && gravatar ? 'gravatar' : 'letter_avatar';
 }
+
+const UserAvatar: React.FC<Props> = ({user, gravatar, renderTooltip, ...props}) => {
+  if (!user) {
+    return null;
+  }
+
+  const type = getType(user, gravatar);
+  let tooltip: React.ReactNode = null;
+  if (isRenderFunc(renderTooltip)) {
+    tooltip = renderTooltip(user);
+  } else if (props.tooltip) {
+    tooltip = props.tooltip;
+  } else {
+    tooltip = userDisplayName(user);
+  }
+
+  return (
+    <BaseAvatar
+      round
+      {...props}
+      type={type}
+      uploadPath="avatar"
+      uploadId={user.avatar ? user.avatar.avatarUuid || '' : ''}
+      gravatarId={user && user.email && user.email.toLowerCase()}
+      letterId={user.email || user.username || user.id || user.ip_address}
+      tooltip={tooltip}
+      title={user.name || user.email || user.username || ''}
+    />
+  );
+};
+
+UserAvatar.propTypes = {
+  user: SentryTypes.User,
+  gravatar: PropTypes.bool,
+  renderTooltip: PropTypes.func,
+  ...BaseAvatar.propTypes,
+} as any;
+
+UserAvatar.defaultProps = defaultProps;
+
 export default UserAvatar;
