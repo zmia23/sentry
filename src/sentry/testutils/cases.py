@@ -294,7 +294,7 @@ class BaseTestCase(Fixtures, Exam):
     def _postEventAttachmentWithHeader(self, attachment, **extra):
         path = reverse(
             "sentry-api-event-attachment",
-            kwargs={"project_id": self.project.id, "event_id": self.event.id},
+            kwargs={"project_id": self.project.id, "event_id": self.event.event_id},
         )
 
         key = self.projectkey.public_key
@@ -663,19 +663,6 @@ class PluginTestCase(TestCase):
 
     def assertAppInstalled(self, name, path):
         for ep in iter_entry_points("sentry.apps"):
-            if ep.name == name:
-                ep_path = ep.module_name
-                if ep_path == path:
-                    return
-                self.fail(
-                    "Found app in entry_points, but wrong class. Got %r, expected %r"
-                    % (ep_path, path)
-                )
-        self.fail("Missing app from entry_points: %r" % (name,))
-
-    # TODO (Steve): remove function
-    def assertTestOnlyAppInstalled(self, name, path):
-        for ep in iter_entry_points("sentry.test_only_apps"):
             if ep.name == name:
                 ep_path = ep.module_name
                 if ep_path == path:
