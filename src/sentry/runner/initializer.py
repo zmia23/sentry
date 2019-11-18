@@ -27,6 +27,7 @@ def register_plugins(settings, test_plugins=False):
 
     for entry_point in entry_points:
         for ep in iter_entry_points(entry_point):
+            print("ep", ep)
             try:
                 plugin = ep.load()
             except Exception:
