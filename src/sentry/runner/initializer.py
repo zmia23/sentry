@@ -37,9 +37,11 @@ def register_plugins(settings, test_plugins=False):
                     "Failed to load plugin %r:\n%s" % (ep.name, traceback.format_exc()), err=True
                 )
             else:
+                print("register", plugin)
                 plugins.register(plugin)
 
     for plugin in plugins.all(version=None):
+        print("plugins.all", plugin)
         init_plugin(plugin)
 
     from sentry import integrations
