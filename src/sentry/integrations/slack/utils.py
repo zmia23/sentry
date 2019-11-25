@@ -30,6 +30,7 @@ logger = logging.getLogger("sentry.integrations.slack")
 
 # Attachment colors used for issues with no actions take
 ACTIONED_ISSUE_COLOR = "#EDEEEF"
+RESOLVED_COLOR = "#0cbd4d"
 LEVEL_TO_COLOR = {
     "debug": "#fbe14f",
     "info": "#2788ce",
@@ -280,7 +281,13 @@ def build_incident_attachment(incident):
     logo_url = absolute_uri(get_asset_url("sentry", "images/sentry-email-avatar.png"))
 
     aggregates = get_incident_aggregates(incident)
-    status = "Closed" if incident.status == IncidentStatus.CLOSED.value else "Open"
+
+    if incident.status == IncidentStatus.CLOSED.value:
+        status = "Resolved"
+        color = RESOLVED_COLOR
+    else:
+        status = "Fired"
+        color = LEVEL_TO_COLOR["error"]
 
     fields = [
         {"title": "Status", "value": status, "short": True},
@@ -310,7 +317,7 @@ def build_incident_attachment(incident):
         "footer_icon": logo_url,
         "footer": "Sentry Incident",
         "ts": to_timestamp(ts),
-        "color": LEVEL_TO_COLOR["error"],
+        "color": color,
         "actions": [],
     }
 
@@ -324,6 +331,10 @@ LIST_TYPES = [
 ]
 
 
+def strip_channel_name(name):
+    return name.lstrip(strip_channel_chars)
+
+
 def get_channel_id(organization, integration_id, name):
     """
     Fetches the internal slack id of a channel.
@@ -332,7 +343,7 @@ def get_channel_id(organization, integration_id, name):
     :param name: The name of the channel
     :return:
     """
-    name = name.lstrip(strip_channel_chars)
+    name = strip_channel_name(name)
     try:
         integration = Integration.objects.get(
             provider="slack", organizations=organization, id=integration_id
@@ -366,3 +377,20 @@ def get_channel_id(organization, integration_id, name):
             item_id = {c["name"]: c["id"] for c in items[result_name]}.get(name)
             if item_id:
                 return prefix, item_id
+
+
+def send_incident_alert_notification(integration, incident, channel):
+    attachment = build_incident_attachment(incident)
+
+    payload = {
+        "token": integration.metadata["access_token"],
+        "channel": channel,
+        "attachments": json.dumps([attachment]),
+    }
+
+    session = http.build_session()
+    resp = session.post("https://slack.com/api/chat.postMessage", data=payload, timeout=5)
+    resp.raise_for_status()
+    resp = resp.json()
+    if not resp.get("ok"):
+        logger.info("rule.fail.slack_post", extra={"error": resp.get("error")})
