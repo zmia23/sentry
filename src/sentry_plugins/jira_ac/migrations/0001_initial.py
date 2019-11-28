@@ -44,6 +44,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         to="sentry.Organization",
                         null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
                     ),
                 ),
             ],

@@ -16,14 +16,14 @@ class ReleaseFile(Model):
     """
     __core__ = False
 
-    organization = FlexibleForeignKey("sentry.Organization")
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
     # DEPRECATED
     project_id = BoundedPositiveIntegerField(null=True)
-    release = FlexibleForeignKey("sentry.Release")
-    file = FlexibleForeignKey("sentry.File")
+    release = FlexibleForeignKey("sentry.Release", on_delete=models.CASCADE)
+    file = FlexibleForeignKey("sentry.File", on_delete=models.CASCADE)
     ident = models.CharField(max_length=40)
     name = models.TextField()
-    dist = FlexibleForeignKey("sentry.Distribution", null=True)
+    dist = FlexibleForeignKey("sentry.Distribution", null=True, on_delete=models.CASCADE)
 
     __repr__ = sane_repr("release", "ident")
 

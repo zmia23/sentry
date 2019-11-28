@@ -68,7 +68,7 @@ class WidgetDataSource(Model):
 
     __core__ = True
 
-    widget = FlexibleForeignKey("sentry.Widget")
+    widget = FlexibleForeignKey("sentry.Widget", on_delete=models.CASCADE)
     type = BoundedPositiveIntegerField(choices=WidgetDataSourceTypes.as_choices())
     name = models.CharField(max_length=255)
     data = JSONField(default={})  # i.e. saved discover query
@@ -93,7 +93,7 @@ class Widget(Model):
 
     __core__ = True
 
-    dashboard = FlexibleForeignKey("sentry.Dashboard")
+    dashboard = FlexibleForeignKey("sentry.Dashboard", on_delete=models.CASCADE)
     order = BoundedPositiveIntegerField()
     title = models.CharField(max_length=255)
     display_type = BoundedPositiveIntegerField(choices=WidgetDisplayTypes.as_choices())

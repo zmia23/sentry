@@ -11,8 +11,8 @@ from sentry.db.models import EncryptedJsonField, FlexibleForeignKey, Model, sane
 class AuthIdentity(Model):
     __core__ = True
 
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL)
-    auth_provider = FlexibleForeignKey("sentry.AuthProvider")
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    auth_provider = FlexibleForeignKey("sentry.AuthProvider", on_delete=models.CASCADE)
     ident = models.CharField(max_length=128)
     data = EncryptedJsonField()
     last_verified = models.DateTimeField(default=timezone.now)

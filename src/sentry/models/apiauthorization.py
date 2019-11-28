@@ -18,8 +18,8 @@ class ApiAuthorization(Model, HasApiScopes):
     __core__ = True
 
     # users can generate tokens without being application-bound
-    application = FlexibleForeignKey("sentry.ApiApplication", null=True)
-    user = FlexibleForeignKey("sentry.User")
+    application = FlexibleForeignKey("sentry.ApiApplication", null=True, on_delete=models.CASCADE)
+    user = FlexibleForeignKey("sentry.User", on_delete=models.CASCADE)
     date_added = models.DateTimeField(default=timezone.now)
 
     class Meta:

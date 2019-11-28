@@ -28,7 +28,7 @@ class Rule(Model):
     DEFAULT_ACTION_MATCH = "all"  # any, all
     DEFAULT_FREQUENCY = 30  # minutes
 
-    project = FlexibleForeignKey("sentry.Project")
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
     environment_id = BoundedPositiveIntegerField(null=True)
     label = models.CharField(max_length=64)
     data = GzippedDictField()

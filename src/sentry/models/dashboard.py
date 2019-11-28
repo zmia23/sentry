@@ -15,8 +15,8 @@ class Dashboard(Model):
     __core__ = True
 
     title = models.CharField(max_length=255)
-    created_by = FlexibleForeignKey("sentry.User")
-    organization = FlexibleForeignKey("sentry.Organization")
+    created_by = FlexibleForeignKey("sentry.User", on_delete=models.CASCADE)
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
     date_added = models.DateTimeField(default=timezone.now)
     status = BoundedPositiveIntegerField(
         default=ObjectStatus.VISIBLE, choices=ObjectStatus.as_choices()

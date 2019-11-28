@@ -19,8 +19,10 @@ from sentry.utils.retries import TimedRetryPolicy
 class IncidentProject(Model):
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project", db_index=False, db_constraint=False)
-    incident = FlexibleForeignKey("sentry.Incident")
+    project = FlexibleForeignKey(
+        "sentry.Project", db_index=False, db_constraint=False, on_delete=models.CASCADE
+    )
+    incident = FlexibleForeignKey("sentry.Incident", on_delete=models.CASCADE)
 
     class Meta:
         app_label = "sentry"
@@ -31,8 +33,10 @@ class IncidentProject(Model):
 class IncidentGroup(Model):
     __core__ = False
 
-    group = FlexibleForeignKey("sentry.Group", db_index=False, db_constraint=False)
-    incident = FlexibleForeignKey("sentry.Incident")
+    group = FlexibleForeignKey(
+        "sentry.Group", db_index=False, db_constraint=False, on_delete=models.CASCADE
+    )
+    incident = FlexibleForeignKey("sentry.Incident", on_delete=models.CASCADE)
 
     class Meta:
         app_label = "sentry"
@@ -43,8 +47,8 @@ class IncidentGroup(Model):
 class IncidentSeen(Model):
     __core__ = False
 
-    incident = FlexibleForeignKey("sentry.Incident")
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, db_index=False)
+    incident = FlexibleForeignKey("sentry.Incident", on_delete=models.CASCADE)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, db_index=False, on_delete=models.CASCADE)
     last_seen = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -96,7 +100,7 @@ class Incident(Model):
 
     objects = IncidentManager()
 
-    organization = FlexibleForeignKey("sentry.Organization")
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
     projects = models.ManyToManyField(
         "sentry.Project", related_name="incidents", through=IncidentProject
     )
@@ -141,8 +145,8 @@ class Incident(Model):
 class IncidentSnapshot(Model):
     __core__ = True
 
-    incident = models.OneToOneField("sentry.Incident")
-    event_stats_snapshot = FlexibleForeignKey("sentry.TimeSeriesSnapshot")
+    incident = models.OneToOneField("sentry.Incident", on_delete=models.CASCADE)
+    event_stats_snapshot = FlexibleForeignKey("sentry.TimeSeriesSnapshot", on_delete=models.CASCADE)
     unique_users = models.IntegerField()
     total_events = models.IntegerField()
     date_added = models.DateTimeField(default=timezone.now)
@@ -185,13 +189,15 @@ class IncidentActivityType(Enum):
 class IncidentActivity(Model):
     __core__ = True
 
-    incident = FlexibleForeignKey("sentry.Incident")
-    user = FlexibleForeignKey("sentry.User", null=True)
+    incident = FlexibleForeignKey("sentry.Incident", on_delete=models.CASCADE)
+    user = FlexibleForeignKey("sentry.User", null=True, on_delete=models.CASCADE)
     type = models.IntegerField()
     value = models.TextField(null=True)
     previous_value = models.TextField(null=True)
     comment = models.TextField(null=True)
-    event_stats_snapshot = FlexibleForeignKey("sentry.TimeSeriesSnapshot", null=True)
+    event_stats_snapshot = FlexibleForeignKey(
+        "sentry.TimeSeriesSnapshot", null=True, on_delete=models.CASCADE
+    )
     date_added = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -202,8 +208,8 @@ class IncidentActivity(Model):
 class IncidentSubscription(Model):
     __core__ = True
 
-    incident = FlexibleForeignKey("sentry.Incident", db_index=False)
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL)
+    incident = FlexibleForeignKey("sentry.Incident", db_index=False, on_delete=models.CASCADE)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date_added = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -217,8 +223,8 @@ class IncidentSubscription(Model):
 class IncidentSuspectCommit(Model):
     __core__ = True
 
-    incident = FlexibleForeignKey("sentry.Incident", db_index=False)
-    commit = FlexibleForeignKey("sentry.Commit", db_constraint=False)
+    incident = FlexibleForeignKey("sentry.Incident", db_index=False, on_delete=models.CASCADE)
+    commit = FlexibleForeignKey("sentry.Commit", db_constraint=False, on_delete=models.CASCADE)
     order = models.SmallIntegerField()
 
     class Meta:
@@ -266,8 +272,10 @@ class AlertRuleManager(BaseManager):
 class AlertRuleQuerySubscription(Model):
     __core__ = True
 
-    query_subscription = FlexibleForeignKey("sentry.QuerySubscription", unique=True)
-    alert_rule = FlexibleForeignKey("sentry.AlertRule")
+    query_subscription = FlexibleForeignKey(
+        "sentry.QuerySubscription", unique=True, on_delete=models.CASCADE
+    )
+    alert_rule = FlexibleForeignKey("sentry.AlertRule", on_delete=models.CASCADE)
 
     class Meta:
         app_label = "sentry"
@@ -277,8 +285,8 @@ class AlertRuleQuerySubscription(Model):
 class AlertRuleExcludedProjects(Model):
     __core__ = True
 
-    alert_rule = FlexibleForeignKey("sentry.AlertRule", db_index=False)
-    project = FlexibleForeignKey("sentry.Project", db_constraint=False)
+    alert_rule = FlexibleForeignKey("sentry.AlertRule", db_index=False, on_delete=models.CASCADE)
+    project = FlexibleForeignKey("sentry.Project", db_constraint=False, on_delete=models.CASCADE)
     date_added = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -293,7 +301,9 @@ class AlertRule(Model):
     objects = AlertRuleManager()
     objects_with_deleted = BaseManager()
 
-    organization = FlexibleForeignKey("sentry.Organization", db_index=False, null=True)
+    organization = FlexibleForeignKey(
+        "sentry.Organization", db_index=False, null=True, on_delete=models.CASCADE
+    )
     query_subscriptions = models.ManyToManyField(
         "sentry.QuerySubscription", related_name="alert_rules", through=AlertRuleQuerySubscription
     )
@@ -329,8 +339,8 @@ class TriggerStatus(Enum):
 class IncidentTrigger(Model):
     __core__ = True
 
-    incident = FlexibleForeignKey("sentry.Incident", db_index=False)
-    alert_rule_trigger = FlexibleForeignKey("sentry.AlertRuleTrigger")
+    incident = FlexibleForeignKey("sentry.Incident", db_index=False, on_delete=models.CASCADE)
+    alert_rule_trigger = FlexibleForeignKey("sentry.AlertRuleTrigger", on_delete=models.CASCADE)
     status = models.SmallIntegerField()
     date_added = models.DateTimeField(default=timezone.now)
 
@@ -343,7 +353,7 @@ class IncidentTrigger(Model):
 class AlertRuleTrigger(Model):
     __core__ = True
 
-    alert_rule = FlexibleForeignKey("sentry.AlertRule")
+    alert_rule = FlexibleForeignKey("sentry.AlertRule", on_delete=models.CASCADE)
     label = models.TextField()
     threshold_type = models.SmallIntegerField()
     alert_threshold = models.IntegerField()
@@ -362,8 +372,10 @@ class AlertRuleTrigger(Model):
 class AlertRuleTriggerExclusion(Model):
     __core__ = True
 
-    alert_rule_trigger = FlexibleForeignKey("sentry.AlertRuleTrigger", related_name="exclusions")
-    query_subscription = FlexibleForeignKey("sentry.QuerySubscription")
+    alert_rule_trigger = FlexibleForeignKey(
+        "sentry.AlertRuleTrigger", related_name="exclusions", on_delete=models.CASCADE
+    )
+    query_subscription = FlexibleForeignKey("sentry.QuerySubscription", on_delete=models.CASCADE)
     date_added = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -402,8 +414,8 @@ class AlertRuleTriggerAction(Model):
         ["handler", "slug", "type", "supported_target_types", "integration_provider"],
     )
 
-    alert_rule_trigger = FlexibleForeignKey("sentry.AlertRuleTrigger")
-    integration = FlexibleForeignKey("sentry.Integration", null=True)
+    alert_rule_trigger = FlexibleForeignKey("sentry.AlertRuleTrigger", on_delete=models.CASCADE)
+    integration = FlexibleForeignKey("sentry.Integration", null=True, on_delete=models.CASCADE)
     type = models.SmallIntegerField()
     target_type = models.SmallIntegerField()
     # Identifier used to perform the action on a given target

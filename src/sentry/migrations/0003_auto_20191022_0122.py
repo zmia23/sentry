@@ -42,13 +42,13 @@ class Migration(migrations.Migration):
                 (
                     "alert_rule_trigger",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.AlertRuleTrigger"
+                        to="sentry.AlertRuleTrigger", on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
                 (
                     "integration",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.Integration", null=True
+                        to="sentry.Integration", null=True, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
             ],

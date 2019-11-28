@@ -19,8 +19,8 @@ class RecentSearch(Model):
 
     __core__ = True
 
-    organization = FlexibleForeignKey("sentry.Organization")
-    user = FlexibleForeignKey("sentry.User", db_index=False)
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
+    user = FlexibleForeignKey("sentry.User", db_index=False, on_delete=models.CASCADE)
     type = models.PositiveSmallIntegerField()
     query = models.TextField()
     query_hash = models.CharField(max_length=32)

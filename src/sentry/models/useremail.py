@@ -20,7 +20,9 @@ def default_validation_hash():
 class UserEmail(Model):
     __core__ = True
 
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, related_name="emails")
+    user = FlexibleForeignKey(
+        settings.AUTH_USER_MODEL, related_name="emails", on_delete=models.CASCADE
+    )
     email = models.EmailField(_("email address"), max_length=75)
     validation_hash = models.CharField(max_length=32, default=default_validation_hash)
     date_hash_added = models.DateTimeField(default=timezone.now)

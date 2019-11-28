@@ -2,6 +2,7 @@ from __future__ import absolute_import, print_function
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.db import models
 
 from sentry import roles
 from sentry.db.models import FlexibleForeignKey, Model, sane_repr
@@ -11,8 +12,8 @@ from sentry.utils.http import absolute_uri
 class OrganizationAccessRequest(Model):
     __core__ = True
 
-    team = FlexibleForeignKey("sentry.Team")
-    member = FlexibleForeignKey("sentry.OrganizationMember")
+    team = FlexibleForeignKey("sentry.Team", on_delete=models.CASCADE)
+    member = FlexibleForeignKey("sentry.OrganizationMember", on_delete=models.CASCADE)
 
     class Meta:
         app_label = "sentry"

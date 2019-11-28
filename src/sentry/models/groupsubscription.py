@@ -188,10 +188,14 @@ class GroupSubscription(Model):
 
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project", related_name="subscription_set")
-    group = FlexibleForeignKey("sentry.Group", related_name="subscription_set")
+    project = FlexibleForeignKey(
+        "sentry.Project", related_name="subscription_set", on_delete=models.CASCADE
+    )
+    group = FlexibleForeignKey(
+        "sentry.Group", related_name="subscription_set", on_delete=models.CASCADE
+    )
     # namespace related_name on User since we don't own the model
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
     reason = BoundedPositiveIntegerField(default=GroupSubscriptionReason.unknown)
     date_added = models.DateTimeField(default=timezone.now, null=True)

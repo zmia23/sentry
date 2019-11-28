@@ -20,7 +20,7 @@ READ_CACHE_DURATION = 3600
 class ProjectOwnership(Model):
     __core__ = True
 
-    project = FlexibleForeignKey("sentry.Project", unique=True)
+    project = FlexibleForeignKey("sentry.Project", unique=True, on_delete=models.CASCADE)
     raw = models.TextField(null=True)
     schema = JSONField(null=True)
     fallthrough = models.BooleanField(default=True)

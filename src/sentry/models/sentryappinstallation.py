@@ -17,8 +17,10 @@ def default_uuid():
 class SentryAppInstallationToken(Model):
     __core__ = False
 
-    api_token = FlexibleForeignKey("sentry.ApiToken")
-    sentry_app_installation = FlexibleForeignKey("sentry.SentryAppInstallation")
+    api_token = FlexibleForeignKey("sentry.ApiToken", on_delete=models.CASCADE)
+    sentry_app_installation = FlexibleForeignKey(
+        "sentry.SentryAppInstallation", on_delete=models.CASCADE
+    )
 
     class Meta:
         app_label = "sentry"
@@ -29,13 +31,15 @@ class SentryAppInstallationToken(Model):
 class SentryAppInstallation(ParanoidModel):
     __core__ = True
 
-    sentry_app = FlexibleForeignKey("sentry.SentryApp", related_name="installations")
+    sentry_app = FlexibleForeignKey(
+        "sentry.SentryApp", related_name="installations", on_delete=models.CASCADE
+    )
 
     # SentryApp's are installed and scoped to an Organization. They will have
     # access, defined by their scopes, to Teams, Projects, etc. under that
     # Organization, implicitly.
     organization = FlexibleForeignKey(
-        "sentry.Organization", related_name="sentry_app_installations"
+        "sentry.Organization", related_name="sentry_app_installations", on_delete=models.CASCADE
     )
 
     # Each installation has a Grant that the integration can exchange for an

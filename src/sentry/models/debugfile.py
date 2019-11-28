@@ -110,10 +110,10 @@ class ProjectDebugFileManager(BaseManager):
 class ProjectDebugFile(Model):
     __core__ = False
 
-    file = FlexibleForeignKey("sentry.File")
+    file = FlexibleForeignKey("sentry.File", on_delete=models.CASCADE)
     object_name = models.TextField()
     cpu_name = models.CharField(max_length=40)
-    project = FlexibleForeignKey("sentry.Project", null=True)
+    project = FlexibleForeignKey("sentry.Project", null=True, on_delete=models.CASCADE)
     debug_id = models.CharField(max_length=64, db_column="uuid")
     code_id = models.CharField(max_length=64, null=True)
     data = JSONField(null=True)

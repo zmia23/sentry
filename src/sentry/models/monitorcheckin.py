@@ -37,8 +37,8 @@ class MonitorCheckIn(Model):
 
     guid = UUIDField(unique=True, auto_add=True)
     project_id = BoundedPositiveIntegerField(db_index=True)
-    monitor = FlexibleForeignKey("sentry.Monitor")
-    location = FlexibleForeignKey("sentry.MonitorLocation", null=True)
+    monitor = FlexibleForeignKey("sentry.Monitor", on_delete=models.CASCADE)
+    location = FlexibleForeignKey("sentry.MonitorLocation", null=True, on_delete=models.CASCADE)
     status = BoundedPositiveIntegerField(default=0, choices=CheckInStatus.as_choices())
     config = EncryptedJsonField(default=dict)
     duration = BoundedPositiveIntegerField(null=True)

@@ -21,10 +21,10 @@ class GroupResolution(Model):
         pending = 0
         resolved = 1
 
-    group = FlexibleForeignKey("sentry.Group", unique=True)
+    group = FlexibleForeignKey("sentry.Group", unique=True, on_delete=models.CASCADE)
     # the release in which its suggested this was resolved
     # which allows us to indicate if it still happens in newer versions
-    release = FlexibleForeignKey("sentry.Release")
+    release = FlexibleForeignKey("sentry.Release", on_delete=models.CASCADE)
     type = BoundedPositiveIntegerField(
         choices=((Type.in_next_release, "in_next_release"), (Type.in_release, "in_release")),
         null=True,

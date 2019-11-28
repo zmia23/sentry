@@ -589,7 +589,7 @@ class Authenticator(BaseModel):
     __core__ = True
 
     id = BoundedAutoField(primary_key=True)
-    user = FlexibleForeignKey("sentry.User", db_index=True)
+    user = FlexibleForeignKey("sentry.User", db_index=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     last_used_at = models.DateTimeField(_("last used at"), null=True)
     type = BoundedPositiveIntegerField(choices=AUTHENTICATOR_CHOICES)

@@ -11,11 +11,17 @@ from sentry.db.models import BoundedPositiveIntegerField, FlexibleForeignKey, Mo
 class ReleaseEnvironment(Model):
     __core__ = False
 
-    organization = FlexibleForeignKey("sentry.Organization", db_index=True, db_constraint=False)
+    organization = FlexibleForeignKey(
+        "sentry.Organization", db_index=True, db_constraint=False, on_delete=models.CASCADE
+    )
     # DEPRECATED
     project_id = BoundedPositiveIntegerField(null=True)
-    release = FlexibleForeignKey("sentry.Release", db_index=True, db_constraint=False)
-    environment = FlexibleForeignKey("sentry.Environment", db_index=True, db_constraint=False)
+    release = FlexibleForeignKey(
+        "sentry.Release", db_index=True, db_constraint=False, on_delete=models.CASCADE
+    )
+    environment = FlexibleForeignKey(
+        "sentry.Environment", db_index=True, db_constraint=False, on_delete=models.CASCADE
+    )
     first_seen = models.DateTimeField(default=timezone.now)
     last_seen = models.DateTimeField(default=timezone.now, db_index=True)
 

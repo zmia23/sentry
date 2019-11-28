@@ -199,7 +199,7 @@ class FeatureAdoptionManager(BaseManager):
 class FeatureAdoption(Model):
     __core__ = False
 
-    organization = FlexibleForeignKey("sentry.Organization")
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
     feature_id = models.PositiveIntegerField(choices=[(f.id, f.name) for f in manager.all()])
     date_completed = models.DateTimeField(default=timezone.now)
     complete = models.BooleanField(default=False)

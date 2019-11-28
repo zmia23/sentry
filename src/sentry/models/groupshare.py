@@ -20,11 +20,11 @@ class GroupShare(Model):
 
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project")
-    group = FlexibleForeignKey("sentry.Group", unique=True)
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    group = FlexibleForeignKey("sentry.Group", unique=True, on_delete=models.CASCADE)
     uuid = models.CharField(max_length=32, unique=True, default=default_uuid)
     # Tracking the user that initiated the share.
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, null=True)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
     date_added = models.DateTimeField(default=timezone.now)
 
     objects = BaseManager()

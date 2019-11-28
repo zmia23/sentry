@@ -37,8 +37,8 @@ ProjectStatus = ObjectStatus
 class ProjectTeam(Model):
     __core__ = True
 
-    project = FlexibleForeignKey("sentry.Project")
-    team = FlexibleForeignKey("sentry.Team")
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    team = FlexibleForeignKey("sentry.Team", on_delete=models.CASCADE)
 
     class Meta:
         app_label = "sentry"
@@ -85,7 +85,7 @@ class Project(Model, PendingDeletionMixin):
     slug = models.SlugField(null=True)
     name = models.CharField(max_length=200)
     forced_color = models.CharField(max_length=6, null=True, blank=True)
-    organization = FlexibleForeignKey("sentry.Organization")
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
     teams = models.ManyToManyField("sentry.Team", related_name="teams", through=ProjectTeam)
     public = models.BooleanField(default=False)
     date_added = models.DateTimeField(default=timezone.now)

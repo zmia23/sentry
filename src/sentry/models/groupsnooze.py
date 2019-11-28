@@ -34,7 +34,7 @@ class GroupSnooze(Model):
 
     __core__ = False
 
-    group = FlexibleForeignKey("sentry.Group", unique=True)
+    group = FlexibleForeignKey("sentry.Group", unique=True, on_delete=models.CASCADE)
     until = models.DateTimeField(null=True)
     count = BoundedPositiveIntegerField(null=True)
     window = BoundedPositiveIntegerField(null=True)

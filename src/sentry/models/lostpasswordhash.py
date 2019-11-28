@@ -15,7 +15,7 @@ CHARACTERS = u"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 class LostPasswordHash(Model):
     __core__ = False
 
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, unique=True)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, unique=True, on_delete=models.CASCADE)
     hash = models.CharField(max_length=32)
     date_added = models.DateTimeField(default=timezone.now)
 

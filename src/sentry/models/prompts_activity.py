@@ -21,7 +21,7 @@ class PromptsActivity(Model):
     organization_id = BoundedPositiveIntegerField(db_index=True)
     # Not a Foreign Key because it's no longer safe to take out lock on Project table in Prod
     project_id = BoundedPositiveIntegerField(db_index=True)
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, null=False)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
     feature = models.CharField(max_length=64, null=False)
     # typically will include a dismissed/snoozed timestamp or something similar
     data = JSONField(default={})

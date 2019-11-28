@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from django.db import models
 from django.db.models import DateTimeField, DO_NOTHING
 from django.db.models.signals import post_delete
 from django.utils import timezone
@@ -11,8 +12,10 @@ from sentry.utils.cache import cache
 class GroupEnvironment(Model):
     __core__ = False
 
-    group = FlexibleForeignKey("sentry.Group", db_constraint=False)
-    environment = FlexibleForeignKey("sentry.Environment", db_constraint=False)
+    group = FlexibleForeignKey("sentry.Group", db_constraint=False, on_delete=models.CASCADE)
+    environment = FlexibleForeignKey(
+        "sentry.Environment", db_constraint=False, on_delete=models.CASCADE
+    )
     first_release = FlexibleForeignKey(
         "sentry.Release",
         null=True,

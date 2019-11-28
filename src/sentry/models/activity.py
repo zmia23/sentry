@@ -66,13 +66,13 @@ class Activity(Model):
         (UNMERGE_DESTINATION, "unmerge_destination"),
     )
 
-    project = FlexibleForeignKey("sentry.Project")
-    group = FlexibleForeignKey("sentry.Group", null=True)
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    group = FlexibleForeignKey("sentry.Group", null=True, on_delete=models.CASCADE)
     # index on (type, ident)
     type = BoundedPositiveIntegerField(choices=TYPE)
     ident = models.CharField(max_length=64, null=True)
     # if the user is not set, it's assumed to be the system
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, null=True)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
     datetime = models.DateTimeField(default=timezone.now)
     data = GzippedDictField(null=True)
 

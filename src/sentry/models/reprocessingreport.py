@@ -9,7 +9,7 @@ from sentry.db.models import BaseManager, Model, FlexibleForeignKey, sane_repr
 class ReprocessingReport(Model):
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project")
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
     event_id = models.CharField(max_length=32, null=True)
     datetime = models.DateTimeField(default=timezone.now)
 

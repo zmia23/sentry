@@ -94,7 +94,7 @@ class GroupMeta(Model):
 
     __core__ = False
 
-    group = FlexibleForeignKey("sentry.Group")
+    group = FlexibleForeignKey("sentry.Group", on_delete=models.CASCADE)
     key = models.CharField(max_length=64)
     value = models.TextField()
 

@@ -50,7 +50,7 @@ class Feature(object):
 class IntegrationFeature(Model):
     __core__ = False
 
-    sentry_app = FlexibleForeignKey("sentry.SentryApp")
+    sentry_app = FlexibleForeignKey("sentry.SentryApp", on_delete=models.CASCADE)
     user_description = models.TextField(null=True)
     feature = BoundedPositiveIntegerField(default=0, choices=Feature.as_choices())
     date_added = models.DateTimeField(default=timezone.now)

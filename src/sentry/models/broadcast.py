@@ -33,8 +33,8 @@ class Broadcast(Model):
 class BroadcastSeen(Model):
     __core__ = False
 
-    broadcast = FlexibleForeignKey("sentry.Broadcast")
-    user = FlexibleForeignKey("sentry.User")
+    broadcast = FlexibleForeignKey("sentry.Broadcast", on_delete=models.CASCADE)
+    user = FlexibleForeignKey("sentry.User", on_delete=models.CASCADE)
     date_seen = models.DateTimeField(default=timezone.now)
 
     class Meta:

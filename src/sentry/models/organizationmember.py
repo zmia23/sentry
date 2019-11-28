@@ -52,8 +52,8 @@ class OrganizationMemberTeam(BaseModel):
     __core__ = True
 
     id = BoundedAutoField(primary_key=True)
-    team = FlexibleForeignKey("sentry.Team")
-    organizationmember = FlexibleForeignKey("sentry.OrganizationMember")
+    team = FlexibleForeignKey("sentry.Team", on_delete=models.CASCADE)
+    organizationmember = FlexibleForeignKey("sentry.OrganizationMember", on_delete=models.CASCADE)
     # an inactive membership simply removes the team from the default list
     # but still allows them to re-join without request
     is_active = models.BooleanField(default=True)
@@ -85,10 +85,16 @@ class OrganizationMember(Model):
 
     __core__ = True
 
-    organization = FlexibleForeignKey("sentry.Organization", related_name="member_set")
+    organization = FlexibleForeignKey(
+        "sentry.Organization", related_name="member_set", on_delete=models.CASCADE
+    )
 
     user = FlexibleForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, related_name="sentry_orgmember_set"
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        related_name="sentry_orgmember_set",
+        on_delete=models.CASCADE,
     )
     email = models.EmailField(null=True, blank=True, max_length=75)
     role = models.CharField(max_length=32, default=roles.get_default().id)
@@ -103,7 +109,11 @@ class OrganizationMember(Model):
         "sentry.Team", blank=True, through="sentry.OrganizationMemberTeam"
     )
     inviter = FlexibleForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, related_name="sentry_inviter_set"
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        related_name="sentry_inviter_set",
+        on_delete=models.CASCADE,
     )
     invite_status = models.PositiveSmallIntegerField(
         choices=(

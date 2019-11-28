@@ -101,15 +101,17 @@ class AuditLogEntryEvent(object):
 class AuditLogEntry(Model):
     __core__ = False
 
-    organization = FlexibleForeignKey("sentry.Organization")
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
     actor_label = models.CharField(max_length=64, null=True, blank=True)
     # if the entry was created via a user
-    actor = FlexibleForeignKey("sentry.User", related_name="audit_actors", null=True, blank=True)
+    actor = FlexibleForeignKey(
+        "sentry.User", related_name="audit_actors", null=True, blank=True, on_delete=models.CASCADE
+    )
     # if the entry was created via an api key
-    actor_key = FlexibleForeignKey("sentry.ApiKey", null=True, blank=True)
+    actor_key = FlexibleForeignKey("sentry.ApiKey", null=True, blank=True, on_delete=models.CASCADE)
     target_object = BoundedPositiveIntegerField(null=True)
     target_user = FlexibleForeignKey(
-        "sentry.User", null=True, blank=True, related_name="audit_targets"
+        "sentry.User", null=True, blank=True, related_name="audit_targets", on_delete=models.CASCADE
     )
     # TODO(dcramer): we want to compile this mapping into JSX for the UI
     event = BoundedPositiveIntegerField(

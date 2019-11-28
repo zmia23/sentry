@@ -12,7 +12,7 @@ class EventAttachment(Model):
     project_id = BoundedBigIntegerField()
     group_id = BoundedBigIntegerField(null=True, db_index=True)
     event_id = models.CharField(max_length=32, db_index=True)
-    file = FlexibleForeignKey("sentry.File")
+    file = FlexibleForeignKey("sentry.File", on_delete=models.CASCADE)
     name = models.TextField()
     date_added = models.DateTimeField(default=timezone.now, db_index=True)
 

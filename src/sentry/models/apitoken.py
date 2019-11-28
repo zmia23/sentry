@@ -25,8 +25,8 @@ class ApiToken(Model, HasApiScopes):
     __core__ = True
 
     # users can generate tokens without being application-bound
-    application = FlexibleForeignKey("sentry.ApiApplication", null=True)
-    user = FlexibleForeignKey("sentry.User")
+    application = FlexibleForeignKey("sentry.ApiApplication", null=True, on_delete=models.CASCADE)
+    user = FlexibleForeignKey("sentry.User", on_delete=models.CASCADE)
     token = models.CharField(max_length=64, unique=True, default=generate_token)
     refresh_token = models.CharField(max_length=64, unique=True, null=True, default=generate_token)
     expires_at = models.DateTimeField(null=True, default=default_expiration)

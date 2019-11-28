@@ -27,7 +27,9 @@ class ApiKeyStatus(object):
 class ApiKey(Model):
     __core__ = True
 
-    organization = FlexibleForeignKey("sentry.Organization", related_name="key_set")
+    organization = FlexibleForeignKey(
+        "sentry.Organization", related_name="key_set", on_delete=models.CASCADE
+    )
     label = models.CharField(max_length=64, blank=True, default="Default")
     key = models.CharField(max_length=32, unique=True)
     scopes = BitField(

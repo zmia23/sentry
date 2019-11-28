@@ -14,9 +14,9 @@ class GroupSeen(Model):
 
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project")
-    group = FlexibleForeignKey("sentry.Group")
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, db_index=False)
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    group = FlexibleForeignKey("sentry.Group", on_delete=models.CASCADE)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, db_index=False, on_delete=models.CASCADE)
     last_seen = models.DateTimeField(default=timezone.now)
 
     class Meta:

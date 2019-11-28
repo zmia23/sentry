@@ -17,7 +17,9 @@ class TeamAvatar(AvatarBase):
 
     FILE_TYPE = "avatar.file"
 
-    team = FlexibleForeignKey("sentry.Team", unique=True, related_name="avatar")
+    team = FlexibleForeignKey(
+        "sentry.Team", unique=True, related_name="avatar", on_delete=models.CASCADE
+    )
     avatar_type = models.PositiveSmallIntegerField(default=0, choices=AVATAR_TYPES)
 
     class Meta:

@@ -310,7 +310,9 @@ class File(Model):
 
     # <Legacy fields>
     # Remove in 8.1
-    blob = FlexibleForeignKey("sentry.FileBlob", null=True, related_name="legacy_blob")
+    blob = FlexibleForeignKey(
+        "sentry.FileBlob", null=True, related_name="legacy_blob", on_delete=models.CASCADE
+    )
     path = models.TextField(null=True)
 
     # </Legacy fields>
@@ -441,8 +443,8 @@ class File(Model):
 class FileBlobIndex(Model):
     __core__ = False
 
-    file = FlexibleForeignKey("sentry.File")
-    blob = FlexibleForeignKey("sentry.FileBlob")
+    file = FlexibleForeignKey("sentry.File", on_delete=models.CASCADE)
+    blob = FlexibleForeignKey("sentry.FileBlob", on_delete=models.CASCADE)
     offset = BoundedPositiveIntegerField()
 
     class Meta:
@@ -601,8 +603,8 @@ class ChunkedFileBlobIndexWrapper(object):
 class FileBlobOwner(Model):
     __core__ = False
 
-    blob = FlexibleForeignKey("sentry.FileBlob")
-    organization = FlexibleForeignKey("sentry.Organization")
+    blob = FlexibleForeignKey("sentry.FileBlob", on_delete=models.CASCADE)
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
 
     class Meta:
         app_label = "sentry"

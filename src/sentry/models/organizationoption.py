@@ -103,7 +103,7 @@ class OrganizationOption(Model):
 
     __core__ = True
 
-    organization = FlexibleForeignKey("sentry.Organization")
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
     key = models.CharField(max_length=64)
     value = EncryptedPickledObjectField()
 

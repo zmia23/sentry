@@ -10,8 +10,8 @@ class ProjectRedirect(Model):
     __core__ = True
 
     redirect_slug = models.SlugField(db_index=True)
-    project = FlexibleForeignKey("sentry.Project")
-    organization = FlexibleForeignKey("sentry.Organization")
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
     date_added = models.DateTimeField(default=timezone.now)
 
     class Meta:

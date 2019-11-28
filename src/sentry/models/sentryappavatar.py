@@ -17,7 +17,9 @@ class SentryAppAvatar(AvatarBase):
 
     FILE_TYPE = "avatar.file"
 
-    sentry_app = FlexibleForeignKey("sentry.SentryApp", unique=True, related_name="avatar")
+    sentry_app = FlexibleForeignKey(
+        "sentry.SentryApp", unique=True, related_name="avatar", on_delete=models.CASCADE
+    )
     avatar_type = models.PositiveSmallIntegerField(default=0, choices=AVATAR_TYPES)
 
     class Meta:

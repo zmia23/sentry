@@ -8,7 +8,7 @@ from sentry.db.models import Model, FlexibleForeignKey, sane_repr
 class UserPermission(Model):
     __core__ = True
 
-    user = FlexibleForeignKey("sentry.User")
+    user = FlexibleForeignKey("sentry.User", on_delete=models.CASCADE)
     # permissions should be in the form of 'service-name.permission-name'
     permission = models.CharField(max_length=32)
 

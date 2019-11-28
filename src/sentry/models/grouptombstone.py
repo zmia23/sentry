@@ -19,7 +19,7 @@ class GroupTombstone(Model):
     __core__ = False
 
     previous_group_id = BoundedPositiveIntegerField(unique=True)
-    project = FlexibleForeignKey("sentry.Project")
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
     level = BoundedPositiveIntegerField(
         choices=LOG_LEVELS.items(), default=logging.ERROR, blank=True
     )

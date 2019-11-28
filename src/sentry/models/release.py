@@ -38,8 +38,8 @@ DB_VERSION_LENGTH = 250
 class ReleaseProject(Model):
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project")
-    release = FlexibleForeignKey("sentry.Release")
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    release = FlexibleForeignKey("sentry.Release", on_delete=models.CASCADE)
     new_groups = BoundedPositiveIntegerField(null=True, default=0)
 
     class Meta:
@@ -56,7 +56,7 @@ class Release(Model):
 
     __core__ = False
 
-    organization = FlexibleForeignKey("sentry.Organization")
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
     projects = models.ManyToManyField(
         "sentry.Project", related_name="releases", through=ReleaseProject
     )

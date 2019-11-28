@@ -70,13 +70,13 @@ class Migration(migrations.Migration):
                 (
                     "alert_rule",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.AlertRule", db_index=False
+                        to="sentry.AlertRule", db_index=False, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
                 (
                     "project",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.Project", db_constraint=False
+                        to="sentry.Project", db_constraint=False, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
             ],
@@ -93,7 +93,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "alert_rule",
-                    sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.AlertRule"),
+                    sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.AlertRule", on_delete=django.db.models.deletion.CASCADE),
                 ),
             ],
             options={"db_table": "sentry_alertrulequerysubscription"},
@@ -114,7 +114,7 @@ class Migration(migrations.Migration):
                 ("date_added", models.DateTimeField(default=django.utils.timezone.now)),
                 (
                     "alert_rule",
-                    sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.AlertRule"),
+                    sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.AlertRule", on_delete=django.db.models.deletion.CASCADE),
                 ),
             ],
             options={"db_table": "sentry_alertruletrigger"},
@@ -132,7 +132,7 @@ class Migration(migrations.Migration):
                 (
                     "alert_rule_trigger",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        related_name="exclusions", to="sentry.AlertRuleTrigger"
+                        related_name="exclusions", to="sentry.AlertRuleTrigger", on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
             ],
@@ -211,12 +211,12 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "incident",
-                    sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Incident"),
+                    sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Incident", on_delete=django.db.models.deletion.CASCADE),
                 ),
                 (
                     "project",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        db_constraint=False, to="sentry.Project", db_index=False
+                        db_constraint=False, to="sentry.Project", db_index=False, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
             ],
@@ -234,12 +234,12 @@ class Migration(migrations.Migration):
                 ("last_seen", models.DateTimeField(default=django.utils.timezone.now)),
                 (
                     "incident",
-                    sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Incident"),
+                    sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Incident", on_delete=django.db.models.deletion.CASCADE),
                 ),
                 (
                     "user",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to=settings.AUTH_USER_MODEL, db_index=False
+                        to=settings.AUTH_USER_MODEL, db_index=False, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
             ],
@@ -273,13 +273,13 @@ class Migration(migrations.Migration):
                 (
                     "incident",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.Incident", db_index=False
+                        to="sentry.Incident", db_index=False, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
                 (
                     "user",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to=settings.AUTH_USER_MODEL
+                        to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
             ],
@@ -298,13 +298,13 @@ class Migration(migrations.Migration):
                 (
                     "commit",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.Commit", db_constraint=False
+                        to="sentry.Commit", db_constraint=False, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
                 (
                     "incident",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.Incident", db_index=False
+                        to="sentry.Incident", db_index=False, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
             ],
@@ -324,13 +324,13 @@ class Migration(migrations.Migration):
                 (
                     "alert_rule_trigger",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.AlertRuleTrigger"
+                        to="sentry.AlertRuleTrigger", on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
                 (
                     "incident",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.Incident", db_index=False
+                        to="sentry.Incident", db_index=False, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
             ],
@@ -378,7 +378,7 @@ class Migration(migrations.Migration):
                 (
                     "organization_integration",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.OrganizationIntegration"
+                        to="sentry.OrganizationIntegration", on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
             ],
@@ -400,19 +400,19 @@ class Migration(migrations.Migration):
                 (
                     "organization_integration",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.OrganizationIntegration", null=True
+                        to="sentry.OrganizationIntegration", null=True, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
                 (
                     "pagerduty_service",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.PagerDutyService"
+                        to="sentry.PagerDutyService", on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
                 (
                     "project",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        db_constraint=False, to="sentry.Project", db_index=False
+                        db_constraint=False, to="sentry.Project", db_index=False, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
             ],
@@ -438,7 +438,7 @@ class Migration(migrations.Migration):
                 (
                     "project",
                     sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                        to="sentry.Project", db_constraint=False
+                        to="sentry.Project", db_constraint=False, on_delete=django.db.models.deletion.CASCADE
                     ),
                 ),
             ],
@@ -455,7 +455,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "api_token",
-                    sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.ApiToken"),
+                    sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.ApiToken", on_delete=django.db.models.deletion.CASCADE),
                 ),
             ],
             options={"db_table": "sentry_sentryappinstallationtoken"},
@@ -564,6 +564,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 to=settings.AUTH_USER_MODEL,
                 null=True,
+                on_delete=django.db.models.deletion.CASCADE,
             ),
         ),
         migrations.AddField(
@@ -684,7 +685,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="group",
             name="project",
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Project"),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Project", on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterField(
             model_name="grouplink",
@@ -819,69 +820,69 @@ class Migration(migrations.Migration):
             model_name="sentryappwebhookerror",
             name="organization",
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name="sentry_app_webhook_errors", to="sentry.Organization"
+                related_name="sentry_app_webhook_errors", to="sentry.Organization", on_delete=django.db.models.deletion.CASCADE
             ),
         ),
         migrations.AddField(
             model_name="sentryappwebhookerror",
             name="sentry_app",
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name="webhook_errors", to="sentry.SentryApp"
+                related_name="webhook_errors", to="sentry.SentryApp", on_delete=django.db.models.deletion.CASCADE
             ),
         ),
         migrations.AddField(
             model_name="sentryappinstallationtoken",
             name="sentry_app_installation",
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to="sentry.SentryAppInstallation"
+                to="sentry.SentryAppInstallation", on_delete=django.db.models.deletion.CASCADE
             ),
         ),
         migrations.AddField(
             model_name="integrationfeature",
             name="sentry_app",
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.SentryApp"),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.SentryApp", on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name="incidentsnapshot",
             name="event_stats_snapshot",
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to="sentry.TimeSeriesSnapshot"
+                to="sentry.TimeSeriesSnapshot", on_delete=django.db.models.deletion.CASCADE
             ),
         ),
         migrations.AddField(
             model_name="incidentsnapshot",
             name="incident",
-            field=models.OneToOneField(to="sentry.Incident"),
+            field=models.OneToOneField(to="sentry.Incident", on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name="incidentgroup",
             name="group",
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                db_constraint=False, to="sentry.Group", db_index=False
+                db_constraint=False, to="sentry.Group", db_index=False, on_delete=django.db.models.deletion.CASCADE
             ),
         ),
         migrations.AddField(
             model_name="incidentgroup",
             name="incident",
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Incident"),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Incident", on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name="incidentactivity",
             name="event_stats_snapshot",
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to="sentry.TimeSeriesSnapshot", null=True
+                to="sentry.TimeSeriesSnapshot", null=True, on_delete=django.db.models.deletion.CASCADE
             ),
         ),
         migrations.AddField(
             model_name="incidentactivity",
             name="incident",
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Incident"),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Incident", on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name="incidentactivity",
             name="user",
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to=settings.AUTH_USER_MODEL, null=True
+                to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE
             ),
         ),
         migrations.AddField(
@@ -894,7 +895,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="incident",
             name="organization",
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Organization"),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to="sentry.Organization", on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name="incident",
@@ -907,7 +908,7 @@ class Migration(migrations.Migration):
             model_name="alertruletriggerexclusion",
             name="query_subscription",
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to="sentry.QuerySubscription"
+                to="sentry.QuerySubscription", on_delete=django.db.models.deletion.CASCADE
             ),
         ),
         migrations.AddField(
@@ -921,7 +922,7 @@ class Migration(migrations.Migration):
             model_name="alertrulequerysubscription",
             name="query_subscription",
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to="sentry.QuerySubscription", unique=True
+                to="sentry.QuerySubscription", unique=True, on_delete=django.db.models.deletion.CASCADE
             ),
         ),
         migrations.AddField(
@@ -937,7 +938,7 @@ class Migration(migrations.Migration):
             model_name="alertrule",
             name="organization",
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to="sentry.Organization", null=True, db_index=False
+                to="sentry.Organization", null=True, db_index=False, on_delete=django.db.models.deletion.CASCADE
             ),
         ),
         migrations.AddField(

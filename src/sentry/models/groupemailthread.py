@@ -17,8 +17,12 @@ class GroupEmailThread(Model):
     __core__ = False
 
     email = models.EmailField(max_length=75)
-    project = FlexibleForeignKey("sentry.Project", related_name="groupemail_set")
-    group = FlexibleForeignKey("sentry.Group", related_name="groupemail_set")
+    project = FlexibleForeignKey(
+        "sentry.Project", related_name="groupemail_set", on_delete=models.CASCADE
+    )
+    group = FlexibleForeignKey(
+        "sentry.Group", related_name="groupemail_set", on_delete=models.CASCADE
+    )
     msgid = models.CharField(max_length=100)
     date = models.DateTimeField(default=timezone.now, db_index=True)
 

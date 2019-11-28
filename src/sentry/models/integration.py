@@ -16,7 +16,9 @@ from sentry.signals import integration_added
 class PagerDutyService(Model):
     __core__ = False
 
-    organization_integration = FlexibleForeignKey("sentry.OrganizationIntegration")
+    organization_integration = FlexibleForeignKey(
+        "sentry.OrganizationIntegration", on_delete=models.CASCADE
+    )
     integration_key = models.CharField(max_length=255)
     service_name = models.CharField(max_length=255)
     date_added = models.DateTimeField(default=timezone.now)
@@ -29,9 +31,13 @@ class PagerDutyService(Model):
 class PagerDutyServiceProject(Model):
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project", db_index=False, db_constraint=False)
-    pagerduty_service = FlexibleForeignKey("sentry.PagerDutyService")
-    organization_integration = FlexibleForeignKey("sentry.OrganizationIntegration", null=True)
+    project = FlexibleForeignKey(
+        "sentry.Project", db_index=False, db_constraint=False, on_delete=models.CASCADE
+    )
+    pagerduty_service = FlexibleForeignKey("sentry.PagerDutyService", on_delete=models.CASCADE)
+    organization_integration = FlexibleForeignKey(
+        "sentry.OrganizationIntegration", null=True, on_delete=models.CASCADE
+    )
     integration_key = models.CharField(max_length=255, null=True)
     service_id = models.CharField(max_length=255, null=True)
     service_name = models.CharField(max_length=255, null=True)
@@ -62,8 +68,8 @@ class IntegrationExternalProject(Model):
 class OrganizationIntegration(Model):
     __core__ = False
 
-    organization = FlexibleForeignKey("sentry.Organization")
-    integration = FlexibleForeignKey("sentry.Integration")
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
+    integration = FlexibleForeignKey("sentry.Integration", on_delete=models.CASCADE)
     config = EncryptedJsonField(default=dict)
 
     default_auth_id = BoundedPositiveIntegerField(db_index=True, null=True)
@@ -83,8 +89,8 @@ class OrganizationIntegration(Model):
 class ProjectIntegration(Model):
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project")
-    integration = FlexibleForeignKey("sentry.Integration")
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    integration = FlexibleForeignKey("sentry.Integration", on_delete=models.CASCADE)
     config = EncryptedJsonField(default=dict)
 
     class Meta:

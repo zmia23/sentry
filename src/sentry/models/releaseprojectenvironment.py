@@ -11,9 +11,9 @@ from sentry.db.models import BoundedPositiveIntegerField, FlexibleForeignKey, Mo
 class ReleaseProjectEnvironment(Model):
     __core__ = False
 
-    release = FlexibleForeignKey("sentry.Release")
-    project = FlexibleForeignKey("sentry.Project")
-    environment = FlexibleForeignKey("sentry.Environment")
+    release = FlexibleForeignKey("sentry.Release", on_delete=models.CASCADE)
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    environment = FlexibleForeignKey("sentry.Environment", on_delete=models.CASCADE)
     new_issues_count = BoundedPositiveIntegerField(default=0)
     first_seen = models.DateTimeField(default=timezone.now)
     last_seen = models.DateTimeField(default=timezone.now, db_index=True)

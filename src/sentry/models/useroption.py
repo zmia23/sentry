@@ -147,9 +147,9 @@ class UserOption(Model):
 
     __core__ = True
 
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL)
-    project = FlexibleForeignKey("sentry.Project", null=True)
-    organization = FlexibleForeignKey("sentry.Organization", null=True)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    project = FlexibleForeignKey("sentry.Project", null=True, on_delete=models.CASCADE)
+    organization = FlexibleForeignKey("sentry.Organization", null=True, on_delete=models.CASCADE)
     key = models.CharField(max_length=64)
     value = EncryptedPickledObjectField()
 

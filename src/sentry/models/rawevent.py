@@ -11,7 +11,7 @@ from sentry.utils.canonical import CanonicalKeyView
 class RawEvent(Model):
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project")
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
     event_id = models.CharField(max_length=32, null=True)
     datetime = models.DateTimeField(default=timezone.now)
     data = NodeField(

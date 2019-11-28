@@ -31,7 +31,7 @@ SERVICE_HOOK_EVENTS = [
 class ServiceHookProject(Model):
     __core__ = False
 
-    service_hook = FlexibleForeignKey("sentry.ServiceHook")
+    service_hook = FlexibleForeignKey("sentry.ServiceHook", on_delete=models.CASCADE)
     project_id = BoundedPositiveIntegerField(db_index=True)
 
     class Meta:
@@ -49,7 +49,7 @@ class ServiceHook(Model):
 
     guid = models.CharField(max_length=32, unique=True, null=True)
     # hooks may be bound to an api application, or simply registered by a user
-    application = FlexibleForeignKey("sentry.ApiApplication", null=True)
+    application = FlexibleForeignKey("sentry.ApiApplication", null=True, on_delete=models.CASCADE)
     actor_id = BoundedPositiveIntegerField(db_index=True)
     project_id = BoundedPositiveIntegerField(db_index=True)
     organization_id = BoundedPositiveIntegerField(db_index=True, null=True)

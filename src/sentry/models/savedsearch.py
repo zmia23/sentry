@@ -25,8 +25,8 @@ class SavedSearch(Model):
     __core__ = True
     # TODO: Remove this column and rows where it's not null once we've
     # completely removed Sentry 9
-    project = FlexibleForeignKey("sentry.Project", null=True)
-    organization = FlexibleForeignKey("sentry.Organization", null=True)
+    project = FlexibleForeignKey("sentry.Project", null=True, on_delete=models.CASCADE)
+    organization = FlexibleForeignKey("sentry.Organization", null=True, on_delete=models.CASCADE)
     type = models.PositiveSmallIntegerField(default=SearchType.ISSUE.value, null=True)
     name = models.CharField(max_length=128)
     query = models.TextField()
@@ -34,7 +34,7 @@ class SavedSearch(Model):
     # TODO: Remove this column once we've completely removed Sentry 9
     is_default = models.BooleanField(default=False)
     is_global = models.NullBooleanField(null=True, default=False, db_index=True)
-    owner = FlexibleForeignKey("sentry.User", null=True)
+    owner = FlexibleForeignKey("sentry.User", null=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = "sentry"
@@ -73,9 +73,9 @@ class SavedSearchUserDefault(Model):
 
     __core__ = True
 
-    savedsearch = FlexibleForeignKey("sentry.SavedSearch")
-    project = FlexibleForeignKey("sentry.Project")
-    user = FlexibleForeignKey("sentry.User")
+    savedsearch = FlexibleForeignKey("sentry.SavedSearch", on_delete=models.CASCADE)
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    user = FlexibleForeignKey("sentry.User", on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (("project", "user"),)

@@ -11,7 +11,7 @@ class AssistantActivity(Model):
 
     __core__ = False
 
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, null=False)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
     guide_id = BoundedPositiveIntegerField()
     # Time the user completed the guide. If this is set, dismissed_ts will be null.
     viewed_ts = models.DateTimeField(null=True)

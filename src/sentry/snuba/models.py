@@ -20,7 +20,7 @@ class QueryDatasets(Enum):
 class QuerySubscription(Model):
     __core__ = True
 
-    project = FlexibleForeignKey("sentry.Project", db_constraint=False)
+    project = FlexibleForeignKey("sentry.Project", db_constraint=False, on_delete=models.CASCADE)
     type = models.TextField()
     subscription_id = models.TextField(unique=True)
     dataset = models.TextField()

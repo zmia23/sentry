@@ -91,7 +91,7 @@ class ProcessingIssueManager(BaseManager):
 class ProcessingIssue(Model):
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project", db_index=True)
+    project = FlexibleForeignKey("sentry.Project", db_index=True, on_delete=models.CASCADE)
     checksum = models.CharField(max_length=40, db_index=True)
     type = models.CharField(max_length=30)
     data = GzippedDictField()
@@ -118,8 +118,8 @@ class ProcessingIssue(Model):
 class EventProcessingIssue(Model):
     __core__ = False
 
-    raw_event = FlexibleForeignKey("sentry.RawEvent")
-    processing_issue = FlexibleForeignKey("sentry.ProcessingIssue")
+    raw_event = FlexibleForeignKey("sentry.RawEvent", on_delete=models.CASCADE)
+    processing_issue = FlexibleForeignKey("sentry.ProcessingIssue", on_delete=models.CASCADE)
 
     class Meta:
         app_label = "sentry"

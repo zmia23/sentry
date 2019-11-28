@@ -20,7 +20,7 @@ class PullRequest(Model):
 
     title = models.TextField(null=True)
     message = models.TextField(null=True)
-    author = FlexibleForeignKey("sentry.CommitAuthor", null=True)
+    author = FlexibleForeignKey("sentry.CommitAuthor", null=True, on_delete=models.CASCADE)
     merge_commit_sha = models.CharField(max_length=64, null=True)
 
     class Meta:
@@ -55,8 +55,8 @@ class PullRequest(Model):
 
 class PullRequestCommit(Model):
     __core__ = False
-    pull_request = FlexibleForeignKey("sentry.PullRequest")
-    commit = FlexibleForeignKey("sentry.Commit")
+    pull_request = FlexibleForeignKey("sentry.PullRequest", on_delete=models.CASCADE)
+    commit = FlexibleForeignKey("sentry.Commit", on_delete=models.CASCADE)
 
     class Meta:
         app_label = "sentry"

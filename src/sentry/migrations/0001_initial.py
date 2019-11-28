@@ -175,7 +175,8 @@ class Migration(migrations.Migration):
                 ('privacy_url', models.URLField(null=True)),
                 ('terms_url', models.URLField(null=True)),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
-                ('owner', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('owner', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL,
+                                                                                on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_apiapplication',
@@ -223,8 +224,8 @@ class Migration(migrations.Migration):
                 ('scope_list', sentry.db.models.fields.array.ArrayField(null=True)),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
                 ('application', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.ApiApplication', null=True)),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                    to='sentry.ApiApplication', null=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_apiauthorization',
@@ -276,8 +277,8 @@ class Migration(migrations.Migration):
                                           default=None)),
                 ('scope_list', sentry.db.models.fields.array.ArrayField(null=True)),
                 ('application', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.ApiApplication')),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                    to='sentry.ApiApplication', on_delete=django.db.models.deletion.CASCADE)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_apigrant',
@@ -382,8 +383,8 @@ class Migration(migrations.Migration):
                     default=sentry.models.apitoken.default_expiration, null=True)),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
                 ('application', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.ApiApplication', null=True)),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                    to='sentry.ApiApplication', null=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_apitoken',
@@ -398,7 +399,7 @@ class Migration(migrations.Migration):
                 ('viewed_ts', models.DateTimeField(null=True)),
                 ('dismissed_ts', models.DateTimeField(null=True)),
                 ('useful', models.NullBooleanField()),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_assistant_activity',
@@ -522,9 +523,9 @@ class Migration(migrations.Migration):
                 ('data', sentry.db.models.fields.gzippeddict.GzippedDictField()),
                 ('datetime', models.DateTimeField(default=django.utils.timezone.now)),
                 ('actor', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='audit_actors', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                    related_name='audit_actors', blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE)),
                 ('actor_key', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    blank=True, to='sentry.ApiKey', null=True)),
+                    blank=True, to='sentry.ApiKey', null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_auditlogentry',
@@ -540,7 +541,7 @@ class Migration(migrations.Migration):
                 ('type', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(choices=[
                  (0, 'Recovery Codes'), (1, 'Authenticator App'), (2, 'Text Message'), (3, 'U2F (Universal 2nd Factor)')])),
                 ('config', sentry.db.models.fields.encrypted.EncryptedPickledObjectField(editable=False)),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'auth_authenticator',
@@ -606,8 +607,8 @@ class Migration(migrations.Migration):
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
                 ('date_seen', models.DateTimeField(default=django.utils.timezone.now)),
-                ('broadcast', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Broadcast')),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('broadcast', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Broadcast', on_delete=django.db.models.deletion.CASCADE)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_broadcastseen',
@@ -651,7 +652,7 @@ class Migration(migrations.Migration):
                 ('filename', models.TextField()),
                 ('type', models.CharField(max_length=1, choices=[
                  (b'A', b'Added'), (b'D', b'Deleted'), (b'M', b'Modified')])),
-                ('commit', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Commit')),
+                ('commit', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Commit', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_commitfilechange',
@@ -678,7 +679,7 @@ class Migration(migrations.Migration):
                 ('status', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(default=0, choices=[
                  (0, b'active'), (1, b'disabled'), (2, b'pending_deletion'), (3, b'deletion_in_progress')])),
                 ('created_by', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to=settings.AUTH_USER_MODEL)),
+                    to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_dashboard',
@@ -787,7 +788,7 @@ class Migration(migrations.Migration):
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
                 ('discover_saved_query', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.DiscoverSavedQuery')),
+                    to='sentry.DiscoverSavedQuery', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_discoversavedqueryproject',
@@ -839,7 +840,7 @@ class Migration(migrations.Migration):
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
                 ('is_hidden', models.NullBooleanField()),
-                ('environment', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Environment')),
+                ('environment', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Environment', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_environmentproject',
@@ -1108,8 +1109,8 @@ class Migration(migrations.Migration):
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
                 ('offset', sentry.db.models.fields.bounded.BoundedPositiveIntegerField()),
-                ('blob', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.FileBlob')),
-                ('file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File')),
+                ('blob', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.FileBlob', on_delete=django.db.models.deletion.CASCADE)),
+                ('file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_fileblobindex',
@@ -1120,7 +1121,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
-                ('blob', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.FileBlob')),
+                ('blob', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.FileBlob', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_fileblobowner',
@@ -1167,7 +1168,7 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True)),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
                 ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='assignee_set', to='sentry.Group', unique=True)),
+                    related_name='assignee_set', to='sentry.Group', unique=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_groupasignee',
@@ -1180,7 +1181,7 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True)),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now, null=True)),
                 ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='bookmark_set', to='sentry.Group')),
+                    related_name='bookmark_set', to='sentry.Group', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_groupbookmark',
@@ -1208,7 +1209,7 @@ class Migration(migrations.Migration):
                 ('msgid', models.CharField(max_length=100)),
                 ('date', models.DateTimeField(default=django.utils.timezone.now, db_index=True)),
                 ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='groupemail_set', to='sentry.Group')),
+                    related_name='groupemail_set', to='sentry.Group', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_groupemailthread',
@@ -1222,7 +1223,7 @@ class Migration(migrations.Migration):
                 ('first_seen', models.DateTimeField(
                     default=django.utils.timezone.now, null=True, db_index=True)),
                 ('environment', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Environment', db_constraint=False)),
+                    to='sentry.Environment', db_constraint=False, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_groupenvironment',
@@ -1238,7 +1239,7 @@ class Migration(migrations.Migration):
                     null=True, db_index=True)),
                 ('state', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(
                     null=True, choices=[(1, 'Locked (Migration in Progress)')])),
-                ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Group', null=True)),
+                ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Group', null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_grouphash',
@@ -1270,7 +1271,7 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True)),
                 ('key', models.CharField(max_length=64)),
                 ('value', models.TextField()),
-                ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Group')),
+                ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Group', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_groupmeta',
@@ -1316,7 +1317,7 @@ class Migration(migrations.Migration):
                 ('status', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(
                     default=0, choices=[(0, 'Pending'), (1, 'Resolved')])),
                 ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Group', unique=True)),
+                    to='sentry.Group', unique=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_groupresolution',
@@ -1330,7 +1331,7 @@ class Migration(migrations.Migration):
                 ('status', models.PositiveSmallIntegerField(default=0)),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_active', models.DateTimeField(null=True)),
-                ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Group')),
+                ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Group', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_grouprulestatus',
@@ -1342,7 +1343,7 @@ class Migration(migrations.Migration):
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
                 ('last_seen', models.DateTimeField(default=django.utils.timezone.now)),
-                ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Group')),
+                ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Group', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_groupseen',
@@ -1357,7 +1358,7 @@ class Migration(migrations.Migration):
                     default=sentry.models.groupshare.default_uuid, unique=True, max_length=32)),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
                 ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Group', unique=True)),
+                    to='sentry.Group', unique=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_groupshare',
@@ -1376,7 +1377,7 @@ class Migration(migrations.Migration):
                 ('state', sentry.db.models.fields.jsonfield.JSONField(null=True)),
                 ('actor_id', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(null=True)),
                 ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Group', unique=True)),
+                    to='sentry.Group', unique=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_groupsnooze',
@@ -1391,7 +1392,7 @@ class Migration(migrations.Migration):
                 ('reason', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(default=0)),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now, null=True)),
                 ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='subscription_set', to='sentry.Group')),
+                    related_name='subscription_set', to='sentry.Group', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_groupsubscription',
@@ -1534,7 +1535,7 @@ class Migration(migrations.Migration):
                 ('hash', models.CharField(max_length=32)),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
                 ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to=settings.AUTH_USER_MODEL, unique=True)),
+                    to=settings.AUTH_USER_MODEL, unique=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_lostpasswordhash',
@@ -1663,7 +1664,7 @@ class Migration(migrations.Migration):
                 ('file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(null=True,
                                                                                on_delete=django.db.models.deletion.SET_NULL, to='sentry.File', unique=True)),
                 ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='avatar', to='sentry.Organization', unique=True)),
+                    related_name='avatar', to='sentry.Organization', unique=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_organizationavatar',
@@ -1680,8 +1681,8 @@ class Migration(migrations.Migration):
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now, null=True)),
                 ('status', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(default=0, choices=[
                  (0, b'active'), (1, b'disabled'), (2, b'pending_deletion'), (3, b'deletion_in_progress')])),
-                ('integration', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Integration')),
-                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization')),
+                ('integration', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Integration', on_delete=django.db.models.deletion.CASCADE)),
+                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_organizationintegration',
@@ -1703,7 +1704,7 @@ class Migration(migrations.Migration):
                 ('has_global_access', models.BooleanField(default=True)),
                 ('type', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(default=50, blank=True)),
                 ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='member_set', to='sentry.Organization')),
+                    related_name='member_set', to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_organizationmember',
@@ -1715,7 +1716,7 @@ class Migration(migrations.Migration):
                 ('id', sentry.db.models.fields.bounded.BoundedAutoField(serialize=False, primary_key=True)),
                 ('is_active', models.BooleanField(default=True)),
                 ('organizationmember', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.OrganizationMember')),
+                    to='sentry.OrganizationMember', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_organizationmember_teams',
@@ -1750,9 +1751,9 @@ class Migration(migrations.Migration):
                 ('date_completed', models.DateTimeField(default=django.utils.timezone.now)),
                 ('project_id', sentry.db.models.fields.bounded.BoundedBigIntegerField(null=True, blank=True)),
                 ('data', sentry.db.models.fields.jsonfield.JSONField(default=dict)),
-                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization')),
+                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
                 ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to=settings.AUTH_USER_MODEL, null=True)),
+                    to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_organizationonboardingtask',
@@ -1765,7 +1766,7 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True)),
                 ('key', models.CharField(max_length=64)),
                 ('value', sentry.db.models.fields.encrypted.EncryptedPickledObjectField(editable=False)),
-                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization')),
+                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_organizationoptions',
@@ -1816,7 +1817,7 @@ class Migration(migrations.Migration):
                 ('flags', bitfield.models.BitField(
                     ((b'has_releases', b'This Project has sent release data'),), default=0, null=True)),
                 ('platform', models.CharField(max_length=64, null=True)),
-                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization')),
+                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_project',
@@ -1834,7 +1835,7 @@ class Migration(migrations.Migration):
                 ('file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(null=True,
                                                                                on_delete=django.db.models.deletion.SET_NULL, to='sentry.File', unique=True)),
                 ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='avatar', to='sentry.Project', unique=True)),
+                    related_name='avatar', to='sentry.Project', unique=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_projectavatar',
@@ -1847,8 +1848,8 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True)),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now, null=True)),
                 ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    db_constraint=False, blank=True, to='sentry.Project', null=True)),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                    db_constraint=False, blank=True, to='sentry.Project', null=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_projectbookmark',
@@ -1861,7 +1862,7 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True)),
                 ('checksum', models.CharField(max_length=40)),
                 ('version', sentry.db.models.fields.bounded.BoundedPositiveIntegerField()),
-                ('cache_file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File')),
+                ('cache_file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'abstract': False,
@@ -1878,9 +1879,9 @@ class Migration(migrations.Migration):
                 ('debug_id', models.CharField(max_length=64, db_column=b'uuid')),
                 ('code_id', models.CharField(max_length=64, null=True)),
                 ('data', sentry.db.models.fields.jsonfield.JSONField(null=True)),
-                ('file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File')),
+                ('file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File', on_delete=django.db.models.deletion.CASCADE)),
                 ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Project', null=True)),
+                    to='sentry.Project', null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_projectdsymfile',
@@ -1892,8 +1893,8 @@ class Migration(migrations.Migration):
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
                 ('config', sentry.db.models.fields.encrypted.EncryptedJsonField(default=dict)),
-                ('integration', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Integration')),
-                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project')),
+                ('integration', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Integration', on_delete=django.db.models.deletion.CASCADE)),
+                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_projectintegration',
@@ -1916,7 +1917,7 @@ class Migration(migrations.Migration):
                 ('rate_limit_window', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(null=True)),
                 ('data', sentry.db.models.fields.jsonfield.JSONField(default=dict)),
                 ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='key_set', to='sentry.Project')),
+                    related_name='key_set', to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_projectkey',
@@ -1929,7 +1930,7 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True)),
                 ('key', models.CharField(max_length=64)),
                 ('value', sentry.db.models.fields.encrypted.EncryptedPickledObjectField(editable=False)),
-                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project')),
+                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_projectoptions',
@@ -1947,7 +1948,7 @@ class Migration(migrations.Migration):
                 ('last_updated', models.DateTimeField(default=django.utils.timezone.now)),
                 ('is_active', models.BooleanField(default=True)),
                 ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Project', unique=True)),
+                    to='sentry.Project', unique=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_projectownership',
@@ -1974,8 +1975,8 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True)),
                 ('redirect_slug', models.SlugField()),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
-                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization')),
-                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project')),
+                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
+                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_projectredirect',
@@ -1988,13 +1989,13 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True)),
                 ('checksum', models.CharField(max_length=40)),
                 ('version', sentry.db.models.fields.bounded.BoundedPositiveIntegerField()),
-                ('cache_file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File')),
+                ('cache_file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File', on_delete=django.db.models.deletion.CASCADE)),
                 ('debug_file',
                  sentry.db.models.fields.foreignkey.FlexibleForeignKey(db_column=b'dsym_file_id',
                                                                        on_delete=django.db.models.deletion.DO_NOTHING,
                                                                        to='sentry.ProjectDebugFile')),
                 ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Project', null=True)),
+                    to='sentry.Project', null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'abstract': False,
@@ -2006,7 +2007,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
-                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project')),
+                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_projectteam',
@@ -2022,7 +2023,7 @@ class Migration(migrations.Migration):
                 ('feature', models.CharField(max_length=64)),
                 ('data', sentry.db.models.fields.jsonfield.JSONField(default={})),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_promptsactivity',
@@ -2041,7 +2042,7 @@ class Migration(migrations.Migration):
                 ('message', models.TextField(null=True)),
                 ('merge_commit_sha', models.CharField(max_length=64, null=True)),
                 ('author', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.CommitAuthor', null=True)),
+                    to='sentry.CommitAuthor', null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_pull_request',
@@ -2052,8 +2053,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
-                ('commit', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Commit')),
-                ('pull_request', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.PullRequest')),
+                ('commit', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Commit', on_delete=django.db.models.deletion.CASCADE)),
+                ('pull_request', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.PullRequest', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_pullrequest_commit',
@@ -2067,7 +2068,7 @@ class Migration(migrations.Migration):
                 ('event_id', models.CharField(max_length=32, null=True)),
                 ('datetime', models.DateTimeField(default=django.utils.timezone.now)),
                 ('data', sentry.db.models.fields.node.NodeField(null=True, blank=True)),
-                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project')),
+                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_rawevent',
@@ -2083,9 +2084,9 @@ class Migration(migrations.Migration):
                 ('query_hash', models.CharField(max_length=32)),
                 ('last_seen', models.DateTimeField(default=django.utils.timezone.now)),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
-                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization')),
+                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
                 ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to=settings.AUTH_USER_MODEL, db_index=False)),
+                    to=settings.AUTH_USER_MODEL, db_index=False, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_recentsearch',
@@ -2126,7 +2127,7 @@ class Migration(migrations.Migration):
                 ('total_deploys', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(
                     default=0, null=True)),
                 ('last_deploy_id', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(null=True)),
-                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization')),
+                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
                 ('owner', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
                     on_delete=django.db.models.deletion.SET_NULL, blank=True, to=settings.AUTH_USER_MODEL, null=True)),
             ],
@@ -2142,8 +2143,8 @@ class Migration(migrations.Migration):
                 ('organization_id', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(db_index=True)),
                 ('project_id', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(null=True)),
                 ('order', sentry.db.models.fields.bounded.BoundedPositiveIntegerField()),
-                ('commit', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Commit')),
-                ('release', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release')),
+                ('commit', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Commit', on_delete=django.db.models.deletion.CASCADE)),
+                ('release', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_releasecommit',
@@ -2158,11 +2159,11 @@ class Migration(migrations.Migration):
                 ('first_seen', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_seen', models.DateTimeField(default=django.utils.timezone.now, db_index=True)),
                 ('environment', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Environment', db_constraint=False)),
+                    to='sentry.Environment', db_constraint=False, on_delete=django.db.models.deletion.CASCADE)),
                 ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Organization', db_constraint=False)),
+                    to='sentry.Organization', db_constraint=False, on_delete=django.db.models.deletion.CASCADE)),
                 ('release', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Release', db_constraint=False)),
+                    to='sentry.Release', db_constraint=False, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_environmentrelease',
@@ -2177,10 +2178,10 @@ class Migration(migrations.Migration):
                 ('ident', models.CharField(max_length=40)),
                 ('name', models.TextField()),
                 ('dist', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Distribution', null=True)),
-                ('file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File')),
-                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization')),
-                ('release', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release')),
+                    to='sentry.Distribution', null=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File', on_delete=django.db.models.deletion.CASCADE)),
+                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
+                ('release', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_releasefile',
@@ -2193,8 +2194,8 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True)),
                 ('organization_id', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(db_index=True)),
                 ('repository_id', sentry.db.models.fields.bounded.BoundedPositiveIntegerField()),
-                ('commit', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Commit')),
-                ('release', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release')),
+                ('commit', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Commit', on_delete=django.db.models.deletion.CASCADE)),
+                ('release', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_releaseheadcommit',
@@ -2206,8 +2207,8 @@ class Migration(migrations.Migration):
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
                 ('new_groups', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(default=0, null=True)),
-                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project')),
-                ('release', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release')),
+                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
+                ('release', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_release_project',
@@ -2223,9 +2224,9 @@ class Migration(migrations.Migration):
                 ('last_seen', models.DateTimeField(default=django.utils.timezone.now, db_index=True)),
                 ('last_deploy_id', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(
                     null=True, db_index=True)),
-                ('environment', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Environment')),
-                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project')),
-                ('release', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release')),
+                ('environment', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Environment', on_delete=django.db.models.deletion.CASCADE)),
+                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
+                ('release', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_releaseprojectenvironment',
@@ -2260,7 +2261,7 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True)),
                 ('event_id', models.CharField(max_length=32, null=True)),
                 ('datetime', models.DateTimeField(default=django.utils.timezone.now)),
-                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project')),
+                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_reprocessingreport',
@@ -2277,7 +2278,7 @@ class Migration(migrations.Migration):
                 ('status', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(
                     default=0, db_index=True, choices=[(0, b'Active'), (1, b'Inactive')])),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
-                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project')),
+                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_rule',
@@ -2295,11 +2296,11 @@ class Migration(migrations.Migration):
                 ('is_default', models.BooleanField(default=False)),
                 ('is_global', models.NullBooleanField(default=False, db_index=True)),
                 ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Organization', null=True)),
+                    to='sentry.Organization', null=True, on_delete=django.db.models.deletion.CASCADE)),
                 ('owner', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to=settings.AUTH_USER_MODEL, null=True)),
+                    to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE)),
                 ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Project', null=True)),
+                    to='sentry.Project', null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_savedsearch',
@@ -2310,9 +2311,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
-                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project')),
-                ('savedsearch', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.SavedSearch')),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
+                ('savedsearch', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.SavedSearch', on_delete=django.db.models.deletion.CASCADE)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_savedsearch_userdefault',
@@ -2412,7 +2413,7 @@ class Migration(migrations.Migration):
                 ('application', models.OneToOneField(related_name='sentry_app', null=True,
                                                      on_delete=django.db.models.deletion.SET_NULL, to='sentry.ApiApplication')),
                 ('owner', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='owned_sentry_apps', to='sentry.Organization')),
+                    related_name='owned_sentry_apps', to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
                 ('proxy_user', models.OneToOneField(related_name='sentry_app', null=True,
                                                     on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
             ],
@@ -2431,7 +2432,7 @@ class Migration(migrations.Migration):
                 ('file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(null=True,
                                                                                on_delete=django.db.models.deletion.SET_NULL, to='sentry.File', unique=True)),
                 ('sentry_app', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='avatar', to='sentry.SentryApp', unique=True)),
+                    related_name='avatar', to='sentry.SentryApp', unique=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_sentryappavatar',
@@ -2447,7 +2448,7 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(max_length=64)),
                 ('schema', sentry.db.models.fields.encrypted.EncryptedJsonField(default=dict)),
                 ('sentry_app', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='components', to='sentry.SentryApp')),
+                    related_name='components', to='sentry.SentryApp', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_sentryappcomponent',
@@ -2467,9 +2468,9 @@ class Migration(migrations.Migration):
                 ('authorization', models.OneToOneField(related_name='sentry_app_installation',
                                                        null=True, on_delete=django.db.models.deletion.SET_NULL, to='sentry.ApiAuthorization')),
                 ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='sentry_app_installations', to='sentry.Organization')),
+                    related_name='sentry_app_installations', to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
                 ('sentry_app', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='installations', to='sentry.SentryApp')),
+                    related_name='installations', to='sentry.SentryApp', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_sentryappinstallation',
@@ -2495,7 +2496,7 @@ class Migration(migrations.Migration):
                     default=0, choices=[(0, b'0')])),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
                 ('application', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.ApiApplication', null=True)),
+                    to='sentry.ApiApplication', null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_servicehook',
@@ -2507,7 +2508,7 @@ class Migration(migrations.Migration):
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
                 ('project_id', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(db_index=True)),
-                ('service_hook', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.ServiceHook')),
+                ('service_hook', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.ServiceHook', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_servicehookproject',
@@ -2558,7 +2559,7 @@ class Migration(migrations.Migration):
                 ('status', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(default=0,
                                                                                        choices=[(0, 'Active'), (1, 'Pending Deletion'), (2, 'Deletion in Progress')])),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now, null=True)),
-                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization')),
+                ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_team',
@@ -2575,7 +2576,7 @@ class Migration(migrations.Migration):
                 ('file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(null=True,
                                                                                on_delete=django.db.models.deletion.SET_NULL, to='sentry.File', unique=True)),
                 ('team', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='avatar', to='sentry.Team', unique=True)),
+                    related_name='avatar', to='sentry.Team', unique=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_teamavatar',
@@ -2592,7 +2593,7 @@ class Migration(migrations.Migration):
                 ('file', sentry.db.models.fields.foreignkey.FlexibleForeignKey(null=True,
                                                                                on_delete=django.db.models.deletion.SET_NULL, to='sentry.File', unique=True)),
                 ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='avatar', to=settings.AUTH_USER_MODEL, unique=True)),
+                    related_name='avatar', to=settings.AUTH_USER_MODEL, unique=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_useravatar',
@@ -2612,7 +2613,7 @@ class Migration(migrations.Migration):
                                      help_text='Designates whether this user has confirmed their email.',
                                      verbose_name='verified')),
                 ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    related_name='emails', to=settings.AUTH_USER_MODEL)),
+                    related_name='emails', to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_useremail',
@@ -2628,7 +2629,7 @@ class Migration(migrations.Migration):
                 ('region_code', models.CharField(max_length=16, null=True)),
                 ('first_seen', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_seen', models.DateTimeField(default=django.utils.timezone.now)),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_userip',
@@ -2642,10 +2643,10 @@ class Migration(migrations.Migration):
                 ('key', models.CharField(max_length=64)),
                 ('value', sentry.db.models.fields.encrypted.EncryptedPickledObjectField(editable=False)),
                 ('organization', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Organization', null=True)),
+                    to='sentry.Organization', null=True, on_delete=django.db.models.deletion.CASCADE)),
                 ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Project', null=True)),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                    to='sentry.Project', null=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_useroption',
@@ -2657,7 +2658,7 @@ class Migration(migrations.Migration):
                 ('id', sentry.db.models.fields.bounded.BoundedBigAutoField(
                     serialize=False, primary_key=True)),
                 ('permission', models.CharField(max_length=32)),
-                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_userpermission',
@@ -2675,9 +2676,9 @@ class Migration(migrations.Migration):
                 ('comments', models.TextField()),
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now, db_index=True)),
                 ('environment', sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                    to='sentry.Environment', null=True)),
-                ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Group', null=True)),
-                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project')),
+                    to='sentry.Environment', null=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('group', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Group', null=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('project', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_userreport',
@@ -2696,7 +2697,7 @@ class Migration(migrations.Migration):
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
                 ('status', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(default=0, choices=[
                  (0, b'active'), (1, b'disabled'), (2, b'pending_deletion'), (3, b'deletion_in_progress')])),
-                ('dashboard', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Dashboard')),
+                ('dashboard', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Dashboard', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_widget',
@@ -2715,7 +2716,7 @@ class Migration(migrations.Migration):
                 ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
                 ('status', sentry.db.models.fields.bounded.BoundedPositiveIntegerField(default=0, choices=[
                  (0, b'active'), (1, b'disabled'), (2, b'pending_deletion'), (3, b'deletion_in_progress')])),
-                ('widget', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Widget')),
+                ('widget', sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Widget', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'db_table': 'sentry_widgetdatasource',
@@ -2753,7 +2754,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='projectteam',
             name='team',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Team'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Team', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='projectplatform',
@@ -2771,7 +2772,7 @@ class Migration(migrations.Migration):
             model_name='projectcficachefile',
             name='project',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.Project', null=True),
+                to='sentry.Project', null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='project',
@@ -2784,7 +2785,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='processingissue',
             name='project',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='platformexternalissue',
@@ -2793,7 +2794,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='organizationmemberteam',
             name='team',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Team'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Team', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='organizationmember',
@@ -2807,18 +2808,18 @@ class Migration(migrations.Migration):
             model_name='organizationmember',
             name='user',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name='sentry_orgmember_set', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+                related_name='sentry_orgmember_set', blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='organizationaccessrequest',
             name='member',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.OrganizationMember'),
+                to='sentry.OrganizationMember', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='organizationaccessrequest',
             name='team',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Team'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Team', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='organization',
@@ -2832,12 +2833,12 @@ class Migration(migrations.Migration):
             model_name='monitorcheckin',
             name='location',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.MonitorLocation', null=True),
+                to='sentry.MonitorLocation', null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='monitorcheckin',
             name='monitor',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Monitor'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Monitor', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterIndexTogether(
             name='monitor',
@@ -2875,18 +2876,18 @@ class Migration(migrations.Migration):
             model_name='identity',
             name='idp',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.IdentityProvider'),
+                to='sentry.IdentityProvider', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='identity',
             name='user',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to=settings.AUTH_USER_MODEL),
+                to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='grouptombstone',
             name='project',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='grouptagvalue',
@@ -2904,50 +2905,50 @@ class Migration(migrations.Migration):
             model_name='groupsubscription',
             name='project',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name='subscription_set', to='sentry.Project'),
+                related_name='subscription_set', to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupsubscription',
             name='user',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to=settings.AUTH_USER_MODEL),
+                to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupshare',
             name='project',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupshare',
             name='user',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to=settings.AUTH_USER_MODEL, null=True),
+                to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupseen',
             name='project',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupseen',
             name='user',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to=settings.AUTH_USER_MODEL, db_index=False),
+                to=settings.AUTH_USER_MODEL, db_index=False, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='grouprulestatus',
             name='project',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='grouprulestatus',
             name='rule',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Rule'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Rule', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupresolution',
             name='release',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='grouprelease',
@@ -2961,7 +2962,7 @@ class Migration(migrations.Migration):
             model_name='grouphash',
             name='project',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.Project', null=True),
+                to='sentry.Project', null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupenvironment',
@@ -2973,13 +2974,13 @@ class Migration(migrations.Migration):
             model_name='groupenvironment',
             name='group',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.Group', db_constraint=False),
+                to='sentry.Group', db_constraint=False, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupemailthread',
             name='project',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name='groupemail_set', to='sentry.Project'),
+                related_name='groupemail_set', to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='groupcommitresolution',
@@ -2989,31 +2990,31 @@ class Migration(migrations.Migration):
             model_name='groupbookmark',
             name='project',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name='bookmark_set', to='sentry.Project'),
+                related_name='bookmark_set', to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupbookmark',
             name='user',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name='sentry_bookmark_set', to=settings.AUTH_USER_MODEL),
+                related_name='sentry_bookmark_set', to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupassignee',
             name='project',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name='assignee_set', to='sentry.Project'),
+                related_name='assignee_set', to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupassignee',
             name='team',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name='sentry_assignee_set', to='sentry.Team', null=True),
+                related_name='sentry_assignee_set', to='sentry.Team', null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='groupassignee',
             name='user',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name='sentry_assignee_set', to=settings.AUTH_USER_MODEL, null=True),
+                related_name='sentry_assignee_set', to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='group',
@@ -3025,18 +3026,18 @@ class Migration(migrations.Migration):
             model_name='group',
             name='project',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.Project', null=True),
+                to='sentry.Project', null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='fileblobowner',
             name='organization',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='file',
             name='blob',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name='legacy_blob', to='sentry.FileBlob', null=True),
+                related_name='legacy_blob', to='sentry.FileBlob', null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='file',
@@ -3046,7 +3047,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='featureadoption',
             name='organization',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='externalissue',
@@ -3073,12 +3074,12 @@ class Migration(migrations.Migration):
             model_name='eventprocessingissue',
             name='processing_issue',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.ProcessingIssue'),
+                to='sentry.ProcessingIssue', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='eventprocessingissue',
             name='raw_event',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.RawEvent'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.RawEvent', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='eventmapping',
@@ -3087,7 +3088,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='eventattachment',
             name='file',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.File', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='event',
@@ -3100,7 +3101,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='environmentproject',
             name='project',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='environment',
@@ -3110,17 +3111,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='distribution',
             name='release',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='discoversavedqueryproject',
             name='project',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='discoversavedquery',
             name='organization',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='discoversavedquery',
@@ -3132,18 +3133,18 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='deploy',
             name='release',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Release', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='dashboard',
             name='organization',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='counter',
             name='project',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.Project', unique=True),
+                to='sentry.Project', unique=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='commitauthor',
@@ -3153,7 +3154,7 @@ class Migration(migrations.Migration):
             model_name='commit',
             name='author',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.CommitAuthor', null=True),
+                to='sentry.CommitAuthor', null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='authprovider',
@@ -3164,52 +3165,52 @@ class Migration(migrations.Migration):
             model_name='authprovider',
             name='organization',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.Organization', unique=True),
+                to='sentry.Organization', unique=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='authidentity',
             name='auth_provider',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.AuthProvider'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.AuthProvider', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='authidentity',
             name='user',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to=settings.AUTH_USER_MODEL),
+                to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='auditlogentry',
             name='organization',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='auditlogentry',
             name='target_user',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name='audit_targets', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+                related_name='audit_targets', blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='apikey',
             name='organization',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                related_name='key_set', to='sentry.Organization'),
+                related_name='key_set', to='sentry.Organization', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='activity',
             name='group',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to='sentry.Group', null=True),
+                to='sentry.Group', null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='activity',
             name='project',
-            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project'),
+            field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(to='sentry.Project', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='activity',
             name='user',
             field=sentry.db.models.fields.foreignkey.FlexibleForeignKey(
-                to=settings.AUTH_USER_MODEL, null=True),
+                to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='widgetdatasource',

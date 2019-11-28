@@ -12,7 +12,7 @@ from sentry.utils.geo import geo_by_addr
 class UserIP(Model):
     __core__ = True
 
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     ip_address = models.GenericIPAddressField()
     country_code = models.CharField(max_length=16, null=True)
     region_code = models.CharField(max_length=16, null=True)

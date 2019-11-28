@@ -10,7 +10,7 @@ class Distribution(Model):
     __core__ = False
 
     organization_id = BoundedPositiveIntegerField(db_index=True)
-    release = FlexibleForeignKey("sentry.Release")
+    release = FlexibleForeignKey("sentry.Release", on_delete=models.CASCADE)
     name = models.CharField(max_length=64)
     date_added = models.DateTimeField(default=timezone.now)
 

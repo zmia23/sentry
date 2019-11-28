@@ -210,12 +210,21 @@ class GroupAssignee(Model):
 
     objects = GroupAssigneeManager()
 
-    project = FlexibleForeignKey("sentry.Project", related_name="assignee_set")
-    group = FlexibleForeignKey("sentry.Group", related_name="assignee_set", unique=True)
-    user = FlexibleForeignKey(
-        settings.AUTH_USER_MODEL, related_name="sentry_assignee_set", null=True
+    project = FlexibleForeignKey(
+        "sentry.Project", related_name="assignee_set", on_delete=models.CASCADE
     )
-    team = FlexibleForeignKey("sentry.Team", related_name="sentry_assignee_set", null=True)
+    group = FlexibleForeignKey(
+        "sentry.Group", related_name="assignee_set", unique=True, on_delete=models.CASCADE
+    )
+    user = FlexibleForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="sentry_assignee_set",
+        null=True,
+        on_delete=models.CASCADE,
+    )
+    team = FlexibleForeignKey(
+        "sentry.Team", related_name="sentry_assignee_set", null=True, on_delete=models.CASCADE
+    )
     date_added = models.DateTimeField(default=timezone.now)
 
     class Meta:

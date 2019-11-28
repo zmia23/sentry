@@ -52,8 +52,8 @@ class Identity(Model):
 
     __core__ = False
 
-    idp = FlexibleForeignKey("sentry.IdentityProvider")
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL)
+    idp = FlexibleForeignKey("sentry.IdentityProvider", on_delete=models.CASCADE)
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     external_id = models.CharField(max_length=64)
     data = EncryptedJsonField()
     status = BoundedPositiveIntegerField(default=IdentityStatus.UNKNOWN)

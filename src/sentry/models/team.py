@@ -102,7 +102,7 @@ class Team(Model):
 
     __core__ = True
 
-    organization = FlexibleForeignKey("sentry.Organization")
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
     slug = models.SlugField()
     name = models.CharField(max_length=64)
     status = BoundedPositiveIntegerField(

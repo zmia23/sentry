@@ -105,7 +105,7 @@ class ProjectOption(Model):
 
     __core__ = True
 
-    project = FlexibleForeignKey("sentry.Project")
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
     key = models.CharField(max_length=64)
     value = EncryptedPickledObjectField()
 

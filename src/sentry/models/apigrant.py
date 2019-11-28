@@ -30,8 +30,8 @@ class ApiGrant(Model):
 
     __core__ = False
 
-    user = FlexibleForeignKey("sentry.User")
-    application = FlexibleForeignKey("sentry.ApiApplication")
+    user = FlexibleForeignKey("sentry.User", on_delete=models.CASCADE)
+    application = FlexibleForeignKey("sentry.ApiApplication", on_delete=models.CASCADE)
     code = models.CharField(max_length=64, db_index=True, default=generate_code)
     expires_at = models.DateTimeField(db_index=True, default=default_expiration)
     redirect_uri = models.CharField(max_length=255)

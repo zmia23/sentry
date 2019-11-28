@@ -8,8 +8,8 @@ from sentry.db.models import Model, FlexibleForeignKey, sane_repr
 class DiscoverSavedQueryProject(Model):
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project")
-    discover_saved_query = FlexibleForeignKey("sentry.DiscoverSavedQuery")
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    discover_saved_query = FlexibleForeignKey("sentry.DiscoverSavedQuery", on_delete=models.CASCADE)
 
     class Meta:
         app_label = "sentry"
@@ -25,7 +25,7 @@ class DiscoverSavedQuery(Model):
     __core__ = False
 
     projects = models.ManyToManyField("sentry.Project", through=DiscoverSavedQueryProject)
-    organization = FlexibleForeignKey("sentry.Organization")
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
     created_by = FlexibleForeignKey("sentry.User", null=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=255)
     query = JSONField()

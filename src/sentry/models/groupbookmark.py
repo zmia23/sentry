@@ -15,10 +15,16 @@ class GroupBookmark(Model):
 
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project", related_name="bookmark_set")
-    group = FlexibleForeignKey("sentry.Group", related_name="bookmark_set")
+    project = FlexibleForeignKey(
+        "sentry.Project", related_name="bookmark_set", on_delete=models.CASCADE
+    )
+    group = FlexibleForeignKey(
+        "sentry.Group", related_name="bookmark_set", on_delete=models.CASCADE
+    )
     # namespace related_name on User since we don't own the model
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, related_name="sentry_bookmark_set")
+    user = FlexibleForeignKey(
+        settings.AUTH_USER_MODEL, related_name="sentry_bookmark_set", on_delete=models.CASCADE
+    )
     date_added = models.DateTimeField(default=timezone.now, null=True)
 
     objects = BaseManager()

@@ -17,7 +17,9 @@ class UserAvatar(AvatarBase):
 
     FILE_TYPE = "avatar.file"
 
-    user = FlexibleForeignKey("sentry.User", unique=True, related_name="avatar")
+    user = FlexibleForeignKey(
+        "sentry.User", unique=True, related_name="avatar", on_delete=models.CASCADE
+    )
     avatar_type = models.PositiveSmallIntegerField(default=0, choices=AVATAR_TYPES)
 
     objects = BaseManager(cache_fields=["user"])

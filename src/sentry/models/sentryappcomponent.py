@@ -9,7 +9,9 @@ class SentryAppComponent(Model):
     __core__ = True
 
     uuid = UUIDField(unique=True, auto_add=True)
-    sentry_app = FlexibleForeignKey("sentry.SentryApp", related_name="components")
+    sentry_app = FlexibleForeignKey(
+        "sentry.SentryApp", related_name="components", on_delete=models.CASCADE
+    )
     type = models.CharField(max_length=64)
     schema = EncryptedJsonField()
 

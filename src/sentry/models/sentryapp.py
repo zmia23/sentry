@@ -71,7 +71,9 @@ class SentryApp(ParanoidModel, HasApiScopes):
 
     # The Organization the Sentry App was created in "owns" it. Members of that
     # Org have differing access, dependent on their role within the Org.
-    owner = FlexibleForeignKey("sentry.Organization", related_name="owned_sentry_apps")
+    owner = FlexibleForeignKey(
+        "sentry.Organization", related_name="owned_sentry_apps", on_delete=models.CASCADE
+    )
 
     name = models.TextField()
     slug = models.CharField(max_length=SENTRY_APP_SLUG_MAX_LENGTH, unique=True)

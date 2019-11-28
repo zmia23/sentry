@@ -100,8 +100,10 @@ class OrganizationOnboardingTask(Model):
         (OnboardingTaskStatus.SKIPPED, "Skipped"),
     )
 
-    organization = FlexibleForeignKey("sentry.Organization")
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, null=True)  # user that completed
+    organization = FlexibleForeignKey("sentry.Organization", on_delete=models.CASCADE)
+    user = FlexibleForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE
+    )  # user that completed
     task = BoundedPositiveIntegerField(choices=TASK_CHOICES)
     status = BoundedPositiveIntegerField(choices=STATUS_CHOICES)
     date_completed = models.DateTimeField(default=timezone.now)

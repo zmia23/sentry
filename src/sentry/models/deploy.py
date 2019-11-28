@@ -17,7 +17,7 @@ class Deploy(Model):
     __core__ = False
 
     organization_id = BoundedPositiveIntegerField(db_index=True)
-    release = FlexibleForeignKey("sentry.Release")
+    release = FlexibleForeignKey("sentry.Release", on_delete=models.CASCADE)
     environment_id = BoundedPositiveIntegerField(db_index=True)
     date_finished = models.DateTimeField(default=timezone.now)
     date_started = models.DateTimeField(null=True, blank=True)

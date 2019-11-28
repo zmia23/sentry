@@ -9,11 +9,11 @@ from sentry.db.models import BoundedBigIntegerField, FlexibleForeignKey, Model, 
 class UserReport(Model):
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project")
-    group = FlexibleForeignKey("sentry.Group", null=True)
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    group = FlexibleForeignKey("sentry.Group", null=True, on_delete=models.CASCADE)
     event_user_id = BoundedBigIntegerField(null=True)
     event_id = models.CharField(max_length=32)
-    environment = FlexibleForeignKey("sentry.Environment", null=True)
+    environment = FlexibleForeignKey("sentry.Environment", null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
     email = models.EmailField(max_length=75)
     comments = models.TextField()

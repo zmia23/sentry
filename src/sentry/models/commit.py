@@ -17,7 +17,7 @@ class Commit(Model):
     date_added = models.DateTimeField(default=timezone.now)
     # all commit metadata must be optional, as it may not be available
     # when the initial commit object is referenced (and thus created)
-    author = FlexibleForeignKey("sentry.CommitAuthor", null=True)
+    author = FlexibleForeignKey("sentry.CommitAuthor", null=True, on_delete=models.CASCADE)
     message = models.TextField(null=True)
 
     class Meta:

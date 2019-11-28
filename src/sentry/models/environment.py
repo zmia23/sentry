@@ -15,8 +15,8 @@ OK_NAME_PATTERN = re.compile(ENVIRONMENT_NAME_PATTERN)
 class EnvironmentProject(Model):
     __core__ = False
 
-    project = FlexibleForeignKey("sentry.Project")
-    environment = FlexibleForeignKey("sentry.Environment")
+    project = FlexibleForeignKey("sentry.Project", on_delete=models.CASCADE)
+    environment = FlexibleForeignKey("sentry.Environment", on_delete=models.CASCADE)
     is_hidden = models.NullBooleanField()
 
     class Meta:

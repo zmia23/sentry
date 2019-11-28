@@ -16,8 +16,10 @@ class ProjectBookmark(Model):
 
     __core__ = True
 
-    project = FlexibleForeignKey(Project, blank=True, null=True, db_constraint=False)
-    user = FlexibleForeignKey(settings.AUTH_USER_MODEL)
+    project = FlexibleForeignKey(
+        Project, blank=True, null=True, db_constraint=False, on_delete=models.CASCADE
+    )
+    user = FlexibleForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date_added = models.DateTimeField(default=timezone.now, null=True)
 
     objects = BaseManager()
