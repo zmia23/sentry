@@ -149,3 +149,20 @@ class SlackActionHandler(ActionHandler):
         send_incident_alert_notification(
             self.action.integration, self.incident, self.action.target_identifier
         )
+
+
+@AlertRuleTriggerAction.register_type(
+    "pagerduty",
+    AlertRuleTriggerAction.Type.PAGERDUTY,
+    [AlertRuleTriggerAction.TargetType.SPECIFIC],
+    integration_provider="pagerduty",
+)
+class PagerDutyActionHandler(ActionHandler):
+    def fire(self):
+        self.send_alert()
+
+    def resolve(self):
+        self.send_alert()
+
+    def send_alert(self):
+        pass

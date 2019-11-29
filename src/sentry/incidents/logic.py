@@ -1080,6 +1080,9 @@ def update_alert_rule_trigger_action(
             # Use the channel name for display
             updated_fields["target_display"] = target_identifier
             updated_fields["target_identifier"] = channel_id
+        elif type == AlertRuleTriggerAction.Type.PAGERDUTY.value:
+            # TODO: Implement this.
+            updated_fields["target_identifier"] = "XXX"
         else:
             updated_fields["target_identifier"] = target_identifier
 
