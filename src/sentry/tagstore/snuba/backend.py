@@ -253,7 +253,7 @@ class SnubaTagStorage(TagStorage):
     def get_tag_keys_for_projects(
         self, projects, environments, start, end, status=TagKeyStatus.VISIBLE
     ):
-        MAX_UNSAMPLED_PROJECTS = 50
+        MAX_UNSAMPLED_PROJECTS = 0
         # We want to disable FINAL in the snuba query to reduce load.
         optimize_kwargs = {"turbo": True}
         # If we are fetching less than MAX_UNSAMPLED_PROJECTS, then disable
