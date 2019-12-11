@@ -7,6 +7,7 @@ class SentryWebpackPerfPlugin {
   constructor({dsn}) {
     Sentry.init({
       dsn,
+      tracesSampleRate: 1,
       // integrations: [
       // new Integrations.Tracing({
       // // tracingOrigins: ['localhost', 'sentry.io', /^\//],
@@ -14,32 +15,39 @@ class SentryWebpackPerfPlugin {
       // }),
       // ],
     });
-    Sentry.configureScope(scope => {
-      scope.setTransaction('webpack');
-      this.transaction = Sentry.getCurrentHub().startSpan({
-        op: 'webpack-init',
-        description: 'webpack initialization',
-      });
-      Sentry.getCurrentHub().captureEvent({
-        spans: [],
-        start_timestamp: +new Date(),
-        tags: [],
-        timestamp: +new Date() + 1000,
-        transaction: 'transaction test',
-        type: 'transaction',
-      });
-    });
+    // this.transaction.initFinishedSpans();
   }
 
   apply(compiler) {
-    compiler.hooks.done.tapAsync('SentryWebpackPerfPlugin', (_compilation, callback) => {
-      this.transaction.finish();
-      callback();
+    let spans = {};
+    this.transaction = Sentry.getCurrentHub().startSpan({
+      op: 'webpack-init',
+      description: 'webpack initialization',
+      transaction: 'webpack',
     });
+
+    compiler.hooks.done.tapAsync(
+      'SentryWebpackPerfPlugin',
+      async (_compilation, callback) => {
+        this.transaction.finish();
+        await Sentry.flush();
+        callback();
+      }
+    );
 
     compiler.hooks.beforeCompile.tapAsync(
       'SentryWebpackPerfPlugin',
       (params, callback) => {
+        spans.compile = Sentry.getCurrentHub().startSpan({
+          op: 'compile',
+        });
+        callback();
+      }
+    );
+    compiler.hooks.afterCompile.tapAsync(
+      'SentryWebpackPerfPlugin',
+      (params, callback) => {
+        spans.compile.finish();
         callback();
       }
     );
@@ -47,7 +55,7 @@ class SentryWebpackPerfPlugin {
 
     compiler.hooks.compilation.tap('SentryWebpackPerfPlugin', compilation => {
       compilation.hooks.buildModule.tap('SentryWebpackPerfPlugin', module => {
-        console.log(module);
+        // console.log(module);
       });
     });
   }
