@@ -13,6 +13,7 @@ const CompressionPlugin = require('compression-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries');
 const CopyPlugin = require('copy-webpack-plugin');
+const SentryWebpackPerfPlugin = require('./build-utils/sentry-apm');
 
 const babelConfig = require('./babel.config');
 
@@ -318,6 +319,12 @@ let appConfig = {
     new FixStyleOnlyEntriesPlugin(),
 
     ...localeRestrictionPlugins,
+
+    new SentryWebpackPerfPlugin({
+      dsn: 'https://1e77769d661c4caab572f453e631362e@sentry.io/1853222',
+    }),
+
+    new webpack.debug.ProfilingPlugin(),
   ],
   resolve: {
     alias: {
