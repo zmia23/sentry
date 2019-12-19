@@ -1,10 +1,3 @@
-/**
- * A component to render a Field (i.e. label + help + form "control"),
- * generally inside of a Panel.
- *
- * This is unconnected to any Form state
- */
-
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -17,104 +10,147 @@ import FieldLabel from 'app/views/settings/components/forms/field/fieldLabel';
 import FieldRequiredBadge from 'app/views/settings/components/forms/field/fieldRequiredBadge';
 import FieldWrapper from 'app/views/settings/components/forms/field/fieldWrapper';
 
-class Field extends React.Component {
-  static propTypes = {
-    /**
-     * Aligns Control to the right
-     */
-    alignRight: PropTypes.bool,
+const defaultProps = {
+  alignRight: false,
+  inline: true,
+  disabled: false,
+  required: false,
+  visible: true,
+};
 
-    /**
-     * Is "highlighted", i.e. after a search
-     */
-    highlighted: PropTypes.bool,
+// Type guard for render func.
+function isRenderFunc(func: React.ReactNode | Function): func is ChildRenderFunction {
+  return typeof func === 'function';
+}
 
-    /**
-     * Show "required" indicator
-     */
-    required: PropTypes.bool,
+type DefaultProps = typeof defaultProps;
 
-    /**
-     * Should field be visible
-     */
-    visible: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
+type FieldProps = {
+  className?: string;
 
-    /**
-     * Should field be disabled?
-     */
-    disabled: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
+  /**
+   * Aligns Control to the right
+   */
+  alignRight?: boolean;
 
-    /**
-     * Reason why field is disabled (displays in tooltip)
-     */
-    disabledReason: PropTypes.string,
+  /**
+   * Is "highlighted", i.e. after a search
+   */
+  highlighted?: boolean;
 
-    /**
-     * Error message
-     */
-    error: PropTypes.string,
+  /**
+   * Show "required" indicator
+   */
+  required?: boolean;
 
-    /**
-     * Hide ControlState component
-     */
-    flexibleControlStateSize: PropTypes.bool,
+  /**
+   * Should field be visible
+   */
+  visible?: boolean | ((props: Props) => boolean);
 
-    /**
-     * User-facing field name
-     */
-    label: PropTypes.node,
+  /**
+   * Should field be disabled?
+   */
+  disabled?: boolean | ((props: Props) => boolean);
 
-    /**
-     * Help or description of the field
-     */
-    help: PropTypes.oneOfType([PropTypes.node, PropTypes.element, PropTypes.func]),
+  /**
+   * Reason why field is disabled (displays in tooltip)
+   */
+  disabledReason?: string;
 
-    /**
-     * Should Control be inline with Label
-     */
-    inline: PropTypes.bool,
+  /**
+   * Error message
+   */
+  error?: string;
 
-    /**
-     * Should the field display in a stacked manner (no borders + reduced padding
-     */
-    stacked: PropTypes.bool,
+  /**
+   * Hide ControlState component
+   */
+  flexibleControlStateSize?: boolean;
 
-    /**
-     * The control's `id` property
-     */
-    id: PropTypes.string,
+  /**
+   * User-facing field name
+   */
+  label?: React.ReactNode;
 
-    /**
-     * Field is in saving state
-     */
-    isSaving: PropTypes.bool,
+  /**
+   * Help or description of the field
+   */
+  help?: React.ReactNode | Function;
 
-    /**
-     * Field has finished saving state
-     */
-    isSaved: PropTypes.bool,
+  /**
+   * Should Control be inline with Label
+   */
+  inline?: boolean;
 
+  /**
+   * Should the field display in a stacked manner (no borders + reduced padding
+   */
+  stacked?: boolean;
+
+  /**
+   * The control's `id` property
+   */
+  id?: string;
+
+  /**
+   * Field is in saving state
+   */
+  isSaving?: boolean;
+
+  /**
+   * Field has finished saving state
+   */
+  isSaved?: boolean;
+
+  /**
+   * Class name for inner control
+   */
+  controlClassName?: string;
+
+  /** Inline style */
+  style?: React.CSSProperties;
+};
+
+type ChildRenderFunction = (props: FieldControl['props'] & FieldProps) => React.ReactNode;
+
+type Props = FieldProps &
+  Partial<DefaultProps> & {
     /**
      * The Control component
      */
+    children: React.ReactNode | ChildRenderFunction;
+  };
+
+/**
+ * A component to render a Field (i.e. label + help + form "control"),
+ * generally inside of a Panel.
+ *
+ * This is unconnected to any Form state
+ */
+class Field extends React.Component<Props> {
+  static propTypes: any = {
+    alignRight: PropTypes.bool,
+    highlighted: PropTypes.bool,
+    required: PropTypes.bool,
+    visible: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
+    disabled: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
+    disabledReason: PropTypes.string,
+    error: PropTypes.string,
+    flexibleControlStateSize: PropTypes.bool,
+    label: PropTypes.node,
+    help: PropTypes.oneOfType([PropTypes.node, PropTypes.element, PropTypes.func]),
+    inline: PropTypes.bool,
+    stacked: PropTypes.bool,
+    id: PropTypes.string,
+    isSaving: PropTypes.bool,
+    isSaved: PropTypes.bool,
     children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-
-    /**
-     * Class name for inner control
-     */
     controlClassName: PropTypes.string,
-
-    /** Inline style */
     style: PropTypes.object,
   };
 
-  static defaultProps = {
-    alignRight: false,
-    inline: true,
-    disabled: false,
-    required: false,
-    visible: true,
-  };
+  static defaultProps: DefaultProps = defaultProps;
 
   render() {
     const {className, ...otherProps} = this.props;
@@ -157,11 +193,13 @@ class Field extends React.Component {
       flexibleControlStateSize,
       help: helpElement,
       errorState: error ? <FieldErrorReason>{error}</FieldErrorReason> : null,
-      controlState: <ControlState error={error} isSaving={isSaving} isSaved={isSaved} />,
+      controlState: (
+        <ControlState error={!!error} isSaving={isSaving} isSaved={isSaved} />
+      ),
     };
 
     // See comments in prop types
-    if (typeof children === 'function') {
+    if (isRenderFunc(children)) {
       Control = children({
         ...otherProps,
         ...controlProps,
@@ -187,7 +225,7 @@ class Field extends React.Component {
               </FieldLabel>
             )}
             {helpElement && (
-              <FieldHelp stacked={stacked} inline={inline}>
+              <FieldHelp stacked={!!stacked} inline={!!inline}>
                 {helpElement}
               </FieldHelp>
             )}
