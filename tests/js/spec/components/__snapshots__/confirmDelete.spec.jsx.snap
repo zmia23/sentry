@@ -103,7 +103,11 @@ exports[`ConfirmDelete renders 1`] = `
                 </FieldDescription>
                 <FieldControl
                   alignRight={false}
-                  controlState={<ControlState />}
+                  controlState={
+                    <ControlState
+                      error={false}
+                    />
+                  }
                   disabled={false}
                   errorState={null}
                   flexibleControlStateSize={true}
@@ -147,7 +151,9 @@ exports[`ConfirmDelete renders 1`] = `
                             <div
                               className="css-18vhbhh-FieldControlState ep9s0su0"
                             >
-                              <ControlState />
+                              <ControlState
+                                error={false}
+                              />
                             </div>
                           </FieldControlState>
                         </div>
