@@ -354,7 +354,9 @@ def get_channel_id(organization, integration_id, name):
     token_payload = {"token": integration.metadata["access_token"]}
 
     # Look for channel ID
-    payload = dict(token_payload, **{"exclude_archived": False, "exclude_members": True})
+    payload = dict(
+        token_payload, **{"exclude_archived": False, "exclude_members": True, "limit": 1000}
+    )
 
     session = http.build_session()
     for list_type, result_name, prefix in LIST_TYPES:
