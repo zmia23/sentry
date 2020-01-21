@@ -704,36 +704,7 @@ class QueryTransformTest(TestCase):
             selected_columns=["transaction", "p95()"],
             query="http.method:GET p95():>5",
             params={"project_id": [self.project.id], "start": start_time, "end": end_time},
-        )
-
-        mock_query.assert_called_with(
-            selected_columns=["transaction"],
-            conditions=[["http_method", "=", "GET"]],
-            filter_keys={"project_id": [self.project.id]},
-            groupby=["transaction"],
-            dataset=Dataset.Discover,
-            aggregations=[["quantile(0.95)(duration)", None, "p95"]],
-            having=[["p95", ">", 5]],
-            end=end_time,
-            start=start_time,
-            orderby=None,
-            limit=50,
-            offset=None,
-            referrer=None,
-        )
-
-    @patch("sentry.snuba.discover.raw_query")
-    def test_alias_aggregate_conditions_with_brackets(self, mock_query):
-        mock_query.return_value = {
-            "meta": [{"name": "transaction"}, {"name": "duration"}],
-            "data": [{"transaction": "api.do_things", "duration": 200}],
-        }
-        start_time = before_now(minutes=10)
-        end_time = before_now(seconds=1)
-        discover.query(
-            selected_columns=["transaction", "p95()"],
-            query="http.method:GET p95():>5",
-            params={"project_id": [self.project.id], "start": start_time, "end": end_time},
+            use_aggregate_conditions=True,
         )
 
         mock_query.assert_called_with(
