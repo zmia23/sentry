@@ -7,10 +7,9 @@ ifneq "$(wildcard /usr/local/opt/openssl/lib)" ""
 	LDFLAGS += -L/usr/local/opt/openssl/lib
 endif
 
-PIP := LDFLAGS="$(LDFLAGS)" python -m pip
+PIP := LDFLAGS="$(LDFLAGS)" python -m pip --disable-pip-version-check
 # Note: this has to be synced with the pip version in .travis.yml.
 PIP_VERSION := 19.2.3
-PIP_OPTS := --disable-pip-version-check
 WEBPACK := NODE_ENV=production ./bin/yarn webpack
 YARN := ./bin/yarn
 
@@ -75,7 +74,7 @@ setup-git: ensure-latest-pip
 	git config branch.autosetuprebase always
 	git config core.ignorecase false
 	cd .git/hooks && ln -sf ../../config/hooks/* ./
-	$(PIP) install "pre-commit==1.18.2" $(PIP_OPTS)
+	$(PIP) install "pre-commit==1.18.2"
 	pre-commit install --install-hooks
 	@echo ""
 
@@ -105,7 +104,7 @@ venv-sync: ./bin/venv-update requirements-base.txt requirements-dev.txt
 
 install-sentry-dev: venv-sync node-version-check
 	@echo "--> Installing Sentry (for development)"
-	source ./.venv/bin/activate; SENTRY_LIGHT_BUILD=1 $(PIP) install -e ".[dev]" $(PIP_OPTS)
+	source ./.venv/bin/activate; SENTRY_LIGHT_BUILD=1 $(PIP) install -e ".[dev]"
 	@[ -z "$$VIRTUAL_ENV"] && echo "Your virtualenv is set up for sentry dev, but it doesn't seem to be activated. Please run: source .venv/bin/activate"
 	@echo "Installation complete. Note that assets weren't webpacked - you'll need that for acceptance testing or frontend development."
 
@@ -120,7 +119,7 @@ locale: build-js-po
 	cd src/sentry && sentry django compilemessages
 
 update-transifex: build-js-po
-	$(PIP) install transifex-client $(PIP_OPTS)
+	$(PIP) install transifex-client
 	cd src/sentry && sentry django makemessages -i static -l en
 	./bin/merge-catalogs en
 	tx push -s
@@ -262,7 +261,7 @@ travis-test-dist:
 .PHONY: scan-python travis-scan-postgres travis-scan-acceptance travis-scan-snuba travis-scan-symbolicator travis-scan-js travis-scan-cli travis-scan-dist travis-scan-lint
 scan-python:
 	@echo "--> Running Python vulnerability scanner"
-	$(PIP) install safety $(PIP_OPTS)
+	$(PIP) install safety
 	bin/scan
 	@echo ""
 
