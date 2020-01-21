@@ -24,9 +24,7 @@ endif
 
 bootstrap: develop init-config run-dependent-services create-db apply-migrations
 
-develop: ensure-venv setup-git develop-only
-
-develop-only: ensure-venv update-submodules install-yarn-pkgs install-sentry-dev
+develop: update-submodules install-sentry-dev install-yarn-pkgs
 
 init-config:
 	sentry init --dev
@@ -62,9 +60,6 @@ clean:
 	@echo "--> Cleaning python build artifacts"
 	rm -rf build/ dist/ src/sentry/assets.json
 	@echo ""
-
-ensure-venv:
-	@./scripts/ensure-venv.sh
 
 ensure-latest-pip:
 	$(PIP) install "pip==$(PIP_VERSION)"
@@ -105,7 +100,7 @@ venv-sync: ./bin/venv-update requirements-base.txt requirements-dev.txt
 		install= -r requirements-base.txt -r requirements-dev.txt \
 		pip-command= $(PIP) install
 
-install-sentry-dev: venv-sync node-version-check
+install-sentry-dev: venv-sync node-version-check setup-git
 	@echo "--> Installing Sentry (for development)"
 	source ./.venv/bin/activate; SENTRY_LIGHT_BUILD=1 $(PIP) install -e ".[dev]"
 	@[ -z "$$VIRTUAL_ENV"] && echo "Your virtualenv is set up for sentry dev, but it doesn't seem to be activated. Please run: source .venv/bin/activate"
