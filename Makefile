@@ -7,7 +7,7 @@ ifneq "$(wildcard /usr/local/opt/openssl/lib)" ""
 	LDFLAGS += -L/usr/local/opt/openssl/lib
 endif
 
-PIP := LDFLAGS="$(LDFLAGS)" python -m pip --disable-pip-version-check
+PIP := python -m pip --disable-pip-version-check
 # Note: this has to be synced with the pip version in .travis.yml.
 PIP_VERSION := 19.2.3
 WEBPACK := NODE_ENV=production ./bin/yarn webpack
@@ -100,13 +100,16 @@ install-yarn-pkgs:
 
 .PHONY: venv-sync
 venv-sync: ./bin/venv-update requirements-base.txt requirements-dev.txt
-	./bin/venv-update venv= -ppython2.7 ./.venv install= -r requirements-base.txt -r requirements-dev.txt
+	LDFLAGS="$(LDFLAGS)" ./bin/venv-update \
+		venv= -ppython2.7 ./.venv \
+		install= -r requirements-base.txt -r requirements-dev.txt \
+		pip-command= $(PIP) install
 
 install-sentry-dev: venv-sync node-version-check
 	@echo "--> Installing Sentry (for development)"
 	source ./.venv/bin/activate; SENTRY_LIGHT_BUILD=1 $(PIP) install -e ".[dev]"
 	@[ -z "$$VIRTUAL_ENV"] && echo "Your virtualenv is set up for sentry dev, but it doesn't seem to be activated. Please run: source .venv/bin/activate"
-	@echo "Installation complete. Note that assets weren't webpacked - you'll need that for acceptance testing or frontend development."
+	@echo "Installation complete. Note that assets weren't webpacked - you'll need that for acceptance testing or frontend development.
 
 build-js-po: node-version-check
 	mkdir -p build
