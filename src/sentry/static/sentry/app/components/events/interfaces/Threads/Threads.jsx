@@ -1,18 +1,20 @@
 import isNil from 'lodash/isNil';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {t} from 'app/locale';
+import { t } from 'app/locale';
 import EventDataSection from 'app/components/events/eventDataSection';
 import SentryTypes from 'app/sentryTypes';
-import {isStacktraceNewestFirst} from 'app/components/events/interfaces/stacktrace';
-import {defined} from 'app/utils';
+import { isStacktraceNewestFirst } from 'app/components/events/interfaces/stacktrace';
+import { defined } from 'app/utils';
 import DropdownLink from 'app/components/dropdownLink';
 import MenuItem from 'app/components/menuItem';
-import {trimPackage} from 'app/components/events/interfaces/frame';
+import { trimPackage } from 'app/components/events/interfaces/frame';
 import CrashHeader from 'app/components/events/interfaces/crashHeader';
 import CrashContent from 'app/components/events/interfaces/crashContent';
 import Pills from 'app/components/pills';
 import Pill from 'app/components/pill';
+
+import ThreadsSelector from './ThreadsSelector'
 
 function trimFilename(fn) {
   const pieces = fn.split(/\//g);
@@ -66,46 +68,6 @@ function findThreadStacktrace(thread, event, raw) {
   return null;
 }
 
-function getThreadTitle(thread, event, simplified) {
-  const stacktrace = findThreadStacktrace(thread, event, false);
-  const bits = ['Thread'];
-  if (defined(thread.name)) {
-    bits.push(` "${thread.name}"`);
-  }
-  if (defined(thread.id)) {
-    bits.push(' #' + thread.id);
-  }
-
-  if (!simplified) {
-    if (stacktrace) {
-      const frame = findRelevantFrame(stacktrace);
-      bits.push(' — ');
-      bits.push(
-        <em key="location">
-          {frame.filename
-            ? trimFilename(frame.filename)
-            : frame.package
-            ? trimPackage(frame.package)
-            : frame.module
-            ? frame.module
-            : '<unknown>'}
-        </em>
-      );
-    }
-
-    if (thread.crashed) {
-      const exc = findThreadException(thread, event);
-      bits.push(' — ');
-      bits.push(
-        <small key="crashed">
-          {exc ? `(crashed with ${exc.values[0].type})` : '(crashed)'}
-        </small>
-      );
-    }
-  }
-
-  return bits;
-}
 
 function getIntendedStackView(thread, event) {
   const stacktrace = findThreadStacktrace(thread, event, false);
@@ -151,7 +113,7 @@ class Thread extends React.Component {
   };
 
   hasMissingStacktrace = () => {
-    const {exception, stacktrace} = this.props;
+    const { exception, stacktrace } = this.props;
     return !(exception || stacktrace);
   };
 
@@ -185,16 +147,16 @@ class Thread extends React.Component {
         {this.hasMissingStacktrace() ? (
           this.renderMissingStacktrace()
         ) : (
-          <CrashContent
-            event={event}
-            stackType={stackType}
-            stackView={stackView}
-            newestFirst={newestFirst}
-            projectId={projectId}
-            exception={exception}
-            stacktrace={stacktrace}
-          />
-        )}
+            <CrashContent
+              event={event}
+              stackType={stackType}
+              stackView={stackView}
+              newestFirst={newestFirst}
+              projectId={projectId}
+              exception={exception}
+              stacktrace={stacktrace}
+            />
+          )}
       </div>
     );
   }
@@ -257,33 +219,12 @@ class ThreadsInterface extends React.Component {
 
   render() {
     const evt = this.props.event;
-    const {projectId, hideGuide} = this.props;
-    const {stackView, stackType, newestFirst, activeThread} = this.state;
+    const { projectId, hideGuide } = this.props;
+    const { stackView, stackType, newestFirst, activeThread } = this.state;
     const exception = this.getException();
     const stacktrace = this.getStacktrace();
 
     const threads = this.props.data.values || [];
-
-    const threadSelector = (
-      <div className="pull-left btn-group">
-        <DropdownLink
-          btnGroup
-          caret
-          className="btn btn-default btn-sm"
-          title={getThreadTitle(activeThread, this.props.event, true)}
-        >
-          {threads.map((thread, idx) => {
-            return (
-              <MenuItem key={idx} noAnchor>
-                <a onClick={this.onSelectNewThread.bind(this, thread)}>
-                  {getThreadTitle(thread, this.props.event, false)}
-                </a>
-              </MenuItem>
-            );
-          })}
-        </DropdownLink>
-      </div>
-    );
 
     const titleProps = {
       platform: evt.platform,
@@ -299,14 +240,16 @@ class ThreadsInterface extends React.Component {
       threads.length > 1 ? (
         <CrashHeader
           title={null}
-          beforeTitle={threadSelector}
+          beforeTitle={<ThreadsSelector threads={threads} />}
           thread={activeThread}
           exception={exception}
           {...titleProps}
         />
       ) : (
-        <CrashHeader title={t('Stacktrace')} {...titleProps} />
-      );
+          <CrashHeader title={t('Stacktrace')} {...titleProps} />
+        );
+
+    console.log('event', evt)
 
     return (
       <EventDataSection
@@ -326,6 +269,7 @@ class ThreadsInterface extends React.Component {
           projectId={projectId}
         />
       </EventDataSection>
+
     );
   }
 }

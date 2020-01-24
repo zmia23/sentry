@@ -35,15 +35,15 @@ class SelectAsyncField extends SelectField {
   };
 
   onResults = data => {
-    const {name} = this.props;
+    const { name } = this.props;
     const results = data && data[name];
 
-    return (results && results.map(({id, text}) => ({value: id, label: text}))) || [];
+    return (results && results.map(({ id, text }) => ({ value: id, label: text }))) || [];
   };
 
   onQuery = query => {
     // Used by legacy integrations
-    return {autocomplete_query: query, autocomplete_field: this.props.name};
+    return { autocomplete_query: query, autocomplete_field: this.props.name };
   };
 
   getField() {

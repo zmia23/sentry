@@ -1,8 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Tooltip from 'app/components/tooltip';
-import {t} from 'app/locale';
+import Box from 'app/components/Box';
+import { t } from 'app/locale';
 import GuideAnchor from 'app/components/assistant/guideAnchor';
+import styled from '@emotion/styled'
+
+const StyledBeforeTitleBox = styled(Box)({
+  marginBottom: 9
+})
 
 class CrashHeader extends React.Component {
   static propTypes = {
@@ -24,7 +30,7 @@ class CrashHeader extends React.Component {
   };
 
   hasSystemFrames() {
-    const {stacktrace, thread, exception} = this.props;
+    const { stacktrace, thread, exception } = this.props;
     return (
       (stacktrace && stacktrace.hasSystemFrames) ||
       (thread && thread.stacktrace && thread.stacktrace.hasSystemFrames) ||
@@ -37,7 +43,7 @@ class CrashHeader extends React.Component {
     if (!this.props.stackType) {
       return false;
     }
-    const {exception, thread} = this.props;
+    const { exception, thread } = this.props;
     return (
       (exception && !!exception.values.find(x => x.rawStacktrace)) ||
       (thread && !!thread.rawStacktrace)
@@ -85,15 +91,15 @@ class CrashHeader extends React.Component {
   }
 
   render() {
-    const {title, beforeTitle, hideGuide, stackView, stackType, newestFirst} = this.props;
+    const { title, beforeTitle, hideGuide, stackView, stackType, newestFirst } = this.props;
 
     let titleNode = (
-      <h3 className="pull-left">
+      <h3 className="pull-left" style={{ marginBottom: 0 }}>
         {title}
-        <small style={{marginLeft: 5}}>
+        <small style={{ marginLeft: 5 }}>
           (
           <Tooltip title={t('Toggle stacktrace order')}>
-            <a onClick={this.handleToggleOrder} style={{borderBottom: '1px dotted #aaa'}}>
+            <a onClick={this.handleToggleOrder} style={{ borderBottom: '1px dotted #aaa' }}>
               {newestFirst ? t('most recent call first') : t('most recent call last')}
             </a>
           </Tooltip>
@@ -111,10 +117,12 @@ class CrashHeader extends React.Component {
     }
 
     return (
-      <div className="crash-title">
-        {beforeTitle}
-        {titleNode}
-        <div className="btn-group" style={{marginLeft: 10}}>
+      <Box alignItems='center'>
+        <StyledBeforeTitleBox flexGrow={1} flexShrink={1} alignItems='center'>
+          {beforeTitle}
+          {titleNode}
+        </StyledBeforeTitleBox>
+        <div className="btn-group" style={{ marginLeft: 10 }}>
           {this.hasSystemFrames() && (
             <a
               className={
@@ -160,7 +168,7 @@ class CrashHeader extends React.Component {
             </a>,
           ]}
         </div>
-      </div>
+      </Box>
     );
   }
 }
