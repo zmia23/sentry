@@ -8,7 +8,6 @@ import { isStacktraceNewestFirst } from 'app/components/events/interfaces/stackt
 import { defined } from 'app/utils';
 import DropdownLink from 'app/components/dropdownLink';
 import MenuItem from 'app/components/menuItem';
-import { trimPackage } from 'app/components/events/interfaces/frame';
 import CrashHeader from 'app/components/events/interfaces/crashHeader';
 import CrashContent from 'app/components/events/interfaces/crashContent';
 import Pills from 'app/components/pills';
@@ -16,12 +15,7 @@ import Pill from 'app/components/pill';
 
 import ThreadsSelector from './ThreadsSelector'
 
-function trimFilename(fn) {
-  const pieces = fn.split(/\//g);
-  return pieces[pieces.length - 1];
-}
-
-function findRelevantFrame(stacktrace) {
+export function findRelevantFrame(stacktrace) {
   if (!stacktrace.hasSystemFrames) {
     return stacktrace.frames[stacktrace.frames.length - 1];
   }
@@ -49,7 +43,7 @@ function findThreadException(thread, event) {
   return null;
 }
 
-function findThreadStacktrace(thread, event, raw) {
+export function findThreadStacktrace(thread, event, raw) {
   if (raw && thread.rawStacktrace) {
     return thread.rawStacktrace;
   } else if (thread.stacktrace) {
@@ -236,11 +230,12 @@ class ThreadsInterface extends React.Component {
       onChange: newState => this.setState(newState),
     };
 
+    console.log('threads', threads)
     const title =
       threads.length > 1 ? (
         <CrashHeader
           title={null}
-          beforeTitle={<ThreadsSelector threads={threads} />}
+          beforeTitle={<ThreadsSelector threads={threads} event={event} />}
           thread={activeThread}
           exception={exception}
           {...titleProps}

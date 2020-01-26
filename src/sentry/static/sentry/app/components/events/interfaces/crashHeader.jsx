@@ -6,8 +6,8 @@ import { t } from 'app/locale';
 import GuideAnchor from 'app/components/assistant/guideAnchor';
 import styled from '@emotion/styled'
 
-const StyledBeforeTitleBox = styled(Box)({
-  marginBottom: 9
+const StyledContainer = styled(Box)({
+  marginBottom: 20
 })
 
 class CrashHeader extends React.Component {
@@ -117,11 +117,11 @@ class CrashHeader extends React.Component {
     }
 
     return (
-      <Box alignItems='center'>
-        <StyledBeforeTitleBox flexGrow={1} flexShrink={1} alignItems='center'>
+      <StyledContainer alignItems='center'>
+        <Box flexGrow={1} flexShrink={1}>
           {beforeTitle}
           {titleNode}
-        </StyledBeforeTitleBox>
+        </Box>
         <div className="btn-group" style={{ marginLeft: 10 }}>
           {this.hasSystemFrames() && (
             <a
@@ -168,7 +168,7 @@ class CrashHeader extends React.Component {
             </a>,
           ]}
         </div>
-      </Box>
+      </StyledContainer>
     );
   }
 }

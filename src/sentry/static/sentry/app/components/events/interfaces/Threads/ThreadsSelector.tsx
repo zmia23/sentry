@@ -1,32 +1,53 @@
 import React from 'react'
 import { default as ReactSelect } from 'react-select'
 import InlineSvg from 'app/components/inlineSvg'
+import Badge from 'app/components/badge';
 import Box from 'app/components/Box'
+import styled from '@emotion/styled'
 
-// const options = [
-//     { value: 'chocolate', label: 'Chocolate' },
-//     { value: 'strawberry', label: 'Strawberry' },
-//     { value: 'vanilla', label: 'Vanilla' }
-// ]
+import getThreadLabel, { Thread } from './getThreadLabel'
 
 interface Props {
     className?: string
     threads: Array<Thread>
+    event: any
 }
 
-interface Thread {
-    name?: string
-    id?: string
-    crashed: boolean
-    current: boolean
-}
+const StyledInlineSvg = styled(InlineSvg)(({ theme }) => ({
+    color: theme.orange
+}))
 
-const ThreadsSelector: React.FC<Props> = ({ className, threads }) => {
+const StyledBadge = styled(Badge)({
+    marginRight: 5
+})
+
+const StyledFormatOptionLabelContainer = styled(Box)({
+    minHeight: 28
+})
+
+const ThreadsSelector: React.FC<Props> = ({ className, threads, event }) => {
+    const SingleValue = () => (
+        <div>oi</div>
+    );
+
     return (
         <ReactSelect
             defaultValue={threads[0]}
             className={className}
             styles={{
+                control: provided => ({
+                    ...provided,
+                    width: '100%',
+                    height: 28,
+                    minHeight: 28,
+                    border: '1px solid #c1b8ca',
+                    borderColor: '#c1b8ca',
+                    boxShadow: '0 2px 0 rgba(0, 0, 0, 0.03)',
+                    cursor: 'pointer',
+                    ':hover': {
+                        borderColor: '#c1b8ca'
+                    }
+                }),
                 container: provided => ({
                     ...provided,
                     zIndex: 3,
@@ -34,37 +55,92 @@ const ThreadsSelector: React.FC<Props> = ({ className, threads }) => {
                     display: 'inline-flex',
                     // TODO: define width in the theme ?
                     width: 420,
+                    height: 30
                 }),
-                control: provided => ({
+                valueContainer: (base) => ({
+                    ...base,
+                    maxHeight: '100%'
+                }),
+                indicatorsContainer: provided => ({
                     ...provided,
-                    width: '100%'
+                    maxHeight: '100%'
                 }),
                 dropdownIndicator: (provided, state) => ({
                     ...provided,
                     transition: 'all .2s ease',
                     transform: state.selectProps.menuIsOpen ? 'rotate(180deg)' : ''
                 }),
-                option: provided => ({
-                    ...provided,
-                    // backgroundColor: 'transparent'
-                }),
+                singleValue: (provided, state) => {
+                    let opacity = 1;
+                    if (state.isDisabled) {
+                        opacity = 0.5
+                    }
+                    return {
+                        ...provided,
+                        opacity,
+                        transition: 'opacity 300ms',
+                        width: 'calc(100% - 10px)',
+                        color: '#443A4E'
+                    };
+                },
+                option: (provided, state) => {
+                    let background = '#ffffff';
+                    let color = '#443A4E';
+                    let opacity = 1;
+
+                    if (state.isSelected) {
+                        background = '#6c5fc7';
+                        color = '#ffffff';
+                    }
+                    if (state.isDisabled) {
+                        opacity = 0.5
+                    }
+                    return ({
+                        ...provided,
+                        cursor: !state.isDisabled ? 'pointer' : 'auto',
+                        background,
+                        color,
+                        opacity,
+                        transition: 'opacity 300ms',
+                        userSelect: state.isDisabled ? 'none' : 'auto',
+                        height: 'auto',
+                        ':hover': {
+                            fontWeight: !state.isDisabled && 600,
+                            background: !state.isSelected && !state.isDisabled && '#f7f8f9'
+                        }
+                    })
+                },
             }}
-            formatOptionLabel={({ name, id, crashed }) => (
-                <Box alignContent='center' justifyContent='space-between'>
-                    <Box>
+            formatOptionLabel={({ id, name, crashed }) => (
+                <StyledFormatOptionLabelContainer alignItems='center' justifyContent='space-between'>
+                    <Box alignItems='center'>
                         {id && (
-                            <span>
-                                {`#${id}`}
-                            </span >
+                            <StyledBadge text={id} />
                         )}
-                        {name}
+                        <Box flexDirection='column'>
+                            {name}
+                            {crashed && (
+                                <div>crashed with X</div>
+                            )
+                        </Box>
                     </Box>
                     {crashed && (
-                        <InlineSvg src="icon-siren" />
+                        <StyledInlineSvg src="icon-siren" />
                     )}
-                </Box>
+                </StyledFormatOptionLabelContainer>
             )}
-            options={threads}
+            options={
+                threads.map(thread => {
+                    const name = getThreadLabel(thread, event)
+                    return ({
+                        ...thread,
+                        name,
+                        value: thread.id,
+                        isDisabled: name === 'unknown'
+                    })
+                })
+            }
+            components={{ SingleValue }}
             isClearable
             isSearchable
         />
@@ -72,65 +148,3 @@ const ThreadsSelector: React.FC<Props> = ({ className, threads }) => {
 }
 
 export default ThreadsSelector
-
-// function getThreadTitle(thread, event, simplified) {
-//     const stacktrace = findThreadStacktrace(thread, event, false);
-//     const bits = ['Thread'];
-//     if (defined(thread.name)) {
-//       bits.push(` "${thread.name}"`);
-//     }
-//     if (defined(thread.id)) {
-//       bits.push(' #' + thread.id);
-//     }
-
-//     if (!simplified) {
-//       if (stacktrace) {
-//         const frame = findRelevantFrame(stacktrace);
-//         bits.push(' — ');
-//         bits.push(
-//           <em key="location">
-//             {frame.filename
-//               ? trimFilename(frame.filename)
-//               : frame.package
-//                 ? trimPackage(frame.package)
-//                 : frame.module
-//                   ? frame.module
-//                   : '<unknown>'}
-//           </em>
-//         );
-//       }
-
-//       if (thread.crashed) {
-//         const exc = findThreadException(thread, event);
-//         bits.push(' — ');
-//         bits.push(
-//           <small key="crashed">
-//             {exc ? `(crashed with ${exc.values[0].type})` : '(crashed)'}
-//           </small>
-//         );
-//       }
-//     }
-
-//     return bits;
-//   }
-
-// const threadSelector = (
-//     <div className="pull-left btn-group">
-//       <DropdownLink
-//         btnGroup
-//         caret
-//         className="btn btn-default btn-sm"
-//         title={getThreadTitle(activeThread, this.props.event, true)}
-//       >
-//         {threads.map((thread, idx) => {
-//           return (
-//             <MenuItem key={idx} noAnchor>
-//               <a onClick={this.onSelectNewThread.bind(this, thread)}>
-//                 {getThreadTitle(thread, this.props.event, false)}
-//               </a>
-//             </MenuItem>
-//           );
-//         })}
-//       </DropdownLink>
-//     </div>
-//   );
