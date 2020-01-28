@@ -95,11 +95,10 @@ class OrganizationIntegrations extends AsyncComponent<
 
   getEndpoints(): ([string, string, any] | [string, string])[] {
     const {orgId} = this.props.params;
-    const query = {plugins: ['vsts', 'github', 'bitbucket']};
     const baseEndpoints: ([string, string, any] | [string, string])[] = [
       ['config', `/organizations/${orgId}/config/integrations/`],
       ['integrations', `/organizations/${orgId}/integrations/`],
-      ['plugins', `/organizations/${orgId}/plugins/`, {query}],
+      ['plugins', `/organizations/${orgId}/plugins/configs/`],
       ['orgOwnedApps', `/organizations/${orgId}/sentry-apps/`],
       ['publishedApps', '/sentry-apps/', {query: {status: 'published'}}],
       ['appInstalls', `/organizations/${orgId}/sentry-app-installations/`],
