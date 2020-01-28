@@ -11,15 +11,31 @@ import {
   getStorybook,
   addDecorator,
 } from '@storybook/react';
+import {addons} from '@storybook/addons';
 import {withInfo} from '@storybook/addon-info';
 import {setOptions} from '@storybook/addon-options';
 
-import theme from '../src/sentry/static/sentry/app/utils/theme';
-import '../docs-ui/index.js';
+import sentryTheme from '../../src/sentry/static/sentry/app/utils/theme';
+import '../index';
 
-const withTheme = storyFn => <ThemeProvider theme={theme}>{storyFn()}</ThemeProvider>;
+// const withTheme = storyFn => <ThemeProvider theme={sentryTheme}>{storyFn()}</ThemeProvider>;
 
-addDecorator(withTheme);
+// addDecorator(withTheme);
+
+// const theme = create({
+// base: 'dark',
+// brandTitle: 'Sentry Styleguide',
+// brandUrl: '#',
+// ...sentryTheme,
+// // To control appearance:
+// // brandImage: 'http://url.of/some.svg',
+// });
+
+// addons.setConfig({
+// showRoots: true,
+// panelPosition: 'bottom',
+// theme,
+// });
 
 // Option defaults:
 addParameters({
