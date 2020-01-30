@@ -27,7 +27,7 @@ class OrganizationPluginsConfigsEndpoint(OrganizationEndpoint):
             try:
                 desired_plugins.append(plugins.get(slug))
             except KeyError:
-                return self.response({"detail": "Plugin %s not found" % slug}, status=404)
+                return self.respond({"detail": "Plugin %s not found" % slug}, status=404)
 
         # if no plugins were specified, grab all plugins but limit by those that have the ability to be configured
         if not desired_plugins:
@@ -95,4 +95,4 @@ class OrganizationPluginsConfigsEndpoint(OrganizationEndpoint):
             )
             serialized_plugins.append(serialized_plugin)
 
-        return self.response(serialized_plugins)
+        return self.respond(serialized_plugins)
