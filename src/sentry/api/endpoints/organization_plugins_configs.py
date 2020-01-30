@@ -1,12 +1,9 @@
 from __future__ import absolute_import
 
-from rest_framework.response import Response
-import six
-
 from sentry.plugins.base import plugins
 from sentry.api.bases.organization import OrganizationEndpoint
 from sentry.api.serializers import serialize
-from sentry.api.serializers.models.plugin import PluginSerializer
+from sentry.api.serializers.models.organization_plugin import OrganizationPluginConfigSerializer
 from sentry.models import ProjectOption, Project
 
 
@@ -30,7 +27,7 @@ class OrganizationPluginsConfigsEndpoint(OrganizationEndpoint):
             try:
                 desired_plugins.append(plugins.get(slug))
             except KeyError:
-                return Response({"detail": "Plugin %s not found" % slug}, status=404)
+                return self.response({"detail": "Plugin %s not found" % slug}, status=404)
 
         # if no plugins were specified, grab all plugins but limit by those that have the ability to be configured
         if not desired_plugins:
@@ -89,29 +86,13 @@ class OrganizationPluginsConfigsEndpoint(OrganizationEndpoint):
         # iterate through the desired plugins and serialize them
         serialized_plugins = []
         for plugin in desired_plugins:
-            serialized_plugin = serialize(plugin, request.user, PluginSerializer())
-
-            serialized_plugin["projectList"] = []
-
             info_by_project = info_by_plugin_project.get(plugin.slug, {})
 
-            # iterate through the projects
-            for project_id, plugin_info in six.iteritems(info_by_project):
-                project = project_map[project_id]
-
-                # only include plugins which are configured
-                if not plugin_info["configured"]:
-                    continue
-
-                serialized_plugin["projectList"].append(
-                    {
-                        "projectId": project.id,
-                        "projectSlug": project.slug,
-                        "projectName": project.name,  # TODO(steve): do we need?
-                        "enabled": plugin_info["enabled"],
-                        "configured": plugin_info["configured"],  # TODO(steve): do we need?
-                    }
-                )
+            serialized_plugin = serialize(
+                plugin,
+                request.user,
+                OrganizationPluginConfigSerializer(info_by_project, project_map),
+            )
             serialized_plugins.append(serialized_plugin)
 
-        return Response(serialized_plugins)
+        return self.response(serialized_plugins)
