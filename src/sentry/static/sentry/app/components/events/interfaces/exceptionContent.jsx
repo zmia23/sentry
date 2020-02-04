@@ -22,9 +22,13 @@ class ExceptionContent extends React.Component {
     const children = values.map((exc, excIdx) => {
       return (
         <div key={excIdx} className="exception">
-          <h5 className="break-word" style={{marginBottom: 5}}>
-            <span>{exc.type}</span>
-          </h5>
+          <Annotated object={exc} prop="type" required>
+            {value => (
+              <h5 className="break-word" style={{marginBottom: 5}}>
+                {value}
+              </h5>
+            )}
+          </Annotated>
 
           <Annotated object={exc} prop="value" required>
             {value => (

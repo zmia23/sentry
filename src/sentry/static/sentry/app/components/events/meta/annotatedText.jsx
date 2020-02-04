@@ -103,12 +103,14 @@ function renderErrors(errors) {
     return null;
   }
 
+  console.log('errors', errors);
+
   const tooltip = (
-    <div style={{'text-align': 'left'}}>
+    <div style={{textAlign: 'left'}}>
       <strong>{tn('Processing Error:', 'Processing Errors:', errors.length)}</strong>
       <ul>
         {errors.map(e => (
-          <li key={e}>{e}</li>
+          <li key={e[0]}>{e[1].reason}</li>
         ))}
       </ul>
     </div>

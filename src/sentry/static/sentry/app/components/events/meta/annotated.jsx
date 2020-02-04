@@ -9,6 +9,7 @@ import MetaData from 'app/components/events/meta/metaData';
  * there is meta data
  */
 function Annotated({children, object, prop, required, ...other}) {
+  console.log('object', object, 'prop', prop);
   return (
     <MetaData object={object} prop={prop} required={required}>
       {(value, meta) => {

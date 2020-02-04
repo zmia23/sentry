@@ -74,5 +74,7 @@ export function getMeta(obj, prop) {
     return null;
   }
 
+  // console.log('obj', obj, 'obj[GET_META](prop)', obj[GET_META](prop), 'prop', prop);
+
   return obj[GET_META](prop);
 }
