@@ -3,10 +3,12 @@ import React from 'react';
 
 import UserAvatar from 'app/components/avatar/userAvatar';
 import DeviceName from 'app/components/deviceName';
+import Annotated from 'app/components/events/meta/annotated';
 import {removeFilterMaskedEntries} from 'app/components/events/interfaces/utils';
 import SentryTypes from 'app/sentryTypes';
 import {t} from 'app/locale';
 import {objectIsEmpty} from 'app/utils';
+import space from 'app/styles/space';
 
 const generateClassName = function(name) {
   return name
@@ -50,9 +52,20 @@ class GenericSummary extends React.Component {
     return (
       <div className={`context-item ${className}`}>
         <span className="context-item-icon" />
-        <h3>{data.name}</h3>
+        <h3>
+          <Annotated object={data} prop="name">
+            {value => value}
+          </Annotated>
+        </h3>
         <p>
-          <strong>{t('Version:')}</strong> {data.version || t('Unknown')}
+          <strong style={{marginRight: space(0.25)}}>{t('Version:')}</strong>
+          {data.version ? (
+            <Annotated object={data} prop="version">
+              {value => value}
+            </Annotated>
+          ) : (
+            t('Unknown')
+          )}
         </p>
       </div>
     );
@@ -77,19 +90,26 @@ export class OsSummary extends React.Component {
     if (data.version) {
       versionElement = (
         <p>
-          <strong>{t('Version:')}</strong> {data.version}
+          <strong style={{marginRight: space(0.25)}}>{t('Version:')}</strong>
+          <Annotated object={data} prop="version">
+            {value => value}
+          </Annotated>
         </p>
       );
     } else if (data.kernel_version) {
       versionElement = (
         <p>
-          <strong>{t('Kernel:')}</strong> {data.kernel_version}
+          <strong style={{marginRight: space(0.25)}}>{t('Kernel:')}</strong>
+          <Annotated object={data} prop="kernel_version">
+            {value => value}
+          </Annotated>
         </p>
       );
     } else {
       versionElement = (
         <p>
-          <strong>{t('Version:')}</strong> {t('Unknown')}
+          <strong style={{marginRight: space(0.25)}}>{t('Version:')}</strong>
+          {t('Unknown')}
         </p>
       );
     }
@@ -97,7 +117,11 @@ export class OsSummary extends React.Component {
     return (
       <div className={`context-item ${className}`}>
         <span className="context-item-icon" />
-        <h3>{data.name}</h3>
+        <h3>
+          <Annotated object={data} prop="name">
+            {value => value}
+          </Annotated>
+        </h3>
         {versionElement}
       </div>
     );
@@ -109,6 +133,38 @@ export class UserSummary extends React.Component {
     data: PropTypes.object.isRequired,
   };
 
+  getUserTitle(user) {
+    if (user.email) {
+      return {
+        key: 'email',
+        value: user.email,
+      };
+    }
+
+    if (user.ip_address) {
+      return {
+        key: 'ip_address',
+        value: user.ip_address,
+      };
+    }
+
+    if (user.id) {
+      return {
+        key: 'id',
+        value: user.id,
+      };
+    }
+
+    if (user.username) {
+      return {
+        key: 'username',
+        value: user.username,
+      };
+    }
+
+    return undefined;
+  }
+
   render() {
     const user = removeFilterMaskedEntries(this.props.data);
 
@@ -116,9 +172,7 @@ export class UserSummary extends React.Component {
       return <NoSummary title={t('Unknown User')} />;
     }
 
-    const userTitle = user.email
-      ? user.email
-      : user.ip_address || user.id || user.username;
+    const userTitle = this.getUserTitle(user);
 
     if (!userTitle) {
       return <NoSummary title={t('Unknown User')} />;
@@ -136,14 +190,18 @@ export class UserSummary extends React.Component {
         ) : (
           <span className="context-item-icon" />
         )}
-        <h3 data-test-id="user-title">{userTitle}</h3>
-        {user.id && user.id !== userTitle ? (
+        <h3 data-test-id="user-title">
+          <Annotated object={this.props.data} prop={userTitle.key}>
+            {value => value}
+          </Annotated>
+        </h3>
+        {user.id && user.id !== userTitle.value ? (
           <p>
             <strong>{t('ID:')}</strong> {user.id}
           </p>
         ) : (
           user.username &&
-          user.username !== userTitle && (
+          user.username !== userTitle.value && (
             <p>
               <strong>{t('Username:')}</strong> {user.username}
             </p>
@@ -174,13 +232,19 @@ class DeviceSummary extends React.Component {
     if (data.arch) {
       subTitle = (
         <p>
-          <strong>{t('Arch:')}</strong> {data.arch}
+          <strong style={{marginRight: space(0.25)}}>{t('Arch:')}</strong>
+          <Annotated object={data} prop="arch">
+            {value => value}
+          </Annotated>
         </p>
       );
     } else if (data.model_id) {
       subTitle = (
         <p>
-          <strong>{t('Model:')}</strong> {data.model_id}
+          <strong style={{marginRight: space(0.25)}}>{t('Model:')}</strong>
+          <Annotated object={data} prop="model_id">
+            {value => value}
+          </Annotated>
         </p>
       );
     }
@@ -189,7 +253,15 @@ class DeviceSummary extends React.Component {
       <div className={`context-item ${className}`}>
         <span className="context-item-icon" />
         <h3>
-          {data.model ? <DeviceName>{data.model}</DeviceName> : t('Unknown Device')}
+          {data.model ? (
+            <DeviceName>
+              <Annotated object={data} prop="model">
+                {value => value}
+              </Annotated>
+            </DeviceName>
+          ) : (
+            t('Unknown Device')
+          )}
         </h3>
         {subTitle}
       </div>
@@ -216,7 +288,10 @@ export class GpuSummary extends React.Component {
       className = generateClassName(data.vendor_name);
       versionElement = (
         <p>
-          <strong>{t('Vendor:')}</strong> {data.vendor_name}
+          <strong>{t('Vendor:')}</strong>
+          <Annotated object={data} prop="vendor_name">
+            {value => value}
+          </Annotated>
         </p>
       );
     } else {
@@ -230,7 +305,11 @@ export class GpuSummary extends React.Component {
     return (
       <div className={`context-item ${className}`}>
         <span className="context-item-icon" />
-        <h3>{data.name}</h3>
+        <h3>
+          <Annotated object={data} prop="name">
+            {value => value}
+          </Annotated>
+        </h3>
         {versionElement}
       </div>
     );

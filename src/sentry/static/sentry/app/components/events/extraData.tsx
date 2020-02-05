@@ -35,8 +35,6 @@ class EventExtraData extends React.Component<Props, State> {
   };
 
   render() {
-    const extraDataArray = Object.entries(this.props.event.context || {});
-
     return (
       <div className="extra-data">
         <EventDataSection
@@ -46,7 +44,13 @@ class EventExtraData extends React.Component<Props, State> {
           raw={this.state.raw}
         >
           <ErrorBoundary mini>
-            <KeyValueList data={extraDataArray} isContextData raw={this.state.raw} />
+            <KeyValueList
+              completeData={this.props.event}
+              data={this.props.event.context || {}}
+              dataKey="context"
+              isContextData
+              raw={this.state.raw}
+            />
           </ErrorBoundary>
         </EventDataSection>
       </div>

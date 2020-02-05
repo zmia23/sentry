@@ -23,6 +23,7 @@ class EventOrGroupTitle extends React.Component {
   };
 
   render() {
+    console.log('this.props.data', this.props.data);
     const {title, subtitle} = getTitle(this.props.data);
     if (subtitle) {
       return (

@@ -42,12 +42,14 @@ class ContextBlock extends React.Component {
       data = data.concat(sortBy(extraData, (key, value) => key));
     }
 
+    this.props.data.data = data;
+
     return (
       <div className={className}>
         <ErrorBoundary mini>
           <KeyValueList
-            data={data}
             completeData={this.props.data}
+            data={data}
             isSorted={false}
             isContextData
           />

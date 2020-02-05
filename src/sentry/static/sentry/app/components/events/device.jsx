@@ -12,6 +12,7 @@ class DeviceInterface extends React.Component {
   };
 
   render() {
+    console.log('AQUIUIUIUIUIUIU');
     const {event} = this.props;
     const data = event.device;
     const extras = Object.keys(data.data || {}).map(key => {

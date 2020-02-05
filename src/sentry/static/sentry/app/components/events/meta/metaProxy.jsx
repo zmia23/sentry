@@ -53,6 +53,10 @@ export class MetaProxy {
     // Do we need to check for annotated inside of objects?
     return new Proxy(value, new MetaProxy(this._meta, this.local && this.local[prop]));
   }
+
+  ownKeys(obj) {
+    return Reflect.ownKeys(obj);
+  }
 }
 
 export function withMeta(event) {

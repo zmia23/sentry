@@ -22,11 +22,9 @@ class EventPackageData extends React.Component<Props> {
   }
 
   render() {
-    const {event} = this.props;
     let longKeys: boolean, title: string;
-    const packages = Object.entries(event.packages || {});
 
-    switch (event.platform) {
+    switch (this.props.event.platform) {
       case 'csharp':
         longKeys = true;
         title = t('Assemblies');
@@ -36,11 +34,16 @@ class EventPackageData extends React.Component<Props> {
         title = t('Packages');
     }
 
+    console.log('title', title);
     return (
       <EventDataSection type="packages" title={title}>
         <ClippedBox>
           <ErrorBoundary mini>
-            <KeyValueList data={packages} longKeys={longKeys} />
+            <KeyValueList
+              completeData={this.props.event}
+              data={this.props.event.packages || {}}
+              longKeys={longKeys}
+            />
           </ErrorBoundary>
         </ClippedBox>
       </EventDataSection>
