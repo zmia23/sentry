@@ -1327,7 +1327,7 @@ function routes() {
             path="/organizations/:orgId/issues/:groupId/tags/:tagKey/"
             componentPromise={() =>
               import(
-                /* webpackChunkName: "OrganizationGroupTagsValues" */ 'app/views/organizationGroupDetails/groupTagValues'
+                /* webpackChunkName: "OrganizationGroupTagsValues" */ 'app/views/organizationGroupDetails/groupTagValuesTEMP'
               )
             }
             component={errorHandler(LazyLoad)}
