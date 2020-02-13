@@ -136,7 +136,7 @@ class DataDownload extends AsyncView<Props, State> {
 const ContentContainer = styled('div')`
   text-align: center;
   margin: ${space(4)} auto;
-  width: 300px;
+  width: 350px;
   padding: ${space(4)};
   background: ${p => p.theme.whiteDark};
   border-radius: ${p => p.theme.borderRadius};

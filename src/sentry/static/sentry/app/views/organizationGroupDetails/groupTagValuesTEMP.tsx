@@ -12,6 +12,7 @@ import ExternalLink from 'app/components/links/externalLink';
 import GlobalSelectionLink from 'app/components/globalSelectionLink';
 import Pagination from 'app/components/pagination';
 import TimeSince from 'app/components/timeSince';
+import DataExport from 'app/components/dataExport';
 import {Group, Tag, TagValue} from 'app/types';
 
 type RouteParams = {
@@ -117,8 +118,18 @@ class GroupTagValues extends AsyncComponent<
             className="btn btn-default btn-sm"
             style={{marginLeft: 10}}
           >
-            {t('Export to CSV')}
+            {t('Export Page to CSV')}
           </a>
+          <DataExport
+            payload={{
+              query_type: 2,
+              query_info: {
+                project_id: group.project.id,
+                group_id: group.id,
+                key: this.props.params.tagKey,
+              },
+            }}
+          />
         </h3>
         <table className="table table-striped">
           <thead>
