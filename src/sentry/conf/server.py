@@ -797,11 +797,11 @@ SENTRY_FEATURES = {
     # is not enabled).
     "organizations:create": True,
     # Enable the 'data-export' interface.
-    "organizations:data-export": True,
+    "organizations:data-export": False,
     # Enable the 'discover' interface.
     "organizations:discover": False,
     # Enable attaching arbitrary files to events.
-    "organizations:event-attachments": True,
+    "organizations:event-attachments": False,
     # Allow organizations to configure built-in symbol sources.
     "organizations:symbol-sources": True,
     # Allow organizations to configure custom external symbol sources.
