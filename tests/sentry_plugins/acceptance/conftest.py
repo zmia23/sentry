@@ -5,16 +5,7 @@ import json
 import subprocess
 import time
 
-# note(joshuarli): if i'm correct about .webpack.meta always being written in git root, then this lets you run pytest from anywhere
-# also this helps call vendored yarn
-
-def gitroot(start=os.getcwd()):
-    gitroot, root = start, "/"
-    while not os.path.isdir(os.path.join(gitroot, ".git")):
-        gitroot = os.path.abspath(os.path.join(gitroot, os.pardir))
-        if gitroot == root:
-            raise RuntimeError("failed to locate a git root directory")
-    return gitroot
+# TODO(joshuarli): .webpack.meta doesn't seem to be written anywhere, but works for sentry acceptance
 
 
 def pytest_configure(config):
@@ -31,10 +22,8 @@ def pytest_configure(config):
     if os.environ.get("CI") or os.environ.get("SKIP_ACCEPTANCE_UI_BUILD"):
         return
 
-    fp = os.path.join(gitroot(), ".webpack.meta")
-
     try:
-        with open(fp) as f:
+        with open("./.webpack.meta") as f:
             data = json.load(f)
 
             # If built within last hour, do not build again
@@ -46,11 +35,11 @@ def pytest_configure(config):
 ###################
 #
 # Frontend assets last built {} seconds ago, skipping rebuilds for another {} seconds.
-# Delete the file: `{}` to rebuild.
+# Delete the file: `.webpack.meta` to rebuild.
 #
 ###################
                 """.format(
-                        last_built, 3600 - last_built, fp
+                        last_built, 3600 - last_built
                     )
                 )
                 return
@@ -70,7 +59,7 @@ def pytest_configure(config):
     )
 
     subprocess.call(
-        [os.path.join(fp, "bin", "yarn"), "webpack"],
+        ["yarn", "webpack"],
         env={
             "NODE_ENV": "development",
             "PATH": os.environ["PATH"],
