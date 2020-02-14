@@ -1,108 +1,87 @@
 import moment from 'moment';
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled from '@emotion/styled';
 import {css, keyframes} from '@emotion/core';
-import * as Sentry from '@sentry/browser';
+import * as ReactRouter from 'react-router';
 
 import {t, tct} from 'app/locale';
 import {trackAnalyticsEvent} from 'app/utils/analytics';
-import SentryTypes from 'app/sentryTypes';
 import withOrganization from 'app/utils/withOrganization';
 import Confirmation from 'app/components/onboardingWizard/confirmation';
 import InlineSvg from 'app/components/inlineSvg';
 import Button from 'app/components/button';
 import space from 'app/styles/space';
+import ExternalLink from 'app/components/links/externalLink';
+import {OnboardingTask, Organization} from 'app/types';
+import {navigateTo} from 'app/actionCreators/navigation';
 
-class TodoItem extends React.Component {
-  static propTypes = {
-    task: PropTypes.object.isRequired,
-    onSkip: PropTypes.func.isRequired,
-    organization: SentryTypes.Organization,
-  };
+type Props = ReactRouter.WithRouterProps & {
+  task: OnboardingTask;
+  onSkip: (taskKey: number) => void;
+  organization: Organization;
+};
 
-  state = {
+type State = {
+  showConfirmation: boolean;
+};
+
+class TodoItem extends React.Component<Props, State> {
+  state: State = {
     showConfirmation: false,
-    isExpanded: false,
   };
 
-  toggleDescription = () => {
-    this.setState({isExpanded: !this.state.isExpanded});
-  };
-
-  toggleConfirmation = () => {
+  toggleConfirmation = (e: React.MouseEvent) => {
     this.setState({showConfirmation: !this.state.showConfirmation});
+    e.preventDefault();
   };
 
-  formatDescription() {
+  get formattedDescription() {
     const {task} = this.props;
-    const {isExpanded, showConfirmation} = this.state;
-
-    return (
-      <React.Fragment>
-        {task.description}
-        {(isExpanded || showConfirmation) && '. ' + task.detailedDescription}
-      </React.Fragment>
-    );
+    return `${task.description}. ${task.detailedDescription}`;
   }
 
-  learnMoreUrlCreator() {
-    const org = this.props.organization;
-    const {task} = this.props;
-    let learnMoreUrl;
-    if (task.featureLocation === 'project') {
-      learnMoreUrl = `/organizations/${org.slug}/projects/choose/?onboarding=1&task=${task.task}`;
-    } else if (task.featureLocation === 'organization') {
-      learnMoreUrl = `/organizations/${org.slug}/${task.location}`;
-    } else if (task.featureLocation === 'absolute') {
-      learnMoreUrl = task.location;
-    } else if (task.featureLocation === 'modal') {
-      learnMoreUrl = undefined;
-    } else {
-      Sentry.withScope(scope => {
-        scope.setExtra('props', this.props);
-        scope.setExtra('state', this.state);
-        Sentry.captureMessage('No learnMoreUrl created for this featureLocation');
-      });
-    }
-    return learnMoreUrl;
-  }
-
-  recordAnalytics(action) {
+  recordAnalytics(action: string) {
     const {organization, task} = this.props;
     trackAnalyticsEvent({
       eventKey: 'onboarding.wizard_clicked',
       eventName: 'Onboarding Wizard Clicked',
       organization_id: organization.id,
-      todo_id: parseInt(task.task, 10),
+      todo_id: task.task,
       todo_title: task.title,
       action,
     });
   }
 
-  onSkip = task => {
+  onSkip = (taskKey: number) => {
     this.recordAnalytics('skipped');
-    this.props.onSkip(task);
+    this.props.onSkip(taskKey);
     this.setState({showConfirmation: false});
   };
 
-  handleClick = e => {
-    const {task} = this.props;
-
-    if (task && task.featureLocation === 'modal' && typeof task.location === 'function') {
-      task.location();
-    }
+  handleClick = (e: React.MouseEvent) => {
+    const {task, router} = this.props;
 
     this.recordAnalytics('clickthrough');
     e.stopPropagation();
+
+    if (task.actionType === 'external') {
+      return;
+    }
+
+    if (task.actionType === 'action') {
+      task.action();
+    }
+
+    if (task.actionType === 'app') {
+      navigateTo(task.location, router);
+    }
   };
 
   render() {
     const {task} = this.props;
-    const {showConfirmation, isExpanded} = this.state;
-    const learnMoreUrl = this.learnMoreUrlCreator();
-    let description;
+    const {showConfirmation} = this.state;
 
+    let description: React.ReactNode;
     switch (task.status) {
       case 'complete':
         description = tct('[user] completed [dateCompleted]', {
@@ -123,39 +102,39 @@ class TodoItem extends React.Component {
         });
         break;
       default:
-        description = this.formatDescription();
+        description = this.formattedDescription;
     }
 
     const showSkipButton =
       task.skippable &&
       task.status !== 'skipped' &&
       task.status !== 'complete' &&
-      isExpanded &&
       !showConfirmation;
 
+    const Action = (p: React.HTMLAttributes<HTMLElement>) =>
+      task.actionType === 'external' ? (
+        <ActionExternalLink href={task.location} {...p} />
+      ) : (
+        <ActionTarget {...p} />
+      );
+
     return (
-      <Item
-        status={task.status}
-        onMouseOver={this.toggleDescription}
-        onMouseOut={this.toggleDescription}
-      >
+      <Item status={task.status}>
         <Content blur={showConfirmation}>
-          <Checkbox>{task.status && <IndicatorIcon status={task.status} />}</Checkbox>
-          <StyledLink
-            href={learnMoreUrl}
-            onClick={this.handleClick}
-            data-test-id={task.task}
-          >
+          <Action onClick={this.handleClick} data-test-id={task.task}>
+            <Checkbox status={task.status}>
+              {task.status && <IndicatorIcon status={task.status} />}
+            </Checkbox>
             <ItemHeader status={task.status}>{task.title}</ItemHeader>
-          </StyledLink>
-          <Description>{description}</Description>
-          <SkipButton
-            size="xsmall"
-            hide={!showSkipButton}
-            onClick={this.toggleConfirmation}
-          >
-            {t('Skip task')}
-          </SkipButton>
+            <Description>{description}</Description>
+            <SkipButton
+              size="xsmall"
+              hide={!showSkipButton}
+              onClick={this.toggleConfirmation}
+            >
+              {t('Skip task')}
+            </SkipButton>
+          </Action>
         </Content>
         <Confirmation
           task={task.task}
@@ -177,12 +156,12 @@ export const animateStripes = keyframes`
   }
 `;
 
-const Item = styled('li')`
+const Item = styled('li')<{status: OnboardingTask['status']}>`
   position: relative;
   padding: 15px 20px 15px 75px;
   line-height: 1.2;
   border-bottom: 1px solid ${p => p.theme.borderLight};
-  background: #fff;
+  background: ${p => p.theme.white};
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   font-size: 14px;
 
@@ -204,20 +183,9 @@ const Item = styled('li')`
     `}
 `;
 
-const Content = styled('div')`
+const Content = styled('div')<{blur: boolean}>`
   position: relative;
   filter: ${p => p.blur && 'blur(3px)'};
-`;
-
-const Checkbox = styled('div')`
-  height: 44px;
-  width: 44px;
-  background: #fff;
-  border: 3px solid ${p => p.theme.borderDark};
-  border-radius: 46px;
-  position: absolute;
-  top: -5px;
-  left: -58px;
 `;
 
 const indicatorStyles = {
@@ -225,6 +193,17 @@ const indicatorStyles = {
   pending: ['icon-ellipsis', 'borderDark'],
   complete: ['icon-checkmark-sm', 'green'],
 };
+
+const Checkbox = styled('div')<{status: OnboardingTask['status']}>`
+  height: 44px;
+  width: 44px;
+  background: ${p => p.theme.white};
+  border: 3px solid ${p => p.theme[indicatorStyles[p.status || 'pending'][1]]};
+  border-radius: 46px;
+  position: absolute;
+  top: -5px;
+  left: -58px;
+`;
 
 const IndicatorIcon = styled(({status, ...props}) => (
   <InlineSvg {...props} src={indicatorStyles[status][0]} />
@@ -238,18 +217,21 @@ const IndicatorIcon = styled(({status, ...props}) => (
 
 const Description = styled('p')`
   margin: 0px;
-  line-height: 1.25em;
+  line-height: 1.5;
+  font-size: ${p => p.theme.fontSizeSmall};
+  color: ${p => p.theme.gray3};
 `;
 
-const StyledLink = styled('a')`
-  color: ${p => p.theme.blue};
-  &:hover {
-    color: ${p => p.theme.blueDark};
-    text-decoration: underline;
-  }
+const ActionExternalLink = styled(ExternalLink)`
+  display: block;
 `;
 
-const ItemHeader = styled('h4')`
+const ActionTarget = styled('div')`
+  cursor: pointer;
+`;
+
+const ItemHeader = styled('h4')<{status: OnboardingTask['status']}>`
+  color: ${p => p.theme.foreground};
   font-size: 16px;
   margin-bottom: 5px;
 
@@ -261,9 +243,16 @@ const ItemHeader = styled('h4')`
     `}
 `;
 
-const SkipButton = styled(Button)`
+const SkipButton = styled(Button)<{hide: boolean}>`
   display: ${p => p.hide && 'none'};
   margin-top: ${space(1.5)};
 `;
 
-export default withOrganization(TodoItem);
+// XXX(epurkhiser): The withRouter HoC has incorrect typings. It does not
+// correctly remove the WithRouterProps from the return type of the HoC, thus
+// we manually have to do this.
+type PropsWithoutRouter = Omit<Props, keyof ReactRouter.WithRouterProps>;
+
+export default withOrganization(
+  ReactRouter.withRouter(TodoItem) as React.ComponentClass<PropsWithoutRouter>
+);
