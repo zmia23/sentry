@@ -17,7 +17,7 @@ import withGlobalSelection from 'app/utils/withGlobalSelection';
 import withOrganization from 'app/utils/withOrganization';
 import {PageContent, PageHeader} from 'app/styles/organization';
 
-import SearchBar from './searchBar';
+import SearchBar from './billyOldNewSearchBar';
 
 class EventsContainer extends React.Component {
   static propTypes = {

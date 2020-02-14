@@ -1,7 +1,9 @@
+import classnames from 'classnames';
 import {debounce, flatten, memoize} from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled, {css, cx} from 'react-emotion';
+import styled from '@emotion/styled';
+import {ClassNames} from '@emotion/core';
 
 import {NEGATION_OPERATOR, SEARCH_WILDCARD} from 'app/constants';
 import {addErrorMessage} from 'app/actionCreators/indicator';
@@ -132,55 +134,59 @@ class FieldKeyInput extends React.Component {
 
   render() {
     return (
-      <div style={{position: 'relative'}}>
-        <div style={{opacity: 0, padding: '0 8px', whiteSpace: 'nowrap'}}>
-          {this.props.value || 'Placeholder text'}
-        </div>
-        <DropdownAutoCompleteMenu
-          shouldSelectWithTab={true}
-          defaultHighlightedIndex={-1}
-          busy={this.state.busy}
-          items={this.state.searchItems}
-          alignMenu="left"
-          hideInput
-          rootClassName={css`
-            flex: 1;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: -1px;
-          `}
-          blendCorner={true}
-          isOpen={this.state.isOpen}
-          onSelect={this.handleDropdownSelect}
-          onOpen={this.handleDropdownOpen}
-          onClose={this.handleDropdownClose}
-          value={this.props.value}
-        >
-          {renderProps => {
-            const inputProps = renderProps.getInputProps({
-              type: 'text',
-              tabIndex: 1,
-              placeholder: this.props.placeholder,
-              name: 'query',
-              autoComplete: 'off',
-              onActorMount: this.props.onGetRef,
-              onFocus: () => this.handleInputFocus(renderProps.actions.open),
-              onBlur: this.props.onBlur,
-              onKeyDown: this.handleKeyDown,
-              onChange: this.handleQueryChange,
-              disabled: this.props.disabled,
-            });
-            return (
-              <Input
-                {...renderProps.getActorProps({isStyled: true, ...inputProps})}
-                value={this.props.value}
-              />
-            );
-          }}
-        </DropdownAutoCompleteMenu>
-      </div>
+      <ClassNames>
+        {({css}) => (
+          <div style={{position: 'relative'}}>
+            <div style={{opacity: 0, padding: '0 8px', whiteSpace: 'nowrap'}}>
+              {this.props.value || 'Placeholder text'}
+            </div>
+            <DropdownAutoCompleteMenu
+              shouldSelectWithTab={true}
+              defaultHighlightedIndex={-1}
+              busy={this.state.busy}
+              items={this.state.searchItems}
+              alignMenu="left"
+              hideInput
+              rootClassName={css`
+                flex: 1;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: -1px;
+              `}
+              blendCorner={true}
+              isOpen={this.state.isOpen}
+              onSelect={this.handleDropdownSelect}
+              onOpen={this.handleDropdownOpen}
+              onClose={this.handleDropdownClose}
+              value={this.props.value}
+            >
+              {renderProps => {
+                const inputProps = renderProps.getInputProps({
+                  type: 'text',
+                  tabIndex: 1,
+                  placeholder: this.props.placeholder,
+                  name: 'query',
+                  autoComplete: 'off',
+                  onActorMount: this.props.onGetRef,
+                  onFocus: () => this.handleInputFocus(renderProps.actions.open),
+                  onBlur: this.props.onBlur,
+                  onKeyDown: this.handleKeyDown,
+                  onChange: this.handleQueryChange,
+                  disabled: this.props.disabled,
+                });
+                return (
+                  <Input
+                    {...renderProps.getActorProps({isStyled: true, ...inputProps})}
+                    value={this.props.value}
+                  />
+                );
+              }}
+            </DropdownAutoCompleteMenu>
+          </div>
+        )}
+      </ClassNames>
     );
   }
 }
@@ -304,51 +310,55 @@ class FieldValueInput extends React.Component {
 
   render() {
     return (
-      <DropdownAutoCompleteMenu
-        shouldSelectWithTab={true}
-        busy={this.state.busy}
-        items={this.state.searchItems}
-        alignMenu="left"
-        hideInput
-        rootClassName={css`
-          flex: 1;
-          margin-top: -1px;
-          margin-bottom: -1px;
-        `}
-        blendCorner={true}
-        isOpen={this.state.isOpen}
-        defaultHighlightedIndex={-1}
-        onSelect={this.handleDropdownSelect}
-        onOpen={this.handleDropdownOpen}
-        onClose={this.handleDropdownClose}
-        value={this.props.value}
-      >
-        {renderProps => {
-          const inputProps = renderProps.getInputProps({
-            type: 'text',
-            tabIndex: 2,
-            placeholder: this.props.placeholder,
-            name: 'query',
-            autoComplete: 'off',
-            onActorMount: this.props.onGetRef,
-            onFocus: () => this.handleInputFocus(renderProps.actions.open),
-            onBlur: () => {
-              console.log('renderProps value blur');
-              this.props.onBlur();
-            },
-            onKeyUp: this.handleKeyUp,
-            onKeyDown: this.handleKeyDown,
-            onChange: this.handleQueryChange,
-            disabled: this.props.disabled,
-          });
-          return (
-            <Input
-              {...renderProps.getActorProps({isStyled: true, ...inputProps})}
-              value={this.props.value}
-            />
-          );
-        }}
-      </DropdownAutoCompleteMenu>
+      <ClassNames>
+        {({css}) => (
+          <DropdownAutoCompleteMenu
+            shouldSelectWithTab={true}
+            busy={this.state.busy}
+            items={this.state.searchItems}
+            alignMenu="left"
+            hideInput
+            rootClassName={css`
+              flex: 1;
+              margin-top: -1px;
+              margin-bottom: -1px;
+            `}
+            blendCorner={true}
+            isOpen={this.state.isOpen}
+            defaultHighlightedIndex={-1}
+            onSelect={this.handleDropdownSelect}
+            onOpen={this.handleDropdownOpen}
+            onClose={this.handleDropdownClose}
+            value={this.props.value}
+          >
+            {renderProps => {
+              const inputProps = renderProps.getInputProps({
+                type: 'text',
+                tabIndex: 2,
+                placeholder: this.props.placeholder,
+                name: 'query',
+                autoComplete: 'off',
+                onActorMount: this.props.onGetRef,
+                onFocus: () => this.handleInputFocus(renderProps.actions.open),
+                onBlur: () => {
+                  console.log('renderProps value blur');
+                  this.props.onBlur();
+                },
+                onKeyUp: this.handleKeyUp,
+                onKeyDown: this.handleKeyDown,
+                onChange: this.handleQueryChange,
+                disabled: this.props.disabled,
+              });
+              return (
+                <Input
+                  {...renderProps.getActorProps({isStyled: true, ...inputProps})}
+                  value={this.props.value}
+                />
+              );
+            }}
+          </DropdownAutoCompleteMenu>
+        )}
+      </ClassNames>
     );
   }
 }
@@ -566,7 +576,7 @@ class SmartSearchBar extends React.Component {
 
     return (
       <div
-        className={cx(
+        className={classnames(
           {
             disabled,
           },
@@ -683,18 +693,22 @@ class SearchBar extends React.PureComponent {
 
   render() {
     return (
-      <SmartSearchBar
-        key={this.props.query}
-        {...this.props}
-        onGetTagValues={this.getEventFieldValues}
-        prepareQuery={this.prepareQuery}
-        supportedCategories={this.state.tags}
-        excludeEnvironment
-        dropdownClassName={css`
-          max-height: 300px;
-          overflow-y: auto;
-        `}
-      />
+      <ClassNames>
+        {({css}) => (
+          <SmartSearchBar
+            key={this.props.query}
+            {...this.props}
+            onGetTagValues={this.getEventFieldValues}
+            prepareQuery={this.prepareQuery}
+            supportedCategories={this.state.tags}
+            excludeEnvironment
+            dropdownClassName={css`
+              max-height: 300px;
+              overflow-y: auto;
+            `}
+          />
+        )}
+      </ClassNames>
     );
   }
 }
