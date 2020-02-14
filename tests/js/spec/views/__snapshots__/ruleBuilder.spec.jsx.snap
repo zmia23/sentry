@@ -1139,6 +1139,9 @@ exports[`RuleBuilder renders 1`] = `
                             viewBox="0 0 16 16"
                             width="16px"
                           >
+                            <desc>
+                              IconAdd
+                            </desc>
                             <g>
                               <path
                                 d="M11.28,8.75H4.72a.75.75,0,1,1,0-1.5h6.56a.75.75,0,1,1,0,1.5Z"
@@ -1256,6 +1259,9 @@ exports[`RuleBuilder renders with suggestions 1`] = `
                 viewBox="0 0 16 16"
                 width="16px"
               >
+                <desc>
+                  IconAdd
+                </desc>
                 <g>
                   <path
                     d="M11.28,8.75H4.72a.75.75,0,1,1,0-1.5h6.56a.75.75,0,1,1,0,1.5Z"
@@ -1308,6 +1314,9 @@ exports[`RuleBuilder renders with suggestions 1`] = `
                 viewBox="0 0 16 16"
                 width="16px"
               >
+                <desc>
+                  IconAdd
+                </desc>
                 <g>
                   <path
                     d="M11.28,8.75H4.72a.75.75,0,1,1,0-1.5h6.56a.75.75,0,1,1,0,1.5Z"
@@ -1360,6 +1369,9 @@ exports[`RuleBuilder renders with suggestions 1`] = `
                 viewBox="0 0 16 16"
                 width="16px"
               >
+                <desc>
+                  IconAdd
+                </desc>
                 <g>
                   <path
                     d="M11.28,8.75H4.72a.75.75,0,1,1,0-1.5h6.56a.75.75,0,1,1,0,1.5Z"
@@ -1412,6 +1424,9 @@ exports[`RuleBuilder renders with suggestions 1`] = `
                 viewBox="0 0 16 16"
                 width="16px"
               >
+                <desc>
+                  IconAdd
+                </desc>
                 <g>
                   <path
                     d="M11.28,8.75H4.72a.75.75,0,1,1,0-1.5h6.56a.75.75,0,1,1,0,1.5Z"
@@ -3193,6 +3208,9 @@ exports[`RuleBuilder renders with suggestions 1`] = `
                             viewBox="0 0 16 16"
                             width="16px"
                           >
+                            <desc>
+                              IconAdd
+                            </desc>
                             <g>
                               <path
                                 d="M11.28,8.75H4.72a.75.75,0,1,1,0-1.5h6.56a.75.75,0,1,1,0,1.5Z"
